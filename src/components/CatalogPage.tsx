@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PolymerData } from '../types/polymer';
 import { Search, BookOpen, Layers, Plus, Minus, ChevronRight, SlidersHorizontal, ShieldCheck } from 'lucide-react';
+import { SourcedValue } from './SourcedValue';
 
 interface CatalogPageProps {
  polymers: PolymerData[];
@@ -10,18 +11,7 @@ interface CatalogPageProps {
 }
 
 export const CatalogPage: React.FC<CatalogPageProps> = ({ polymers, onSelectPolymer, onOpenResources, initialFamily }) => {
- const formatVal = (v: any) => {
-  if (v?.value === undefined) return v;
-  const text = `${v.value} ${v.unit}`.trim();
-  return v.note ? (
-    <span className="flex flex-col">
-      <span dir="ltr">{text}</span>
-      <span className="!font-sans font-medium text-[11px] sm:text-xs mt-0.5 text-text-secondary whitespace-normal text-right leading-tight" dir="rtl">{v.note}</span>
-    </span>
-  ) : (
-    <span dir="ltr">{text}</span>
-  );
-};
+ const formatVal = (v: any) => <SourcedValue value={v} />;
 
  const [search, setSearch] = useState('');
  const [expandedFamilies, setExpandedFamilies] = useState<string[]>(initialFamily ? [initialFamily] : ['Polyolefins']);

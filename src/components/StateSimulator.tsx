@@ -1,24 +1,14 @@
 import React, { useState } from 'react';
 import { PolymerData } from '../types/polymer';
 import { InfoTooltip } from './InfoTooltip';
+import { SourcedValue } from './SourcedValue';
 
 interface StateSimulatorProps {
  polymer: PolymerData;
 }
 
 export const StateSimulator: React.FC<StateSimulatorProps> = ({ polymer }) => {
- const formatVal = (v: any) => {
-  if (v?.value === undefined) return v;
-  const text = `${v.value} ${v.unit}`.trim();
-  return v.note ? (
-    <span className="flex flex-col">
-      <span dir="ltr">{text}</span>
-      <span className="!font-sans font-medium text-[11px] sm:text-xs mt-0.5 text-text-secondary whitespace-normal text-right leading-tight" dir="rtl">{v.note}</span>
-    </span>
-  ) : (
-    <span dir="ltr">{text}</span>
-  );
-};
+ const formatVal = (v: any) => <SourcedValue value={v} />;
 
  // Dynamically calculate temperature bounds based on polymer's thermal properties
  const tg = polymer.thermal.tgValue;

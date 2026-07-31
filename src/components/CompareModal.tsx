@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PolymerData } from '../types/polymer';
 import { Scale, X } from 'lucide-react';
+import { SourcedValue } from './SourcedValue';
 
 interface CompareModalProps {
  polymers: PolymerData[];
@@ -8,18 +9,7 @@ interface CompareModalProps {
 }
 
 export const CompareModal: React.FC<CompareModalProps> = ({ polymers, onClose }) => {
- const formatVal = (v: any) => {
-  if (v?.value === undefined) return v;
-  const text = `${v.value} ${v.unit}`.trim();
-  return v.note ? (
-    <span className="flex flex-col">
-      <span dir="ltr">{text}</span>
-      <span className="!font-sans font-medium text-[11px] sm:text-xs mt-0.5 text-text-secondary whitespace-normal text-right leading-tight" dir="rtl">{v.note}</span>
-    </span>
-  ) : (
-    <span dir="ltr">{text}</span>
-  );
-};
+ const formatVal = (v: any) => <SourcedValue value={v} />;
 
  const [poly1Id, setPoly1Id] = useState<string>(polymers[0]?.id || 'ldpe');
  const [poly2Id, setPoly2Id] = useState<string>(polymers[1]?.id || 'hdpe');

@@ -5,6 +5,7 @@ import { PolymerData } from './types/polymer';
 import { Navbar } from './components/Navbar';
 import { HeroChainAnimation } from './components/HeroChainAnimation';
 import { ResinBadge } from './components/ResinBadge';
+import { SourcedValue } from './components/SourcedValue';
 const MarketShareChart = React.lazy(() => import('./components/MarketShareChart').then(m => ({ default: m.MarketShareChart })));
 import { StateSimulator } from './components/StateSimulator';
 const StressStrainChart = React.lazy(() => import('./components/StressStrainChart').then(m => ({ default: m.StressStrainChart })));
@@ -46,18 +47,7 @@ import {
  ArrowUp
 } from 'lucide-react';
 
-const formatVal = (v: any) => {
-  if (v?.value === undefined) return v;
-  const text = `${v.value} ${v.unit}`.trim();
-  return v.note ? (
-    <div className="flex flex-col w-full text-right" dir="rtl">
-      <div dir="ltr" className="en-mono font-mono tabular-nums text-left sm:text-right font-black">{text}</div>
-      <div dir="rtl" className="!font-sans font-medium text-xs mt-1 text-text-secondary whitespace-normal text-right leading-relaxed block">{v.note}</div>
-    </div>
-  ) : (
-    <div dir="ltr" className="en-mono font-mono tabular-nums inline-block font-black">{text}</div>
-  );
-};
+const formatVal = (v: any) => <SourcedValue value={v} variant="block" />;
 
 export default function App() {
  // Hash routing helper

@@ -2,24 +2,14 @@ import React, { useState } from 'react';
 import { PolymerData } from '../types/polymer';
 import { Calculator } from 'lucide-react';
 import { InfoTooltip } from './InfoTooltip';
+import { SourcedValue } from './SourcedValue';
 
 interface DPCalculatorProps {
  polymer: PolymerData;
 }
 
 export const DPCalculator: React.FC<DPCalculatorProps> = ({ polymer }) => {
- const formatVal = (v: any) => {
-  if (v?.value === undefined) return v;
-  const text = `${v.value} ${v.unit}`.trim();
-  return v.note ? (
-    <span className="flex flex-col">
-      <span dir="ltr">{text}</span>
-      <span className="!font-sans font-medium text-[11px] sm:text-xs mt-0.5 text-text-secondary whitespace-normal text-right leading-tight" dir="rtl">{v.note}</span>
-    </span>
-  ) : (
-    <span dir="ltr">{text}</span>
-  );
-};
+ const formatVal = (v: any) => <SourcedValue value={v} />;
 
  const [mnInput, setMnInput] = useState<number>(polymer.academic.mnDefaultValue);
  const [pdiInput, setPdiInput] = useState<number>(2.0);
