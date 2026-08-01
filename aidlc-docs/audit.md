@@ -57,3 +57,18 @@
 **Context**: Extension enforcement per aidlc-state.md Extension Configuration.
 
 ---
+
+## Unit U5 — curation-workflow
+**Timestamp**: 2026-08-02T00:00:00Z
+**User Input**: "yes build it, i dont have any datasheets yet. based on aidlc, look up at our workflow until now. also suggest me from where to go weher to find valid data? comercial datasheets, are about products! how should i find something about a general grade( i am saying ldpe only, they usually have 10 different ldpes or more dude!) i belive i need and importer for their datasheets when i talked to them, no concerns now!"
+**AI Response**: "User raised a correct and material objection: manufacturer datasheets describe individual products (a producer offers 10+ LDPE grades), not the generic material class. Recorded in the U5 design as the generic/grade sourcing distinction. Generic `material` ranges must come from handbooks, encyclopedias, textbooks and open-access review articles, which are themselves generalising over the literature; averaging datasheets would produce an arbitrary number reflecting one producer's portfolio rather than the material class. Grade-level datasheet import deferred to U6 per user instruction ('no concerns now'). New unit U5 `curation-workflow` opened: CSV export/import round-trip so a domain expert can perform the citation campaign without SQL."
+**Context**: Inception (requirements + design) for U5. Stage gates adapted per the earlier documented deviation.
+
+---
+
+## U5 Stage Decisions
+**Timestamp**: 2026-08-02T00:00:00Z
+**AI Response**: "Workspace Detection: SKIPPED (established, brownfield, state file current). Reverse Engineering: SKIPPED (artifacts current, no code drift since). Requirements Analysis: MINIMAL depth, folded into the functional design — the requirement is narrow and was stated directly by the user. User Stories: SKIPPED (single-user internal tooling, no multi-persona workflow). Workflow Planning: MINIMAL (one unit, no decomposition). Application Design: SKIPPED (no new service boundary; tooling reuses the existing Python toolchain). Units Generation: U5 defined, U6 `datasheet-import` named and deferred. Construction: Functional Design EXECUTED; NFR Requirements/Design MINIMAL (security extension applies: importer must connect with least privilege and must not weaken the citation locator constraint); Infrastructure Design SKIPPED (no new infrastructure); Code Generation and Build-and-Test to follow."
+**Context**: AI-DLC adaptive stage assessment for U5.
+
+---
