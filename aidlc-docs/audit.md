@@ -23,3 +23,30 @@
 **Context**: Documented deviation from default per-stage approval gating, per user instruction.
 
 ---
+## Construction — U1 database-core
+**Timestamp**: 2026-07-31T20:55:00Z
+**User Input**: "finish what you have been doing. continue from where you left and do not start from scratch"
+**AI Response**: "Resumed after two subagents were terminated by a session limit. Recovered state: migrations 0001-0008 were already applied to the container; seeds 0001-0002 were written but unapplied; ETL core modules existed but emit_sql.py and tests did not. Continued from that point rather than restarting."
+**Context**: Session-limit recovery. No work was redone.
+
+---
+
+## Defect Fixes During Construction
+**Timestamp**: 2026-07-31T20:55:00Z
+**AI Response**: "Fixed six defects found during verification:
+(1) ETL treated text-typed properties (monomerFormula, repeatingUnit, unitCell, mechanism, notes) as numeric because it classified by string content instead of by the registry's declared data_type; the numeric parser raised before the text fallback could run. Declared shape is now authoritative.
+(2) The oracle compared representative shadow scalars (tgValue, tmValue, degradationValue, mnDefaultValue) against range midpoints, reporting six false defects. These are hand-picked slider defaults, not range duplicates; changed to a containment check. Strict equality retained for the genuine duplicates (minDensity/maxDensity, minCrystallinity/maxCrystallinity).
+(3) `source` had no natural unique key, so seed re-runs would silently duplicate bibliography entries. Added UNIQUE (title, COALESCE(edition,'')) - edition is part of the key because different editions have different page numbers, which matters precisely because citations carry page locators.
+(4) db/run.sh blindly re-applied all migrations, failing on the first CREATE TYPE. Now skips versions recorded in schema_migration.
+(5) A verification test referenced v_unsourced_values.material_slug; the view correctly uses subject_slug since it spans materials and grades.
+(6) Subagent-reported spec defects fixed: over-restrictive CHECKs on test_method.standard_body and material_identifier.type, missing audit timestamps on grade/market_share_datum/chemical_resistance, and a missing 0..1 range CHECK on evidence.confidence."
+**Context**: "find issues and fix on go" - all fixes verified against the live database.
+
+---
+
+## Extension Compliance Summary — U1
+**Timestamp**: 2026-07-31T20:55:00Z
+**AI Response**: "Security Baseline (ENABLED): COMPLIANT. No credentials in git (db/.env gitignored, .env.example is the template); least-privilege runtime role polypedia_app cannot run DDL and cannot write schema_migration; RLS enabled and verified against a genuine non-owner role; generated SQL properly escapes Persian text and apostrophes. Resiliency Baseline (DISABLED): skipped per configuration; backup/restore remains an open item for deployment. Property-Based Testing (PARTIAL): applied to the value parser and unit normaliser as scoped; not applied to schema wiring or CRUD."
+**Context**: Extension enforcement per aidlc-state.md Extension Configuration.
+
+---

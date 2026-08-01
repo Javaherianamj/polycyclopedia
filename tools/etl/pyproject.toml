@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# tests/ imports parse_polymers, value_parser, ts_object_parser, emit_sql
+# directly (they live one directory up, in tools/etl/, not in a package).
+# `pythonpath` (pytest >= 7) adds tools/etl/ itself to sys.path for the
+# duration of the test session so those imports resolve without an
+# __init__.py or an editable install.
+pythonpath = ["."]
