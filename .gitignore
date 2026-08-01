@@ -13,3 +13,13 @@ dist-ssr/
 
 # graphify knowledge-graph output (regenerable via /graphify)
 graphify-out/
+
+# Python (tools/etl one-shot migration tooling)
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.hypothesis/
+
+# Local database env
+db/.env
