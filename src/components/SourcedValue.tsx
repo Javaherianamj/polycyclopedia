@@ -1,5 +1,13 @@
+import type { ReactNode } from 'react';
+import type { SourcedValue as SourcedValueData } from '../types/polymer';
+
 interface SourcedValueProps {
-  value: any;
+  /**
+   * Normally a `SourcedValue` from the dataset. Callers also pass plain
+   * strings/numbers and `undefined` for fields that were never wrapped, so
+   * those pass through untouched rather than being coerced.
+   */
+  value: SourcedValueData | string | number | null | undefined;
   variant?: 'inline' | 'block';
 }
 
@@ -11,14 +19,22 @@ interface SourcedValueProps {
  * else. This is the single place Phase 1's citation marker/popover will plug
  * into once `value.sourceId` resolves to a real source.
  */
-export const SourcedValue: React.FC<SourcedValueProps> = ({ value: v, variant = 'inline' }) => {
-  if (v?.value === undefined) return v;
+export function SourcedValue({ value: v, variant = 'inline' }: SourcedValueProps): ReactNode {
+  // Not a SourcedValue-shaped object (plain string, number, null, undefined):
+  // render it as-is, matching the behaviour of the formatVal helpers this
+  // component replaced.
+  if (v === null || typeof v !== 'object' || v.value === undefined) {
+    return v ?? null;
+  }
   const text = `${v.value} ${v.unit}`.trim();
 
   if (variant === 'block') {
     return v.note ? (
       <div className="flex flex-col w-full text-right" dir="rtl">
-        <div dir="ltr" className="en-mono font-mono tabular-nums text-left sm:text-right font-black">
+        <div
+          dir="ltr"
+          className="en-mono font-mono tabular-nums text-left sm:text-right font-black"
+        >
           {text}
         </div>
         <div
@@ -48,4 +64,4 @@ export const SourcedValue: React.FC<SourcedValueProps> = ({ value: v, variant = 
   ) : (
     <span dir="ltr">{text}</span>
   );
-};
+}

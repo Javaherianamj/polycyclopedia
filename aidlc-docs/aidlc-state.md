@@ -1,6 +1,7 @@
 # AI-DLC State Tracking
 
 ## Project Information
+
 - **Project Name**: Polypedia
 - **Project Type**: Brownfield
 - **Start Date**: 2026-07-31T19:39:43Z
@@ -8,6 +9,7 @@
 - **Branch**: `feat/polypedia-database`
 
 ## Workspace State
+
 - **Existing Code**: Yes
 - **Programming Languages**: TypeScript, TSX (React 19)
 - **Build System**: Vite 6 (bun.lock present; npm-compatible)
@@ -16,25 +18,29 @@
 - **Workspace Root**: `/home/amirmahdi/Projects/polymer-encyclopedia`
 
 ## Code Location Rules
+
 - **Application Code**: Workspace root (NEVER in aidlc-docs/)
 - **Documentation**: aidlc-docs/ only
 - **Structure patterns**: See code-generation.md Critical Rules
 
 ## Extension Configuration
-| Extension | Enabled | Rationale |
-|---|---|---|
-| Security Baseline | Yes (default applied) | System will hold citation provenance and, per roadmap Phase 4, eventual multi-tenant company data. Roadmap explicitly flags tenant isolation failure as business-ending. Defaulted to enforced. |
-| Resiliency Baseline | No (default applied) | Roadmap specifies a deliberately boring single-host Docker Compose deployment for a 1-3 person team at pre-revenue stage. Directional AWS Well-Architected resiliency guidance is out of scope at this stage. |
+
+| Extension              | Enabled                   | Rationale                                                                                                                                                                                                                          |
+| ---------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Security Baseline      | Yes (default applied)     | System will hold citation provenance and, per roadmap Phase 4, eventual multi-tenant company data. Roadmap explicitly flags tenant isolation failure as business-ending. Defaulted to enforced.                                    |
+| Resiliency Baseline    | No (default applied)      | Roadmap specifies a deliberately boring single-host Docker Compose deployment for a 1-3 person team at pre-revenue stage. Directional AWS Well-Architected resiliency guidance is out of scope at this stage.                      |
 | Property-Based Testing | Partial (default applied) | The Phase 1 value-string parser (ranges, inequalities, superscripts, unit repair) and unit normalizer are exactly the pure-function/round-trip surface PBT is strongest on. Applied to parsers and serialization round-trips only. |
 
 **Note**: Defaults were applied rather than blocking on opt-in questions, per the user's explicit instruction to proceed continuously. User may override any of these at any time.
 
 ## Scope of This Run
+
 Phase 1 of the approved roadmap: stand up the real database and data model, seeded with LDPE and HDPE, with the property registry deliberately extensible so further properties and materials are data inserts rather than code changes.
 
 ## Stage Progress
 
 ### INCEPTION
+
 - [x] Workspace Detection — complete (2026-07-31T19:39:43Z)
 - [x] Reverse Engineering — complete. 9 artifacts in `inception/reverse-engineering/`
 - [x] Requirements Analysis — complete (Standard depth). `inception/requirements/requirements.md`
@@ -44,6 +50,7 @@ Phase 1 of the approved roadmap: stand up the real database and data model, seed
 - [x] Units Generation — complete (minimal). U1 `database-core` in scope; U2–U4 deferred
 
 ### CONSTRUCTION — U1 `database-core`
+
 - [x] Functional Design — `construction/database-core/functional-design/schema-design.md`
 - [x] NFR Requirements — folded into `requirements.md` §4 (NFR-1 … NFR-6)
 - [x] NFR Design — least-privilege roles, RLS, env-var secrets (`db/migrations/0009`, `db/.env.example`)
@@ -52,21 +59,22 @@ Phase 1 of the approved roadmap: stand up the real database and data model, seed
 - [~] Build and Test — schema suite passing (16/16); ETL test suite in progress
 
 ### OPERATIONS
+
 - [ ] Operations (placeholder — not started, out of scope)
 
 ## Success Criteria Status
 
-| # | Criterion | Status |
-|---|---|---|
-| 1 | Migrations apply cleanly to an empty database | **PASS** — Postgres 16.14, 24 tables + 3 views, 9 migrations |
-| 2 | Registry contains every property from `src/types/polymer.ts`, grouped as the UI expects | **PASS** — 55 definitions across 6 groups |
-| 3 | Adding a new property requires only an INSERT | **PASS** — proven by test inserting a hydrogel swelling ratio with zero DDL |
-| 4 | LDPE and HDPE seeded with numeric, unit-normalised values | **PASS** — 54 + 55 property values |
-| 5 | ETL output agrees with the legacy shadow numeric fields | **PASS** — 45/46 agree; the 1 disagreement is a genuine source-data defect (see below) |
-| 6 | A citation cannot be inserted without a locator | **PASS** — `{}`, `null`, `{"foo":"bar"}` all rejected |
-| 7 | Unsourced values are queryable as a work list | **PASS** — `v_unsourced_values`, 109 rows |
-| 8 | Parser tests including property-based tests pass | In progress |
-| 9 | Setup reproducible from a documented command sequence | **PASS** — `db/README.md`, `db/run.sh`, `db/test.sh` |
+| #   | Criterion                                                                               | Status                                                                                 |
+| --- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1   | Migrations apply cleanly to an empty database                                           | **PASS** — Postgres 16.14, 24 tables + 3 views, 9 migrations                           |
+| 2   | Registry contains every property from `src/types/polymer.ts`, grouped as the UI expects | **PASS** — 55 definitions across 6 groups                                              |
+| 3   | Adding a new property requires only an INSERT                                           | **PASS** — proven by test inserting a hydrogel swelling ratio with zero DDL            |
+| 4   | LDPE and HDPE seeded with numeric, unit-normalised values                               | **PASS** — 54 + 55 property values                                                     |
+| 5   | ETL output agrees with the legacy shadow numeric fields                                 | **PASS** — 45/46 agree; the 1 disagreement is a genuine source-data defect (see below) |
+| 6   | A citation cannot be inserted without a locator                                         | **PASS** — `{}`, `null`, `{"foo":"bar"}` all rejected                                  |
+| 7   | Unsourced values are queryable as a work list                                           | **PASS** — `v_unsourced_values`, 109 rows                                              |
+| 8   | Parser tests including property-based tests pass                                        | In progress                                                                            |
+| 9   | Setup reproducible from a documented command sequence                                   | **PASS** — `db/README.md`, `db/run.sh`, `db/test.sh`                                   |
 
 ## Data Defects Found (real findings, not parser bugs)
 

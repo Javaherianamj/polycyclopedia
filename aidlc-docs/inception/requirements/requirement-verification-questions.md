@@ -8,6 +8,7 @@
 ---
 
 ## Question 1: Security Extensions
+
 Should security extension rules be enforced for this project?
 
 A) Yes — enforce all SECURITY rules as blocking constraints (recommended for production-grade applications)
@@ -21,6 +22,7 @@ X) Other (please describe after [Answer]: tag below)
 ---
 
 ## Question 2: Resiliency Extensions
+
 Should the resiliency baseline (AWS Well-Architected Reliability directional guidance) be applied to this project?
 
 A) Yes — apply the resiliency baseline as directional best practices and design-time guidance
@@ -34,6 +36,7 @@ X) Other (please describe after [Answer]: tag below)
 ---
 
 ## Question 3: Property-Based Testing Extension
+
 Should property-based testing (PBT) rules be enforced for this project?
 
 A) Yes — enforce all PBT rules as blocking constraints
@@ -49,6 +52,7 @@ X) Other (please describe after [Answer]: tag below)
 ---
 
 ## Question 4: Scope of "the database" for this unit
+
 The roadmap's Phase 1 covers schema + migration + API + frontend swap. Your request was "start building the project database ... use data for ldpe and hdpe."
 
 A) Database only — schema, migrations, property registry, seed data for LDPE + HDPE, and the ETL that parses the existing dataset. No API, no frontend changes.
@@ -64,6 +68,7 @@ X) Other
 ---
 
 ## Question 5: Citations for the seeded LDPE/HDPE data
+
 Every value currently points at the placeholder `src_default`. Real citations need a page/table locator, which requires the actual source documents.
 
 A) Seed values with `status='unsourced'` and a visible provenance gap, so the schema and constraints are exercised now and the citation campaign fills them in later against real documents.
@@ -79,6 +84,7 @@ X) Other
 ---
 
 ## Question 6: Database engine for local development
+
 A) PostgreSQL 16 in Docker — matches the roadmap's target production engine exactly.
 
 B) SQLite — simpler, no daemon, but different SQL dialect and no `numrange`/GiST/RLS.

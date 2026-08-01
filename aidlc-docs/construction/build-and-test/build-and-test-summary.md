@@ -22,6 +22,7 @@ exists, applies migrations (skipping versions already recorded in
 `schema_migration`), then applies the idempotent seeds.
 
 **Reset and rebuild from empty:**
+
 ```bash
 ./db/run.sh --reset
 ```
@@ -35,13 +36,13 @@ exists, applies migrations (skipping versions already recorded in
 16 checks, executed inside a transaction that is rolled back, so the suite is
 safe to run against a seeded database.
 
-| Group | Checks | What it proves |
-|---|---|---|
-| Citation locator | 4 | `{}`, JSON `null`, and `{"foo":"bar"}` are rejected; `{"page":412}` is accepted. The structural fix for `src_default`. |
-| Extensibility | 2 | A brand-new property (hydrogel swelling ratio) is added with zero DDL, and a value against it is accepted. |
-| Value integrity | 3 | A value row with no value at all, an inverted range, and a polymorphic `subject_id` pointing at a nonexistent material are all rejected. |
-| Provenance views | 2 | Unsourced values surface in the work list; all three read views exist. |
-| Registry | 5 | 55 definitions, 6 groups, and a numeric property without a unit is impossible. |
+| Group            | Checks | What it proves                                                                                                                           |
+| ---------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Citation locator | 4      | `{}`, JSON `null`, and `{"foo":"bar"}` are rejected; `{"page":412}` is accepted. The structural fix for `src_default`.                   |
+| Extensibility    | 2      | A brand-new property (hydrogel swelling ratio) is added with zero DDL, and a value against it is accepted.                               |
+| Value integrity  | 3      | A value row with no value at all, an inverted range, and a polymorphic `subject_id` pointing at a nonexistent material are all rejected. |
+| Provenance views | 2      | Unsourced values surface in the work list; all three read views exist.                                                                   |
+| Registry         | 5      | 55 definitions, 6 groups, and a numeric property without a unit is impossible.                                                           |
 
 Negative tests use an `assert_fails` helper: several of these constraints exist
 precisely so that certain inserts are impossible, and a suite that only checked
@@ -51,11 +52,11 @@ happy paths would not notice their removal.
 
 **27 tests, all passing.**
 
-| File | Coverage |
-|---|---|
-| `test_value_parser.py` | One example per legacy value form, using real strings from `polymersData.ts`. Negative tests asserting the seven two-variant strings raise rather than returning a wrong value. |
-| `test_value_parser_properties.py` | Property-based (hypothesis): parse/format round-trip; `min <= max` invariant; no numeric result with all-None fields. |
-| `test_oracle.py` | Regression guard asserting LDPE and HDPE have zero parse failures and zero oracle disagreements, and that every parsed property key exists in the registry. |
+| File                              | Coverage                                                                                                                                                                        |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test_value_parser.py`            | One example per legacy value form, using real strings from `polymersData.ts`. Negative tests asserting the seven two-variant strings raise rather than returning a wrong value. |
+| `test_value_parser_properties.py` | Property-based (hypothesis): parse/format round-trip; `min <= max` invariant; no numeric result with all-None fields.                                                           |
+| `test_oracle.py`                  | Regression guard asserting LDPE and HDPE have zero parse failures and zero oracle disagreements, and that every parsed property key exists in the registry.                     |
 
 The oracle test is the important one: it locks in the currently-clean state, so a
 future edit to the parser cannot silently corrupt the seeded materials.
@@ -75,18 +76,18 @@ oracle disagreement.
 
 ## 3. Results
 
-| Metric | Value |
-|---|---|
-| Migrations applied | 9 |
-| Tables / views | 24 / 3 |
-| Schema verification checks | 16 passed, 0 failed |
-| ETL tests | 27 passed, 0 failed |
-| Property definitions | 55 |
-| Materials seeded | 2 (LDPE, HDPE) |
-| Property values | 109 (LDPE 54, HDPE 55) |
-| Sources / test methods | 10 / 28 |
-| Citation coverage | 0% — by design, see below |
-| Oracle agreement | 45 / 46 |
+| Metric                     | Value                     |
+| -------------------------- | ------------------------- |
+| Migrations applied         | 9                         |
+| Tables / views             | 24 / 3                    |
+| Schema verification checks | 16 passed, 0 failed       |
+| ETL tests                  | 27 passed, 0 failed       |
+| Property definitions       | 55                        |
+| Materials seeded           | 2 (LDPE, HDPE)            |
+| Property values            | 109 (LDPE 54, HDPE 55)    |
+| Sources / test methods     | 10 / 28                   |
+| Citation coverage          | 0% — by design, see below |
+| Oracle agreement           | 45 / 46                   |
 
 The LDPE/HDPE difference of one value is legitimate: `izodImpact` is an optional
 field in the legacy type and is genuinely absent for LDPE.
@@ -95,13 +96,13 @@ field in the legacy type and is genuinely absent for LDPE.
 
 ## 4. Not Tested Here (and why)
 
-| Item | Reason |
-|---|---|
-| REST API endpoints | No Node.js runtime in this environment. Descoped to U2 rather than written blind. |
-| Frontend integration | Depends on U2. |
-| Performance under load | Only 2 materials seeded; a load test now would measure nothing meaningful. Index strategy is designed for the roadmap's target scale but is unproven at that scale. |
-| Backup and restore | Resiliency extension disabled for this unit. **Remains an open item before any deployment.** |
-| Concurrent writes / RLS under multi-tenant load | No tenants exist yet. Policies are verified functionally against a non-owner role, not under contention. |
+| Item                                            | Reason                                                                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REST API endpoints                              | No Node.js runtime in this environment. Descoped to U2 rather than written blind.                                                                                   |
+| Frontend integration                            | Depends on U2.                                                                                                                                                      |
+| Performance under load                          | Only 2 materials seeded; a load test now would measure nothing meaningful. Index strategy is designed for the roadmap's target scale but is unproven at that scale. |
+| Backup and restore                              | Resiliency extension disabled for this unit. **Remains an open item before any deployment.**                                                                        |
+| Concurrent writes / RLS under multi-tenant load | No tenants exist yet. Policies are verified functionally against a non-owner role, not under contention.                                                            |
 
 ---
 

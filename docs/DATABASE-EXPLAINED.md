@@ -67,16 +67,16 @@ code change.
 A database is a set of **tables**. A table is just a grid, like a spreadsheet
 tab: named columns, and rows of data.
 
-| id | slug | name_en |
-|---|---|---|
-| 1 | ldpe | Low-Density Polyethylene |
-| 2 | hdpe | High-Density Polyethylene |
+| id  | slug | name_en                   |
+| --- | ---- | ------------------------- |
+| 1   | ldpe | Low-Density Polyethylene  |
+| 2   | hdpe | High-Density Polyethylene |
 
 Two ideas make it more than a spreadsheet:
 
 **1. Rows can point at other rows.** Instead of typing "Polyolefins" into every
 polyethylene row, you have a separate `family` table, and each material stores
-the *id number* of its family. Change the family's name once and every material
+the _id number_ of its family. Change the family's name once and every material
 referring to it updates. This pointer is called a **foreign key**.
 
 **2. The database enforces rules.** You can tell it "this column may never be
@@ -107,14 +107,14 @@ field  ──contains──>  family  ──contains──>  material  ──has
 - **`material`** — the generic substance. "LDPE" as a class of matter. Its
   numbers are textbook ranges.
 - **`grade`** — a specific commercial product, e.g. "Lupolen 2420H" made by
-  LyondellBasell, with the exact numbers from *that manufacturer's datasheet*.
+  LyondellBasell, with the exact numbers from _that manufacturer's datasheet_.
 
 **Why `grade` matters, even though it's empty right now.** This is the
 distinction between "LDPE melts around 105–115 °C" (a textbook fact) and "this
 specific product I can buy has an MFI of 0.3" (a purchasing decision). Your
 future B2B customers care almost entirely about the second one.
 
-I seeded it empty on purpose. Adding a table later is easy; *retrofitting* one
+I seeded it empty on purpose. Adding a table later is easy; _retrofitting_ one
 after you have hundreds of materials means rewriting every query in the system.
 
 And your existing data already proves the need. Look at what's currently stored
@@ -164,37 +164,37 @@ without a single structural change to the database.
 
 **`property_value`** holds the measurements. The important columns:
 
-| Column | Holds | Example |
-|---|---|---|
-| `value_min` | bottom of a range | 0.910 |
-| `value_max` | top of a range | 0.925 |
-| `value_typical` | a single value | -110 |
-| `qualifier` | `<`, `>`, `~` kept separate | `<` |
-| `unit_display` | what to show | `g/cm³` |
-| `conditions` | test conditions | `{temp: 190, load: 2.16}` |
-| `test_method_id` | which ASTM/ISO standard | ASTM D1238 |
-| `status` | how trustworthy | `unsourced` |
+| Column           | Holds                       | Example                   |
+| ---------------- | --------------------------- | ------------------------- |
+| `value_min`      | bottom of a range           | 0.910                     |
+| `value_max`      | top of a range              | 0.925                     |
+| `value_typical`  | a single value              | -110                      |
+| `qualifier`      | `<`, `>`, `~` kept separate | `<`                       |
+| `unit_display`   | what to show                | `g/cm³`                   |
+| `conditions`     | test conditions             | `{temp: 190, load: 2.16}` |
+| `test_method_id` | which ASTM/ISO standard     | ASTM D1238                |
+| `status`         | how trustworthy             | `unsourced`               |
 
 Compare to before:
 
-| | Before | Now |
-|---|---|---|
-| Density | `'0.910 - 0.925'` (text) | min 0.910, max 0.925 (numbers) |
-| Water absorption | `'< 0.01'` (text) | max 0.01, qualifier `<` |
-| Resistivity | `'10¹⁶ - 10¹⁸'` (text) | min 1×10¹⁶, max 1×10¹⁸ |
-| Refractive index | `'~ 1.51'` (text) | typical 1.51, qualifier `~` |
+|                  | Before                   | Now                            |
+| ---------------- | ------------------------ | ------------------------------ |
+| Density          | `'0.910 - 0.925'` (text) | min 0.910, max 0.925 (numbers) |
+| Water absorption | `'< 0.01'` (text)        | max 0.01, qualifier `<`        |
+| Resistivity      | `'10¹⁶ - 10¹⁸'` (text)   | min 1×10¹⁶, max 1×10¹⁸         |
+| Refractive index | `'~ 1.51'` (text)        | typical 1.51, qualifier `~`    |
 
 Now `WHERE value_min > 0.9` is a real question the database can answer instantly.
 
 **`test_method` and `conditions` deserve a note.** Melt flow index measured at
-190 °C under 2.16 kg is a *different number* from the same polymer at 230 °C
+190 °C under 2.16 kg is a _different number_ from the same polymer at 230 °C
 under 5 kg. Your old data recorded neither the method nor the conditions, which
 means strictly speaking its values weren't comparable across materials. Now they
 can be.
 
 **The display string is now generated from the numbers**, not the other way
 round. That's the whole inversion: numbers are the truth, text is what we
-*render* for humans.
+_render_ for humans.
 
 ### Group D — Citations (the part that makes this an encyclopedia)
 
@@ -212,8 +212,8 @@ Reading it backwards:
   outranks a manufacturer datasheet, which outranks marketing material.
 - **`source_document`** — the specific file (a PDF you actually hold).
 - **`citation`** — **a specific location inside that document.** Page 412. Table 3-2.
-- **`evidence`** — links a citation to a value, and records *how* it supports it:
-  is this the primary source, a corroborating second source, a *conflicting*
+- **`evidence`** — links a citation to a value, and records _how_ it supports it:
+  is this the primary source, a corroborating second source, a _conflicting_
   one, or was the value calculated from others?
 
 **Here is the single most important thing in the entire database:**
@@ -225,7 +225,7 @@ Try to save a citation with no location, and the database rejects it. `{}` —
 rejected. Empty — rejected. `{"foo": "bar"}` — rejected. `{"page": 412}` —
 accepted.
 
-This is *why `src_default` can never happen again.* It's not a coding guideline
+This is _why `src_default` can never happen again._ It's not a coding guideline
 that someone might forget under deadline pressure. It's not a code review
 checklist item. It is structurally impossible to store a citation that doesn't
 say where it came from. There are automated tests that try to break this rule and
@@ -234,7 +234,7 @@ confirm the database refuses.
 ### Group E — Housekeeping
 
 - **`tenant`** + a `tenant_id` column — for when you sell the engine to companies
-  and each one has private data. Empty now, but the *isolation rules* are already
+  and each one has private data. Empty now, but the _isolation rules_ are already
   active and tested. Retrofitting this is the kind of mistake that ends companies:
   one bug and Company A sees Company B's formulations.
 - **`audit_log`** — who changed what, when, and what it looked like before.
@@ -276,7 +276,7 @@ parser is right. Disagreement means something is genuinely wrong.
 Result: **45 of 46 checks agreed.** The one disagreement is a real defect in your
 data (see below).
 
-Those duplicate fields are *not* carried into the database — two copies of the
+Those duplicate fields are _not_ carried into the database — two copies of the
 same fact can drift apart, and then which one is right? Now there's one copy.
 
 ---
@@ -308,16 +308,16 @@ Neither real defect affects LDPE or HDPE. Both of those parse perfectly.
 
 ## Part 6: What's actually in there right now
 
-| | Count |
-|---|---|
-| Tables / views | 24 / 3 |
-| Property definitions | 55 |
-| Materials | 2 (LDPE, HDPE) |
-| Property values | 109 |
-| Sources (bibliography) | 10 |
-| Test methods (ASTM/ISO) | 28 |
-| Manufacturers | 25 |
-| **Values with a real citation** | **0** |
+|                                 | Count          |
+| ------------------------------- | -------------- |
+| Tables / views                  | 24 / 3         |
+| Property definitions            | 55             |
+| Materials                       | 2 (LDPE, HDPE) |
+| Property values                 | 109            |
+| Sources (bibliography)          | 10             |
+| Test methods (ASTM/ISO)         | 28             |
+| Manufacturers                   | 25             |
+| **Values with a real citation** | **0**          |
 
 ### About that last row
 
@@ -361,11 +361,11 @@ docker compose -f db/docker-compose.yml up -d
 
 **Migrations.** Every structural change is a numbered file in `db/migrations/`.
 They run in order, each records that it ran, and they're never edited once
-applied — a change is always a *new* file. This means any machine can reproduce
+applied — a change is always a _new_ file. This means any machine can reproduce
 the exact same structure, and you can always see how the schema got to where it is.
 
 **Two separate logins.** The app connects as `polypedia_app`, which can read and
-write *data* but **cannot change the structure** — it's physically unable to drop
+write _data_ but **cannot change the structure** — it's physically unable to drop
 a table. Structural changes require the owner login, used only for migrations.
 So a bug or an attack in the web app cannot destroy your database. This is
 tested: the app role tries `CREATE TABLE` and gets "permission denied."

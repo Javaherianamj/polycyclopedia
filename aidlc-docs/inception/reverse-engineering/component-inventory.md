@@ -26,47 +26,51 @@ None as separate installable packages, but within the single application package
 ## Full Module Inventory (single application package, by directory)
 
 ### `src/` (root modules)
-| File | Lines | Purpose |
-|---|---|---|
-| `App.tsx` | 991 | App shell: hash router, tab state, theme, layout, nearly all detail-page markup inline |
-| `main.tsx` | 10 | React 19 root bootstrap |
-| `index.css` | 163 | Tailwind v4 entry, theme CSS custom properties, slider/KaTeX overrides |
+
+| File        | Lines | Purpose                                                                                |
+| ----------- | ----- | -------------------------------------------------------------------------------------- |
+| `App.tsx`   | 991   | App shell: hash router, tab state, theme, layout, nearly all detail-page markup inline |
+| `main.tsx`  | 10    | React 19 root bootstrap                                                                |
+| `index.css` | 163   | Tailwind v4 entry, theme CSS custom properties, slider/KaTeX overrides                 |
 
 ### `src/types/`
-| File | Lines | Purpose |
-|---|---|---|
-| `polymer.ts` | 144 | Entire data model (`PolymerData` + 10 nested interfaces) |
+
+| File         | Lines | Purpose                                                  |
+| ------------ | ----- | -------------------------------------------------------- |
+| `polymer.ts` | 144   | Entire data model (`PolymerData` + 10 nested interfaces) |
 
 ### `src/data/`
-| File | Lines | Purpose |
-|---|---|---|
-| `polymersData.ts` | 1278 | The static "database": 6 fully-populated `PolymerData` records |
+
+| File              | Lines | Purpose                                                        |
+| ----------------- | ----- | -------------------------------------------------------------- |
+| `polymersData.ts` | 1278  | The static "database": 6 fully-populated `PolymerData` records |
 
 ### `src/components/` (21 files)
-| File | Lines | Purpose | Scope / gating |
-|---|---|---|---|
-| `AlloyingSimulator.tsx` | 145 | PP/ABS blend-ratio simulator with hardcoded empirical property formulas | Renders only for `id === 'pp'` (`'abs'` branch is dead — no such polymer in data) |
-| `BranchingSimulator.tsx` | 191 | LDPE chain-branching level slider affecting derived crystallinity/density/strength | LDPE only |
-| `CatalogPage.tsx` | 164 | Catalog landing page: search + family accordions | All 6 polymers |
-| `CompareModal.tsx` | 131 | Fixed 2-polymer, 9-row comparison table | All 6 polymers (any 2 at a time) |
-| `DPCalculator.tsx` | 160 | DPn/DPw/PDI calculator from Mn + PDI inputs | All polymers (academic tab) |
-| `DynamicQuiz.tsx` | 157 | Per-polymer multiple-choice quiz runner | Driven by each record's `quiz[]` |
-| `Hansen3DChart.tsx` | 245 | Hand-rolled draggable 3D Hansen solubility scatter plot | All polymers (academic tab) |
-| `HeroChainAnimation.tsx` | 165 | Scroll-linked SVG chain animation, shape varies by `chainType` | All polymers |
-| `InfoTooltip.tsx` | 35 | Reusable info-icon hover/click tooltip | Shared utility |
-| `LCACircularEconomy.tsx` | 138 | PCR% slider -> blended CO2e/kg via hardcoded `baseCo2Map` | All polymers (map includes unreachable `abs` key) |
-| `MarketShareChart.tsx` | 78 | Chart.js doughnut of `marketShare[]` | All polymers (industrial tab), lazy-loaded |
-| `MolecularViewer3D.tsx` | 622 | Three.js 3D ball-and-stick molecule viewer, own atom-geometry generator | All polymers (academic tab), lazy-loaded, largest component in the repo |
-| `Navbar.tsx` | 96 | Fixed top bar: brand, Resources/Compare buttons, theme switcher | Global |
-| `PolymerCombobox.tsx` | 110 | Searchable family-grouped polymer switcher | Detail-page sidebar |
-| `ProcessingWindowSimulator.tsx` | 292 | Melt/mold/pressure sliders checked against hardcoded ISO/ASTM standard windows | All polymers (includes unreachable `abs` branches) |
-| `ResinBadge.tsx` | 93 | SPI/ASTM D7611 resin-code triangle badge | Global |
-| `ResourcesModal.tsx` | 124 | Static hand-written bibliography (no per-value linkage) | Global |
-| `ScrollToTop.tsx` | 48 | Scroll-to-top FAB | **Orphaned — not imported anywhere; App.tsx reimplements the same behavior inline** |
-| `SourcedValue.tsx` | 51 | Shared `SourcedValue` -> JSX formatter | Shared utility, citation-UI seam |
-| `StateSimulator.tsx` | 206 | Temperature slider showing physical state vs. Tg/Tm/degradation | All polymers (engineering tab) |
-| `StressStrainChart.tsx` | 242 | Chart.js approximate stress-strain curve, regex-parses `SourcedValue` strings | All polymers (engineering tab) |
-| `TacticitySimulator.tsx` | 291 | Isotactic/syndiotactic/atactic ring-sequence visualizer | PS only |
+
+| File                            | Lines | Purpose                                                                            | Scope / gating                                                                      |
+| ------------------------------- | ----- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `AlloyingSimulator.tsx`         | 145   | PP/ABS blend-ratio simulator with hardcoded empirical property formulas            | Renders only for `id === 'pp'` (`'abs'` branch is dead — no such polymer in data)   |
+| `BranchingSimulator.tsx`        | 191   | LDPE chain-branching level slider affecting derived crystallinity/density/strength | LDPE only                                                                           |
+| `CatalogPage.tsx`               | 164   | Catalog landing page: search + family accordions                                   | All 6 polymers                                                                      |
+| `CompareModal.tsx`              | 131   | Fixed 2-polymer, 9-row comparison table                                            | All 6 polymers (any 2 at a time)                                                    |
+| `DPCalculator.tsx`              | 160   | DPn/DPw/PDI calculator from Mn + PDI inputs                                        | All polymers (academic tab)                                                         |
+| `DynamicQuiz.tsx`               | 157   | Per-polymer multiple-choice quiz runner                                            | Driven by each record's `quiz[]`                                                    |
+| `Hansen3DChart.tsx`             | 245   | Hand-rolled draggable 3D Hansen solubility scatter plot                            | All polymers (academic tab)                                                         |
+| `HeroChainAnimation.tsx`        | 165   | Scroll-linked SVG chain animation, shape varies by `chainType`                     | All polymers                                                                        |
+| `InfoTooltip.tsx`               | 35    | Reusable info-icon hover/click tooltip                                             | Shared utility                                                                      |
+| `LCACircularEconomy.tsx`        | 138   | PCR% slider -> blended CO2e/kg via hardcoded `baseCo2Map`                          | All polymers (map includes unreachable `abs` key)                                   |
+| `MarketShareChart.tsx`          | 78    | Chart.js doughnut of `marketShare[]`                                               | All polymers (industrial tab), lazy-loaded                                          |
+| `MolecularViewer3D.tsx`         | 622   | Three.js 3D ball-and-stick molecule viewer, own atom-geometry generator            | All polymers (academic tab), lazy-loaded, largest component in the repo             |
+| `Navbar.tsx`                    | 96    | Fixed top bar: brand, Resources/Compare buttons, theme switcher                    | Global                                                                              |
+| `PolymerCombobox.tsx`           | 110   | Searchable family-grouped polymer switcher                                         | Detail-page sidebar                                                                 |
+| `ProcessingWindowSimulator.tsx` | 292   | Melt/mold/pressure sliders checked against hardcoded ISO/ASTM standard windows     | All polymers (includes unreachable `abs` branches)                                  |
+| `ResinBadge.tsx`                | 93    | SPI/ASTM D7611 resin-code triangle badge                                           | Global                                                                              |
+| `ResourcesModal.tsx`            | 124   | Static hand-written bibliography (no per-value linkage)                            | Global                                                                              |
+| `ScrollToTop.tsx`               | 48    | Scroll-to-top FAB                                                                  | **Orphaned — not imported anywhere; App.tsx reimplements the same behavior inline** |
+| `SourcedValue.tsx`              | 51    | Shared `SourcedValue` -> JSX formatter                                             | Shared utility, citation-UI seam                                                    |
+| `StateSimulator.tsx`            | 206   | Temperature slider showing physical state vs. Tg/Tm/degradation                    | All polymers (engineering tab)                                                      |
+| `StressStrainChart.tsx`         | 242   | Chart.js approximate stress-strain curve, regex-parses `SourcedValue` strings      | All polymers (engineering tab)                                                      |
+| `TacticitySimulator.tsx`        | 291   | Isotactic/syndiotactic/atactic ring-sequence visualizer                            | PS only                                                                             |
 
 ## Total Count
 
@@ -77,6 +81,7 @@ None as separate installable packages, but within the single application package
 - **Test**: 0
 
 ## Additional Module Counts (within the single Application package)
+
 - **Total source files analyzed**: 26 (`App.tsx`, `main.tsx`, `index.css`, `types/polymer.ts`, `data/polymersData.ts`, 21 files in `components/`)
 - **React components**: 22 (`App.tsx` + 21 in `src/components/`)
 - **Components actively wired into the render tree**: 21 of 22 App-level consumers (`ScrollToTop.tsx` is dead code, not imported by anything)

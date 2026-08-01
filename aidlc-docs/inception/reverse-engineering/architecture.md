@@ -53,30 +53,35 @@ All boxes above are a fixed 67-character width; arrows/labels between boxes are 
 ## Component Descriptions
 
 ### `index.html` + `src/main.tsx` (Entry / Bootstrap)
+
 - **Purpose**: Single HTML entry point and React root bootstrap.
 - **Responsibilities**: Load Google Fonts (Vazirmatn, JetBrains Mono) and KaTeX CSS from CDN links, set `dir="rtl"` / `lang="fa"` on `<html>`, mount `<App />` into `#root` under `React.StrictMode`.
 - **Dependencies**: React 19, ReactDOM 19.
 - **Type**: Application (entry module).
 
 ### `src/App.tsx` (App Shell / Router) — 991 lines
+
 - **Purpose**: The entire application shell: hash-based routing, tab state, theme state, layout (sidebar/main-column split, mobile bottom sheet, floating action buttons), and composition of every feature component.
 - **Responsibilities**: Hash routing (`getPolymerFromHash`, `hashchange` listener), active-tab state machine (`ind` | `eng` | `aca`), dark/light theme toggle (writes `data-theme` attribute consumed by `src/index.css`), scroll-position-driven FAB visibility, rendering ~all of the per-tab datasheet UI directly inline (not extracted into sub-view components), and wiring the Compare/Resources modals.
 - **Dependencies**: `polymersData`, `PolymerData` type, and 19 of the 21 files in `src/components/`.
 - **Type**: Application (root view/controller).
 
 ### `src/components/*.tsx` — Feature Components (21 files)
+
 - **Purpose**: Self-contained UI features — catalog browsing, comparison, per-polymer interactive simulators/calculators, charts, and a 3D viewer. See `component-inventory.md` for the full per-file breakdown.
 - **Responsibilities**: Each component owns its own local `useState`-based interaction logic; several perform their own derived-value math client-side (e.g. `AlloyingSimulator`, `LCACircularEconomy`, `ProcessingWindowSimulator`) rather than reading pre-computed values from the data file.
 - **Dependencies**: `PolymerData`/sub-types from `src/types/polymer.ts`; `chart.js` + `react-chartjs-2` (2 chart components); `three` (1 component); `motion` (1 component); `lucide-react` (icons, all components).
 - **Type**: Application (presentation/feature layer).
 
 ### `src/data/polymersData.ts` (Static Data Layer) — 1278 lines
+
 - **Purpose**: The entire "database" — a single exported constant `polymersData: PolymerData[]` containing 6 fully-populated polymer records (`ldpe`, `hdpe`, `pp`, `pvc`, `pet`, `ps`).
 - **Responsibilities**: Source of truth for every value rendered anywhere in the app. Imported directly (ES module `import`), not fetched — it becomes part of the JS bundle.
 - **Dependencies**: `PolymerData` type only.
 - **Type**: Model/Data (static, compile-time).
 
 ### `src/types/polymer.ts` (Data Model) — 144 lines
+
 - **Purpose**: Defines the `PolymerData` interface and its 10 nested sub-interfaces (`SourcedValue`, `ProcessingInfo`, `ThermalProperties`, `MechanicalProperties`, `PhysicalProperties`, `ChemicalResistanceItem`, `ElectricalProperties`, `MolecularAcademicInfo`, `QuizQuestion`, `Atom3D`) plus the `MarketShareItem` interface.
 - **Responsibilities**: Compile-time contract for the data file and every component that consumes `PolymerData`. Not validated at runtime (no schema/zod/io-ts — TypeScript types are erased at build time).
 - **Dependencies**: None (leaf module).

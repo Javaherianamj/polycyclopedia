@@ -82,88 +82,106 @@ index.html
 ## Design Patterns
 
 ### Static-Import Data Access (no repository/service layer)
+
 - **Location**: `src/App.tsx` and every component that needs polymer data (`import { polymersData } from '../data/polymersData'` or receives it as a prop from `App.tsx`).
 - **Purpose**: Simplicity for a fully static site — no data-fetching, loading states, or error states are needed anywhere in the app.
 - **Implementation**: `polymersData` is a plain exported `const` array; lookups are linear `Array.find`/`Array.filter` calls (e.g. `polymersData.find((p) => p.id === selectedPolymerId)` in `App.tsx`). This is the seam that will need to become a real data-access layer if/when the planned backend (per `aidlc-docs/audit.md`) is introduced.
 
 ### Manual Hash-Based Routing
+
 - **Location**: `src/App.tsx`, `getPolymerFromHash()` / `hashchange` listener / `window.location.hash` writes.
 - **Purpose**: URL-addressable deep links (`#ldpe`, `#catalog`) without pulling in a router library.
 - **Implementation**: No route table, no nested routes, no route params beyond a single polymer id segment; "catalog" is simply `selectedPolymerId === null`.
 
 ### Lazy-Loaded Heavy Components
+
 - **Location**: `src/App.tsx` lines 9-12, wrapping `MarketShareChart`, `StressStrainChart`, and `MolecularViewer3D` in `React.lazy()` + `React.Suspense` with skeleton-pulse fallbacks.
 - **Purpose**: Defer loading the `chart.js`/`three` bundle chunks (see `vite.config.ts` `manualChunks`) until the relevant tab is actually rendered.
 - **Implementation**: Standard React.lazy/Suspense; matched by the manual Vite chunk split so these libraries don't inflate the initial bundle.
 
 ### Shared Sourced-Value Formatter (the citation seam)
+
 - **Location**: `src/components/SourcedValue.tsx`, consumed by `App.tsx`, `CatalogPage.tsx`, `CompareModal.tsx`, `StateSimulator.tsx`, `DPCalculator.tsx` — each still declares its own trivial local `const formatVal = (v) => <SourcedValue value={v} .../>` wrapper rather than importing `SourcedValue` and calling it directly, but the actual formatting logic itself is now centralized in one file instead of being copy-pasted five times.
 - **Purpose**: Explicitly called out in the component's own doc comment as the future plug-in point for a citation marker/popover once `sourceId` values become real (currently 100% `'src_default'`, see `code-quality-assessment.md`).
 - **Implementation**: Renders `{value} {unit}` plus an optional RTL `note` line, in `inline` (span-based) or `block` (div-based) layout variants.
 
 ### Anti-pattern: Values-as-Display-Strings
+
 - **Location**: Almost every leaf field in `src/data/polymersData.ts` (via the `SourcedValue.value: number | string` union).
 - **Why it's a problem**: Most numeric properties are stored as already-formatted display strings rather than structured numbers, making the data unusable for sorting, filtering, or range queries. Verified examples: `physical.density.value = '0.910 - 0.925'`, `physical.refractiveIndex.value = '~ 1.51'`, `physical.waterAbsorption.value = '< 0.01'`, `electrical.volumeResistivity.value = '10¹⁶ - 10¹⁸'` (Unicode superscript digits embedded in the string), and a genuinely malformed split where the unit leaked into the value: `thermal.cte = { value: '150 - 200 µm/', unit: '°C' }` (LDPE record, `src/data/polymersData.ts` line 75).
 - **Existing workaround**: A parallel set of "shadow" plain-`number` fields exists specifically so sliders/simulators have real numbers to compute with: `thermal.tgValue`, `thermal.tmValue`, `thermal.degradationValue`, `physical.minDensity`/`maxDensity`, `academic.minCrystallinity`/`maxCrystallinity`, `academic.mnDefaultValue`. These are manually kept in sync with their sourced-string siblings by whoever edits the data file — nothing enforces agreement, so they can silently drift (e.g. nothing would catch `tgValue: -110` diverging from a future edit to `tg.value`).
 
 ### Anti-pattern: Presentation Leaking into Data
+
 - **Location**: `PolymerData.chemicalResistance[].colorClass` (`src/types/polymer.ts` line 61), populated with literal Tailwind utility class names like `'text-status-success'` / `'text-status-warning'` / `'text-status-error'` directly in `src/data/polymersData.ts`, then interpolated straight into `className` in `App.tsx` (line 656).
 - **Why it's a problem**: Couples the "database" to a specific CSS framework and a specific theme's class names; a rating-to-color mapping that should be a pure function of the rating value is instead baked into every one of the ~40+ chemical-resistance rows across the 6 records.
 
 ### Anti-pattern: God Component
+
 - **Location**: `src/App.tsx` (991 lines).
 - **Why it's a problem**: Combines routing, layout, theming, modal/FAB orchestration, and the entire markup for all 3 detail-page tabs (Industrial/Engineering/Academic) in one file/one function component, rather than extracting `IndustrialTab`, `EngineeringTab`, `AcademicTab` (etc.) as separate components. Every property card in the Engineering and Academic tabs is hand-written JSX rather than generated from a declarative field list, so adding one new property requires touching `App.tsx`, `src/types/polymer.ts`, and all 6 records in `polymersData.ts`.
 
 ### Anti-pattern: Data-Model Feature Ahead of Implementation
+
 - **Location**: `SourcedValue.sourceId: string` (`src/types/polymer.ts` line 9), populated 269/269 times with the literal placeholder `'src_default'` in `src/data/polymersData.ts` (verified via `grep -c "sourceId" src/data/polymersData.ts` = 269 and `grep -c "src_default"` = 269 — every single occurrence). No component anywhere reads `.sourceId` (`grep -rn "sourceId" src/ --include=*.tsx` only matches a doc comment in `SourcedValue.tsx`, not executable code). `ResourcesModal.tsx` is a completely separate, hand-written bibliography with no join key back to individual data values. Net effect: the type system advertises per-value citation support that does not exist yet anywhere in the running application.
 
 ### Anti-pattern: Dead Code for a Non-Existent Material
+
 - **Location**: `src/components/AlloyingSimulator.tsx` (`isABS = polymer.id === 'abs'`), `src/components/ProcessingWindowSimulator.tsx` (7 occurrences of `polymer.id === 'abs'` branches for melt/mold temp ranges and drying requirements), `src/components/LCACircularEconomy.tsx` (`baseCo2Map` includes an `abs` key).
 - **Why it's a problem**: All three components contain conditional logic for a 7th polymer, `'abs'` (ABS plastic), that does not exist anywhere in `polymersData` (only `ldpe`, `hdpe`, `pp`, `pvc`, `pet`, `ps` are defined). This code is unreachable today; it is either leftover from a planned-but-not-yet-added material or was scaffolded ahead of the data.
 
 ## Critical Dependencies
 
 ### react / react-dom
+
 - **Version**: `^19.0.1`
 - **Usage**: Every component in `src/`.
 - **Purpose**: UI rendering framework.
 
 ### vite / @vitejs/plugin-react
+
 - **Version**: `^6.2.3` / `^5.0.4`
 - **Usage**: Dev server, production bundler, JSX/TS transform.
 - **Purpose**: Build tooling.
 
 ### typescript
+
 - **Version**: `~5.8.2`
 - **Usage**: Type-checking via `tsc --noEmit` (the `typecheck` script); Vite/esbuild does the actual transpile, so TS itself never emits JS.
 - **Purpose**: Static typing of the data model and component props.
 
 ### tailwindcss / @tailwindcss/vite
+
 - **Version**: `^4.1.14`
 - **Usage**: All component styling, via utility classes plus the `@theme`/CSS-custom-property token layer in `src/index.css`.
 - **Purpose**: Styling framework; Tailwind v4's Vite plugin removes the need for a separate PostCSS/`tailwind.config.js` pipeline.
 
 ### chart.js / react-chartjs-2
+
 - **Version**: `^4.5.1` / `^5.3.1`
 - **Usage**: `MarketShareChart.tsx` (doughnut) and `StressStrainChart.tsx` (line), both lazy-loaded and manually chunked.
 - **Purpose**: 2D charting.
 
 ### three / @types/three
+
 - **Version**: `^0.185.1`
 - **Usage**: `MolecularViewer3D.tsx` only (622 lines), lazy-loaded and manually chunked.
 - **Purpose**: 3D ball-and-stick molecular rendering, built directly against the Three.js scene-graph API (no React-three-fiber wrapper).
 
 ### motion
+
 - **Version**: `^12.23.24`
 - **Usage**: `HeroChainAnimation.tsx` only (`motion/react`'s `useScroll`/`useTransform`).
 - **Purpose**: Scroll-linked SVG animation for the per-polymer hero banner.
 
 ### lucide-react
+
 - **Version**: `^0.546.0`
 - **Usage**: Icons throughout nearly every component and `App.tsx`.
 - **Purpose**: Icon set.
 
 ### KaTeX (CDN CSS only — not an npm dependency)
+
 - **Version**: `0.16.8` (pinned in the `index.html` CDN URL)
 - **Usage**: `.katex` CSS class overrides exist in `src/index.css`, but the KaTeX **JS** library is never loaded and no component calls it — see `architecture.md` Integration Points. Effectively unused/dead integration.
 - **Purpose**: (Intended) math-formula typesetting; not currently exercised.

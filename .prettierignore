@@ -1,0 +1,25 @@
+# Build output
+dist/
+dist-ssr/
+api/dist/
+node_modules/
+
+# Archived one-off scripts from the prototype era. Kept for reference only,
+# never edited. Reformatting them would produce a large diff with no benefit
+# and would obscure their original form.
+tools/legacy/
+
+# Python ETL tooling -- formatted by Python tooling, not Prettier.
+tools/etl/
+
+# AI-DLC rule definitions: vendored from the AI-DLC distribution, not our
+# source. Reformatting vendored files makes upstream updates painful.
+.aidlc-rule-details/
+
+# SQL migrations and seeds. Prettier's SQL support is not used here, and
+# migrations are immutable once applied -- reformatting one would change a
+# file that must not change.
+db/
+
+# Generated lockfiles
+package-lock.json

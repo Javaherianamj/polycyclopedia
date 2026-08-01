@@ -1,6 +1,7 @@
 # AI-DLC Audit Log
 
 ## Initial User Request
+
 **Timestamp**: 2026-07-31T19:39:43Z
 **User Input**: "using ai-dlc (added to this project CLAUDE.md), start building the project database in another branch, use data for ldpe and hdpe and leave the space for later properties added. find isses and fix on go to reach the final proper result. use opus to identify the task and sonnet to do the coding, and haiku for repeating actions. if strugling use fable. and in short massage report to me what you are currently doing and what is done."
 **AI Response**: "Loaded AI-DLC rules from .aidlc-rule-details/. Created branch feat/polypedia-database. Committed prior Phase 0 repo-hygiene work. Scaffolded aidlc-docs/. Beginning Workspace Detection."
@@ -9,6 +10,7 @@
 ---
 
 ## Prior Session Context (pre-AI-DLC)
+
 **Timestamp**: 2026-07-31T19:39:43Z
 **User Input**: "this is my polypedia project. this is a polymer encyclopedia prototype, this taget was the webside for this institution. but the bigger picture is a huge database, which all of the polymers exist (in all different fields)and comparison and finding target materials(with properties needed). also i want to give the engine to companies and sell them a product which they can use it to comunicate easier with their costumers (so a compatible core) also i need another engine for data cheking and adding based on the sources i give it to them. like datasheet for each company or a handbook for our website. i need citation everywhere. finla UI is prefered like the prototype. use /model opus to plan and sonnet to do the easy work(reading). /goal giving me the whole project sheme and steps. ask any quastions pop up if needed."
 **AI Response**: "Produced full project roadmap. User answered clarifying questions: (1) build backend/database FIRST; (2) B2B product shape deferred/undecided, wants tradeoff explanation; (3) ingestion engine internal-only for now; (4) yes to a real backend/database. Plan approved via ExitPlanMode."
@@ -17,13 +19,16 @@
 ---
 
 ## Workflow Adaptation Decision
+
 **Timestamp**: 2026-07-31T19:39:43Z
 **User Input**: (see Initial User Request above — "find isses and fix on go to reach the final proper result ... in short massage report to me what you are currently doing and what is done")
 **AI Response**: "Adapting AI-DLC approval gates: user explicitly requested continuous execution with short progress reports rather than stage-by-stage blocking approval. Per the Adaptive Workflow Principle ('The workflow adapts to the work, not the other way around') and the fact that the user already approved a detailed roadmap covering Inception-phase concerns, stage artifacts will still be produced and logged, but execution will proceed without blocking on each approval gate. User retains full control and can redirect at any point."
 **Context**: Documented deviation from default per-stage approval gating, per user instruction.
 
 ---
+
 ## Construction — U1 database-core
+
 **Timestamp**: 2026-07-31T20:55:00Z
 **User Input**: "finish what you have been doing. continue from where you left and do not start from scratch"
 **AI Response**: "Resumed after two subagents were terminated by a session limit. Recovered state: migrations 0001-0008 were already applied to the container; seeds 0001-0002 were written but unapplied; ETL core modules existed but emit_sql.py and tests did not. Continued from that point rather than restarting."
@@ -32,6 +37,7 @@
 ---
 
 ## Defect Fixes During Construction
+
 **Timestamp**: 2026-07-31T20:55:00Z
 **AI Response**: "Fixed six defects found during verification:
 (1) ETL treated text-typed properties (monomerFormula, repeatingUnit, unitCell, mechanism, notes) as numeric because it classified by string content instead of by the registry's declared data_type; the numeric parser raised before the text fallback could run. Declared shape is now authoritative.
@@ -45,6 +51,7 @@
 ---
 
 ## Extension Compliance Summary — U1
+
 **Timestamp**: 2026-07-31T20:55:00Z
 **AI Response**: "Security Baseline (ENABLED): COMPLIANT. No credentials in git (db/.env gitignored, .env.example is the template); least-privilege runtime role polypedia_app cannot run DDL and cannot write schema_migration; RLS enabled and verified against a genuine non-owner role; generated SQL properly escapes Persian text and apostrophes. Resiliency Baseline (DISABLED): skipped per configuration; backup/restore remains an open item for deployment. Property-Based Testing (PARTIAL): applied to the value parser and unit normaliser as scoped; not applied to schema wiring or CRUD."
 **Context**: Extension enforcement per aidlc-state.md Extension Configuration.
