@@ -144,18 +144,23 @@ Two layers:
 - `test_common.py`, `test_validation.py` -- pure logic, no database
   (`validate_row` is exercised with hand-built `LiveValue`/`sources_by_key`
   fixtures). Fast, most of the V1-V10 coverage lives here.
-- `test_integration.py` -- against the live database. Every test either
-  (a) calls `execute_plan` directly on a connection the `db_conn` fixture
-  rolls back in teardown, so nothing it does is ever committed, or (b)
-  drives the real CLI via `subprocess` in a scenario that provably never
-  commits (`--dry-run`, or a CSV engineered so every row fails validation).
-  A run leaves the database exactly as it found it, which the test suite
-  itself confirms by comparing `v_unsourced_values`/`source`/`evidence`/
-  `citation` counts before and after.
+- `test_integration.py`, `test_curation.py` -- against the live database.
+  Every test either (a) calls `execute_plan` directly on a connection the
+  `db_conn` fixture rolls back in teardown, so nothing it does is ever
+  committed, or (b) drives the real CLI via `subprocess` in a scenario that
+  provably never commits (`--dry-run`, or a CSV engineered so every row
+  fails validation). A run leaves the database exactly as it found it,
+  which the suite itself confirms by comparing `v_unsourced_values`/
+  `source`/`evidence`/`citation` counts before and after.
 
 Any row written for test purposes uses the source title `__test_source__`,
 chosen to be unmistakably not real curation output -- never a plausible
-handbook title, so a leftover row can't be confused with genuine work.
+handbook title. This matters more than it sounds: a citation is the one
+row in this whole schema whose entire purpose is verifiable provenance, so
+a leftover test row with a plausible-looking title (e.g. an invented page
+number against "Polymer Handbook") is indistinguishable from genuine
+curation work if a test forgets to clean up. Don't relax this even for a
+quick manual check.
 
 To spot-check the database is clean after running the suite:
 
