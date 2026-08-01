@@ -4,7 +4,7 @@
 **Depends on**: U1 `database-core` (complete)
 **Relationship to U4** `ingestion-engine`: this is the **manual precursor**. U4
 automates extraction from documents; U5 is the human loop that must exist and be
-understood *first*, because you cannot sensibly automate a review process that
+understood _first_, because you cannot sensibly automate a review process that
 has never been performed by hand.
 
 ---
@@ -28,12 +28,12 @@ error-recovery over engineering elegance.
 This was raised directly by the project owner and is worth recording, because it
 determines which sources are even applicable:
 
-| | `material` (generic) | `grade` (product) |
-|---|---|---|
-| Example | LDPE as a class of matter | Lupolen 2420H |
-| Value shape | ranges (density 0.910–0.925) | single measured values (density 0.923) |
-| Correct sources | handbooks, encyclopedias, textbooks, open-access review articles | manufacturer datasheets |
-| Wrong source | a datasheet — it describes one product, not the class | a handbook — too generic to buy from |
+|                 | `material` (generic)                                             | `grade` (product)                      |
+| --------------- | ---------------------------------------------------------------- | -------------------------------------- |
+| Example         | LDPE as a class of matter                                        | Lupolen 2420H                          |
+| Value shape     | ranges (density 0.910–0.925)                                     | single measured values (density 0.923) |
+| Correct sources | handbooks, encyclopedias, textbooks, open-access review articles | manufacturer datasheets                |
+| Wrong source    | a datasheet — it describes one product, not the class            | a handbook — too generic to buy from   |
 
 A producer typically offers 10+ LDPE grades. Averaging their datasheets does
 **not** produce the generic material value; it produces an arbitrary number
@@ -74,26 +74,26 @@ workflow is what it would be modelled on.
 One row per unsourced value. Pre-filled columns give context so the curator never
 has to look anything up; blank columns are what they fill.
 
-| Column | Filled by | Notes |
-|---|---|---|
-| `material_slug` | export | e.g. `ldpe` — do not edit |
-| `property_key` | export | e.g. `density` — do not edit |
-| `property_name_en` / `_fa` | export | context only, ignored on import |
-| `unit` | export | canonical unit expected |
-| `plausible_min` / `plausible_max` | export | context: sanity bounds from the registry |
-| `current_value` | export | what is in the database now, for comparison |
-| **`value_min`** | curator | bottom of range |
-| **`value_max`** | curator | top of range |
-| **`value_typical`** | curator | single value, if not a range |
-| **`qualifier`** | curator | one of `< > ~ >= <=`, optional |
-| **`source_key`** | curator | short key from `sources.csv` |
-| **`page`** | curator | at least one locator required |
-| **`table`** / **`figure`** / **`section`** | curator | alternative locators |
-| **`test_method`** | curator | e.g. `ASTM D1238`, optional |
-| **`conditions`** | curator | e.g. `190C/2.16kg`, optional |
-| **`note_en`** / **`note_fa`** | curator | optional |
-| **`confidence`** | curator | 0–1, defaults to 0.9 |
-| **`skip`** | curator | `y` to leave this row alone |
+| Column                                     | Filled by | Notes                                       |
+| ------------------------------------------ | --------- | ------------------------------------------- |
+| `material_slug`                            | export    | e.g. `ldpe` — do not edit                   |
+| `property_key`                             | export    | e.g. `density` — do not edit                |
+| `property_name_en` / `_fa`                 | export    | context only, ignored on import             |
+| `unit`                                     | export    | canonical unit expected                     |
+| `plausible_min` / `plausible_max`          | export    | context: sanity bounds from the registry    |
+| `current_value`                            | export    | what is in the database now, for comparison |
+| **`value_min`**                            | curator   | bottom of range                             |
+| **`value_max`**                            | curator   | top of range                                |
+| **`value_typical`**                        | curator   | single value, if not a range                |
+| **`qualifier`**                            | curator   | one of `< > ~ >= <=`, optional              |
+| **`source_key`**                           | curator   | short key from `sources.csv`                |
+| **`page`**                                 | curator   | at least one locator required               |
+| **`table`** / **`figure`** / **`section`** | curator   | alternative locators                        |
+| **`test_method`**                          | curator   | e.g. `ASTM D1238`, optional                 |
+| **`conditions`**                           | curator   | e.g. `190C/2.16kg`, optional                |
+| **`note_en`** / **`note_fa`**              | curator   | optional                                    |
+| **`confidence`**                           | curator   | 0–1, defaults to 0.9                        |
+| **`skip`**                                 | curator   | `y` to leave this row alone                 |
 
 Rows left entirely blank are skipped silently — the curator is expected to work
 through the file incrementally over days, not in one sitting.
@@ -114,18 +114,18 @@ created on import; existing ones are matched, not duplicated.
 The importer must reject rather than guess. Every rejection names the CSV row
 number and states the fix in plain language.
 
-| # | Rule | Rationale |
-|---|---|---|
-| V1 | A value must be supplied (min/max, or typical) | An empty row with a citation is meaningless |
-| V2 | `value_min <= value_max` | |
-| V3 | Values must parse as numbers for numeric properties | |
-| V4 | Value must lie within `plausible_min`/`plausible_max` | Catches unit slips and typos — the single most common curation error (g/cm³ vs kg/m³ is a factor of 1000) |
-| V5 | **At least one locator (page/table/figure/section) is required** | Mirrors the database CHECK. Caught early with a readable message rather than as a constraint violation |
-| V6 | `source_key` must exist in `sources.csv` or the database | |
-| V7 | `qualifier` must be one of the permitted symbols | |
-| V8 | `material_slug` + `property_key` must exist and match a real gap | Guards against edited identifier columns |
-| V9 | `test_method` must resolve to a seeded `test_method` row | |
-| V10 | `confidence` must be within 0–1 | |
+| #   | Rule                                                             | Rationale                                                                                                 |
+| --- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| V1  | A value must be supplied (min/max, or typical)                   | An empty row with a citation is meaningless                                                               |
+| V2  | `value_min <= value_max`                                         |                                                                                                           |
+| V3  | Values must parse as numbers for numeric properties              |                                                                                                           |
+| V4  | Value must lie within `plausible_min`/`plausible_max`            | Catches unit slips and typos — the single most common curation error (g/cm³ vs kg/m³ is a factor of 1000) |
+| V5  | **At least one locator (page/table/figure/section) is required** | Mirrors the database CHECK. Caught early with a readable message rather than as a constraint violation    |
+| V6  | `source_key` must exist in `sources.csv` or the database         |                                                                                                           |
+| V7  | `qualifier` must be one of the permitted symbols                 |                                                                                                           |
+| V8  | `material_slug` + `property_key` must exist and match a real gap | Guards against edited identifier columns                                                                  |
+| V9  | `test_method` must resolve to a seeded `test_method` row         |                                                                                                           |
+| V10 | `confidence` must be within 0–1                                  |                                                                                                           |
 
 V4 is a **warning that blocks by default** but can be overridden per row with
 `confidence` explicitly set and a note explaining why — some genuine values do sit
@@ -157,19 +157,19 @@ landed.
 
 ## 8. Testing
 
-| Test | Asserts |
-|---|---|
-| round-trip | export → import unchanged → no spurious writes |
-| missing locator | rejected with a readable message, not a DB constraint error |
-| implausible value | density 920 (kg/m³ mistaken for g/cm³) rejected by V4 |
-| inverted range | rejected |
-| unknown source key | rejected |
-| new source row | creates `source` + `source_document` + `citation` |
-| status transition | `unsourced` → `published`, coverage view reflects it |
-| supersede | re-citing an already-cited value supersedes rather than overwrites |
-| dry-run | writes nothing, reports the same errors |
-| transactional | one bad row late in the file rolls back earlier good rows |
-| Persian text | notes round-trip without mojibake |
+| Test               | Asserts                                                            |
+| ------------------ | ------------------------------------------------------------------ |
+| round-trip         | export → import unchanged → no spurious writes                     |
+| missing locator    | rejected with a readable message, not a DB constraint error        |
+| implausible value  | density 920 (kg/m³ mistaken for g/cm³) rejected by V4              |
+| inverted range     | rejected                                                           |
+| unknown source key | rejected                                                           |
+| new source row     | creates `source` + `source_document` + `citation`                  |
+| status transition  | `unsourced` → `published`, coverage view reflects it               |
+| supersede          | re-citing an already-cited value supersedes rather than overwrites |
+| dry-run            | writes nothing, reports the same errors                            |
+| transactional      | one bad row late in the file rolls back earlier good rows          |
+| Persian text       | notes round-trip without mojibake                                  |
 
 ---
 

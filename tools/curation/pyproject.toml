@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# tests/ imports common, export_gaps, import_values directly (they live one
+# directory up, in tools/curation/, not in a package). `pythonpath` (pytest
+# >= 7) adds tools/curation/ itself to sys.path for the duration of the test
+# session so those imports resolve without an __init__.py or an editable
+# install -- same convention as tools/etl/pyproject.toml.
+pythonpath = ["."]

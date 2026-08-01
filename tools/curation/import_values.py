@@ -271,18 +271,27 @@ def parse_optional_float(raw: str, row_number: int, field_name: str, context: st
 
 
 def plausibility_hint(value: float, plausible_min: float, plausible_max: float) -> str:
-    """Adds the unit-slip hint when the value looks ~1000x (or ~10x/100x)
-    off rather than just a bit outside the range -- that pattern is what a
+    """Adds the unit-slip hint when the value looks ~10x/100x/1000x off
+    rather than just a bit outside the range -- that pattern is what a
     wrong-unit entry (g/cm3 vs kg/m3, mm vs m, ...) produces, whereas a
     typo or a genuinely unusual value tends to be closer to the boundary.
+
+    Checked against both bounds (not just plausible_max): a density of 920
+    against a plausible range of 0.8-2.3 g/cm3 is ~400x plausible_max but
+    ~1150x plausible_min -- either one landing near a clean power of ten is
+    enough to suspect a unit slip.
     """
-    reference = plausible_max if plausible_max else plausible_min
-    if not reference:
-        return ""
-    ratio = value / reference if reference else 0
-    for factor, hint in ((1000, "kg/m³ instead of g/cm³"), (100, "cm instead of mm, or vice versa"), (10, "a misplaced decimal point")):
-        if factor * 0.5 <= abs(ratio) <= factor * 2:
-            return f" Did you enter {hint}?"
+    for reference in (plausible_min, plausible_max):
+        if not reference:
+            continue
+        ratio = abs(value / reference)
+        for factor, hint in (
+            (1000, "kg/m³ instead of g/cm³"),
+            (100, "cm instead of mm, or vice versa"),
+            (10, "a misplaced decimal point"),
+        ):
+            if factor * 0.5 <= ratio <= factor * 2:
+                return f" Did you enter {hint}?"
     return ""
 
 

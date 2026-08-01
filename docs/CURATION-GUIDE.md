@@ -3,8 +3,8 @@
 You do not need to know SQL, and you should never type into the database
 directly. You work in a spreadsheet. A script does the rest.
 
-Companion document: [SOURCING-GUIDE.md](SOURCING-GUIDE.md) — *where* to get the
-data. This one covers *how* to enter it.
+Companion document: [SOURCING-GUIDE.md](SOURCING-GUIDE.md) — _where_ to get the
+data. This one covers _how_ to enter it.
 
 ---
 
@@ -44,7 +44,7 @@ This creates two files in the `curation/` folder:
 Open both in Excel or Google Sheets.
 
 > **If Persian text looks like `Ø¨Ø§Ù„Ø§`** — the file is fine, Excel just
-> guessed the encoding wrong. Use *Data → From Text/CSV* and choose **UTF-8**
+> guessed the encoding wrong. Use _Data → From Text/CSV_ and choose **UTF-8**
 > rather than double-clicking the file.
 
 ---
@@ -56,29 +56,29 @@ Open both in Excel or Google Sheets.
 Some columns are already filled in. **Do not edit those** — they are how the
 script knows which value you mean.
 
-| Column | What it is |
-|---|---|
-| `material_slug`, `property_key` | Already filled. Leave alone. |
-| `property_name_en`, `property_name_fa` | Context, so you know what the row is |
-| `unit` | The unit your number must be in |
-| `plausible_min`, `plausible_max` | Sanity bounds — if your number falls outside, something is wrong |
-| `current_value` | What the old prototype claimed, for comparison |
+| Column                                 | What it is                                                       |
+| -------------------------------------- | ---------------------------------------------------------------- |
+| `material_slug`, `property_key`        | Already filled. Leave alone.                                     |
+| `property_name_en`, `property_name_fa` | Context, so you know what the row is                             |
+| `unit`                                 | The unit your number must be in                                  |
+| `plausible_min`, `plausible_max`       | Sanity bounds — if your number falls outside, something is wrong |
+| `current_value`                        | What the old prototype claimed, for comparison                   |
 
 Now the columns **you** fill:
 
-| Column | How to fill it |
-|---|---|
-| `value_min`, `value_max` | For a range: 0.910 and 0.925 |
-| `value_typical` | For a single number: -110. Use this **or** min/max, not both |
-| `qualifier` | Only if the source says "less than 0.01" → put `<` and 0.01 in `value_max` |
-| `source_key` | The short name from `sources.csv`, e.g. `brydson-plastics-materials` |
-| `page` | **Required.** The page you actually read it on |
-| `table`, `figure`, `section` | Instead of, or as well as, a page |
-| `test_method` | If stated, e.g. `ASTM D1238` |
-| `conditions` | If stated, e.g. `190C/2.16kg` |
-| `note_en`, `note_fa` | Anything worth remembering |
-| `confidence` | 0 to 1. Leave blank for the default (0.9) |
-| `skip` | Put `y` to ignore this row for now |
+| Column                       | How to fill it                                                             |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| `value_min`, `value_max`     | For a range: 0.910 and 0.925                                               |
+| `value_typical`              | For a single number: -110. Use this **or** min/max, not both               |
+| `qualifier`                  | Only if the source says "less than 0.01" → put `<` and 0.01 in `value_max` |
+| `source_key`                 | The short name from `sources.csv`, e.g. `brydson-plastics-materials`       |
+| `page`                       | **Required.** The page you actually read it on                             |
+| `table`, `figure`, `section` | Instead of, or as well as, a page                                          |
+| `test_method`                | If stated, e.g. `ASTM D1238`                                               |
+| `conditions`                 | If stated, e.g. `190C/2.16kg`                                              |
+| `note_en`, `note_fa`         | Anything worth remembering                                                 |
+| `confidence`                 | 0 to 1. Leave blank for the default (0.9)                                  |
+| `skip`                       | Put `y` to ignore this row for now                                         |
 
 **You do not have to fill the whole file.** Do ten rows, import them, come back
 tomorrow. Blank rows are simply ignored.
@@ -87,9 +87,9 @@ tomorrow. Blank rows are simply ignored.
 
 If you are citing a book that is not listed yet, add a row:
 
-| source_key | title | authors | publisher | edition | year | kind | tier |
-|---|---|---|---|---|---|---|---|
-| `brydson-plastics-materials` | Plastics Materials | J.A. Brydson | Butterworth-Heinemann | 7th | 1999 | `handbook` | `peer_reviewed_handbook` |
+| source_key                   | title              | authors      | publisher             | edition | year | kind       | tier                     |
+| ---------------------------- | ------------------ | ------------ | --------------------- | ------- | ---- | ---------- | ------------------------ |
+| `brydson-plastics-materials` | Plastics Materials | J.A. Brydson | Butterworth-Heinemann | 7th     | 1999 | `handbook` | `peer_reviewed_handbook` |
 
 `source_key` is a short nickname you invent. Use it in `gaps.csv`.
 
@@ -147,7 +147,7 @@ python tools/curation/import_values.py
 
 Two things worth knowing:
 
-**All or nothing.** If any row fails, *nothing* is saved. You never end up with
+**All or nothing.** If any row fails, _nothing_ is saved. You never end up with
 half your work loaded and no idea which half.
 
 **Nothing is ever destroyed.** If you re-cite a value that already had a source,
@@ -199,6 +199,6 @@ is more scientifically useful — and more distinctive — than one confident nu
 - **"could not connect to database"** → the database is not running. Start it:
   `docker compose -f db/docker-compose.yml up -d`
 - **Persian shows as `????`** → re-open the CSV as UTF-8 (see Step 1)
-- **Excel changed `4` into a date** → format the column as *Text* before typing
+- **Excel changed `4` into a date** → format the column as _Text_ before typing
 - **You want to start over** → delete `curation/gaps.csv` and re-run
   `export_gaps.py`. Nothing in the database is affected.

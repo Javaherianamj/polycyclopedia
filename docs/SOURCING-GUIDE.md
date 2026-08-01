@@ -1,8 +1,8 @@
 # Where to Get Valid Polymer Data
 
-Written in response to a correct objection: *"commercial datasheets are about
+Written in response to a correct objection: _"commercial datasheets are about
 products! how should I find something about a general grade — LDPE alone, they
-usually have 10 different LDPEs or more."*
+usually have 10 different LDPEs or more."_
 
 Exactly right. This guide exists because that distinction changes which sources
 are even applicable.
@@ -13,18 +13,18 @@ are even applicable.
 
 Your database has two separate tables for a reason.
 
-| | **`material`** — generic | **`grade`** — product |
-|---|---|---|
-| Example | LDPE, the class of matter | Lupolen 2420H |
-| Looks like | density **0.910 – 0.925** g/cm³ | density **0.923** g/cm³ |
-| Question it answers | "What is LDPE like?" | "What exactly am I buying?" |
-| Comes from | handbooks, encyclopedias, textbooks, review articles | manufacturer datasheets |
+|                     | **`material`** — generic                             | **`grade`** — product       |
+| ------------------- | ---------------------------------------------------- | --------------------------- |
+| Example             | LDPE, the class of matter                            | Lupolen 2420H               |
+| Looks like          | density **0.910 – 0.925** g/cm³                      | density **0.923** g/cm³     |
+| Question it answers | "What is LDPE like?"                                 | "What exactly am I buying?" |
+| Comes from          | handbooks, encyclopedias, textbooks, review articles | manufacturer datasheets     |
 
 ### Why you cannot build generic data out of datasheets
 
 Suppose you download all 12 of a producer's LDPE datasheets and average their
 densities. You have **not** computed "the density of LDPE." You have computed
-*the average of that company's current product portfolio* — which shifts when
+_the average of that company's current product portfolio_ — which shifts when
 they discontinue a grade, and which reflects their market focus, not the
 material's physics.
 
@@ -46,14 +46,14 @@ Ordered by how much I would trust them, which is also roughly your `source_tier`
 
 These are what your `source` table is already seeded with.
 
-| Work | Covers | Access |
-|---|---|---|
-| **Polymer Handbook**, 4th ed. (Brandrup, Immergut, Grulke) | The standard. Density, crystallinity, thermal, solubility parameters | University library; used copies |
-| **Encyclopedia of Polymer Science and Technology** (Mark, Wiley) | Broad; excellent per-polymer articles | Library, often online via institution |
-| **Principles of Polymerization**, 4th ed. (Odian) | Synthesis, kinetics, mechanisms | Widely available |
-| **Polymer Physics** (Rubinstein & Colby) | Entanglement Mw, radius of gyration, rheology | Widely available |
-| **Physical Properties of Polymers Handbook** (Mark, Springer) | Very strong on thermal/mechanical | Library |
-| **Plastics Materials** (Brydson) | Engineering-oriented, very practical, readable | Used copies are cheap |
+| Work                                                             | Covers                                                               | Access                                |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------- |
+| **Polymer Handbook**, 4th ed. (Brandrup, Immergut, Grulke)       | The standard. Density, crystallinity, thermal, solubility parameters | University library; used copies       |
+| **Encyclopedia of Polymer Science and Technology** (Mark, Wiley) | Broad; excellent per-polymer articles                                | Library, often online via institution |
+| **Principles of Polymerization**, 4th ed. (Odian)                | Synthesis, kinetics, mechanisms                                      | Widely available                      |
+| **Polymer Physics** (Rubinstein & Colby)                         | Entanglement Mw, radius of gyration, rheology                        | Widely available                      |
+| **Physical Properties of Polymers Handbook** (Mark, Springer)    | Very strong on thermal/mechanical                                    | Library                               |
+| **Plastics Materials** (Brydson)                                 | Engineering-oriented, very practical, readable                       | Used copies are cheap                 |
 
 **How to actually get them:** your university library is the realistic route —
 Iranian universities commonly hold or license these. Interlibrary loan works. A
@@ -67,17 +67,17 @@ through most of LDPE and HDPE by itself.
 ### Tier 2 — Free, legitimate, and genuinely good
 
 **Open-access review articles.** Underrated and the best free option. A review
-paper on "polyethylene structure and properties" gives you property ranges *with
-citations to the primary literature*, is free, and is citable by DOI and page.
+paper on "polyethylene structure and properties" gives you property ranges _with
+citations to the primary literature_, is free, and is citable by DOI and page.
 
 - Search **DOAJ** (doaj.org), **PubMed Central**, **arXiv** (cond-mat.soft)
-- Journals: *Polymers* (MDPI, fully open access), *Progress in Polymer Science*
-  (some open), *Polymer Reviews*
+- Journals: _Polymers_ (MDPI, fully open access), _Progress in Polymer Science_
+  (some open), _Polymer Reviews_
 - Query pattern: `polyethylene review properties crystallinity` + `open access`
 
 **Wikipedia** — CC BY-SA, legally reusable with attribution. Quality varies but
 polymer articles are decent, and they cite their own sources, which is often the
-faster path: use Wikipedia to *find* the primary reference, then cite that.
+faster path: use Wikipedia to _find_ the primary reference, then cite that.
 
 **PubChem** (pubchem.ncbi.nlm.nih.gov) — US government, public domain. Best
 source for your `material_identifier` rows: CAS numbers, molecular formulas,
@@ -160,11 +160,11 @@ blank. `unsourced` is honest; a fabricated citation is undetectable later and
 destroys the one thing that makes this project worth building.
 
 **Record the source you actually read.** If you found a value in Brydson who
-cites a 1963 paper, cite *Brydson* and the page you read — unless you actually
+cites a 1963 paper, cite _Brydson_ and the page you read — unless you actually
 read the 1963 paper.
 
 **Prefer ranges to single values** for generic materials. LDPE density genuinely
-*is* a range; collapsing it to one number destroys real information.
+_is_ a range; collapsing it to one number destroys real information.
 
 **Write down disagreements.** If two handbooks conflict, that is worth capturing
 — your `evidence` table has a `conflicting` role for exactly this. Two sourced,
