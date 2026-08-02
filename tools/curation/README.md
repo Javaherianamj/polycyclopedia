@@ -235,13 +235,14 @@ source.
 
 ## Files
 
-| File                 | Role                                                                                                                       |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `common.py`          | DB connection, CSV column contracts (`GAPS_FIELDNAMES` / `SOURCES_FIELDNAMES`), shared helpers                             |
-| `export_gaps.py`     | unsourced `property_value` + `property_definition` → `gaps.csv`; `source` → `sources.csv`                                  |
-| `import_values.py`   | Validates (V1–V10) and writes → `source` / `source_document` / `citation` / `property_value` / `evidence`, one transaction |
-| `export_workbook.py` | Optional `.xlsx` front-end over the same data                                                                              |
-| `import_workbook.py` | `.xlsx` → CSVs → `import_values.main()`                                                                                    |
+| File                  | Role                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `common.py`           | DB connection, CSV column contracts (`GAPS_FIELDNAMES` / `SOURCES_FIELDNAMES` / `NEW_MATERIALS_FIELDNAMES`), shared helpers           |
+| `export_gaps.py`      | unsourced (+ `--include-missing`: value-less) `property_value` + `property_definition` → `gaps.csv`; `source` → `sources.csv`         |
+| `import_values.py`    | Validates (V1–V10) and writes → `source` / `source_document` / `citation` / `property_value` / `evidence`, one transaction            |
+| `import_materials.py` | `curation/new_materials.csv` → `field` (lookup only) / `family` (create if new) / `material` / `material_identifier`, one transaction |
+| `export_workbook.py`  | Optional `.xlsx` front-end over the same data                                                                                         |
+| `import_workbook.py`  | `.xlsx` → CSVs → `import_values.main()`                                                                                               |
 
 Both export scripts accept `--material` and `--gaps-csv` / `--sources-csv`
 overrides. Full design, including all ten validation rules:
@@ -258,6 +259,20 @@ overrides. Full design, including all ten validation rules:
 - **V8 matches the currently-live value, not strictly `status='unsourced'`.**
   Read literally the spec would make re-citing an already-published value
   unreachable, since such a value no longer appears in a fresh export.
+  Extended further so a row is only rejected if the material or the property
+  genuinely doesn't exist -- if both are real but there's simply no
+  `property_value` row yet (a material `import_materials.py` just created,
+  or any property that material never had a row for), a new row is created
+  instead of the row being rejected. The `current_value` fallback above
+  explicitly does not extend to this case: a brand-new row has no existing
+  value to fall back to, so it must supply one itself (V1).
+- **`import_materials.py` is idempotent by `slug`, not append-only.**
+  Re-running the same CSV updates the existing material in place (status is
+  left untouched) rather than erroring or duplicating -- a curator fixing a
+  typo in `new_materials.csv` shouldn't have to delete anything by hand
+  first. `cas`/`resin_code` identifiers are replaced the same way (delete +
+  insert for that type), so a corrected value doesn't leave the old one
+  behind as an orphan.
 - **`source_key` exists only in the CSV.** Sources are matched to existing rows
   by `(title, edition)` — the same natural key as `uq_source_title_edition` — so
   a new key over an existing title matches rather than duplicating.
@@ -277,9 +292,11 @@ overrides. Full design, including all ten validation rules:
 tools/etl/.venv/bin/python -m pytest tools/curation/tests -q
 ```
 
-84 tests. Pure-logic tests (`test_common.py`, `test_validation.py`) plus
+95 tests. Pure-logic tests (`test_common.py`, `test_validation.py`) plus
 integration tests against the live database, which exercise the real trigger, the
 partial unique index behind supersede, and the `citation.locator` CHECK.
+`test_import_materials.py` covers `import_materials.py` specifically (new
+material, new family, unknown `field_key`, idempotent re-run, `--template`).
 
 **Tests must leave the database exactly as they found it** — verify with
 `SELECT count(*) FROM citation;` (expect 0 on a freshly seeded database). An

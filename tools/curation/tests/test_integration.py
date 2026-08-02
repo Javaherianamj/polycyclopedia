@@ -24,6 +24,7 @@ commits anything -- see strategy 1/2 above.
 """
 from __future__ import annotations
 
+import csv
 import json
 import subprocess
 import sys
