@@ -98,3 +98,21 @@ is worse than a missing one.
 `db/seeds/0005_materials_ldpe_hdpe.sql` is generated, not hand-written. See
 [`tools/etl/`](../tools/etl/) for the parser that converts the legacy
 TypeScript into it, and for the known data defects it surfaced.
+
+## Adding citations
+
+Do not write `INSERT` statements by hand for curation work. Use the spreadsheet
+workflow in [`tools/curation/`](../tools/curation/), which validates values
+against the registry's plausibility bounds, refuses a citation with no page
+reference, and applies the whole file in one transaction.
+
+The current work list is the `v_unsourced_values` view:
+
+```sql
+SELECT * FROM v_unsourced_values;
+```
+
+109 rows today, because no value carries a real citation yet. The curator-facing
+instructions are [`docs/CURATION-GUIDE.md`](../docs/CURATION-GUIDE.md), and
+[`docs/SOURCING-GUIDE.md`](../docs/SOURCING-GUIDE.md) covers which sources are
+appropriate for generic `material` ranges versus grade-level datasheets.
