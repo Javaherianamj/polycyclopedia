@@ -74,3 +74,20 @@
 **Context**: AI-DLC adaptive stage assessment for U5.
 
 ---
+
+## Whole-Project Inception (retroactive) + U5b
+
+**Timestamp**: 2026-08-02T21:00:00Z
+**User Input**: "excelent. and what if i want to add new entry for a new polymer? should i continue under this file? and the python script read them all and add them to database? if not add that feater too and let me go working on citation and data. is there anything else i can do about the project? also based on aidlc, did you make the inception plan for the whole project? we built database and have a nice working UI which needs formation and several fixes but the idea is there. what parts are left? and what else can i do meanwhile i am extracting data"
+**AI Response**: "Confirmed the user's implicit criticism: no whole-project Inception plan existed. Per-unit Inception was performed for U1, U2 and U5, and the session-1 roadmap predated AI-DLC adoption, but the project-level unit decomposition AI-DLC calls for was skipped and units were defined reactively one at a time. Wrote aidlc-docs/inception/plans/project-plan.md covering all 13 units with status, dependency graph, critical path, risks, open decisions, and parallel non-code work. Opened U5b `new-material-curation` to close the gap the user identified: gaps.csv is generated only from existing unsourced property_value rows, so there is currently no path to add a new polymer or to enter a value for a property that has no row yet."
+**Context**: Inception (project level, retroactive) + U5b requirements.
+
+---
+
+## U5b Stage Decisions
+
+**Timestamp**: 2026-08-02T21:00:00Z
+**AI Response**: "Requirements: MINIMAL, stated directly by the user. Design folded into the dispatch spec — three changes: (1) import_materials.py creating materials and, when named, new families under an existing field; (2) export_gaps.py --include-missing, opt-in so existing behaviour and the 84 passing tests are unchanged, emitting rows for (material, property) pairs with no property_value at all and respecting property_definition.applies_to_fields; (3) import_values.py V8 relaxed to INSERT when no live value exists, while still rejecting unknown materials or properties so gaps.csv can never silently create a material. current_value fallback deliberately does not apply to brand-new rows, since there is nothing to fall back on."
+**Context**: AI-DLC adaptive stage assessment for U5b.
+
+---

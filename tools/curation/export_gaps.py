@@ -1,8 +1,9 @@
 """Exports the citation work list to curation/gaps.csv and the bibliography
 to curation/sources.csv.
 
-    python export_gaps.py                  # every unsourced material value
-    python export_gaps.py --material ldpe   # one material only (pilot use)
+    python export_gaps.py                          # every unsourced material value
+    python export_gaps.py --material ldpe           # one material only (pilot use)
+    python export_gaps.py --include-missing         # also rows with no value at all
 
 Both files are written UTF-8 with a BOM (utf-8-sig) so Excel opens Persian
 text (name_fa, note_fa) correctly instead of guessing a codepage and
@@ -15,6 +16,17 @@ grade-level datasheet import is U6, out of scope here.
 sources.csv is always the *full* bibliography (not filtered by --material):
 sources aren't material-specific, and the curator may want to cite an
 existing handbook for a material other than the one they last exported.
+
+--include-missing (default off, so the plain export a curator already knows
+is unchanged) also emits a row for every (material, property_definition)
+pair that has *no* property_value row at all yet -- not just the unsourced
+ones. This is what makes a material created by import_materials.py usable:
+right after creation it has zero property_value rows, so without this flag
+a fresh export shows nothing for it at all, current_value is blank for
+these rows (there's nothing to compare against), and pd.applies_to_fields
+is respected -- a property scoped to certain fields is only offered to
+materials in one of those fields; an empty applies_to_fields means it
+applies to every field, unchanged from today's behaviour.
 """
 from __future__ import annotations
 
@@ -45,6 +57,7 @@ GAPS_QUERY = """
         pd.canonical_unit     AS unit,
         pd.plausible_min      AS plausible_min,
         pd.plausible_max      AS plausible_max,
+        pd.sort_order         AS sort_order,
         pv.value_min,
         pv.value_max,
         pv.value_typical,
@@ -56,7 +69,41 @@ GAPS_QUERY = """
     JOIN material m ON pv.subject_type = 'material' AND m.id = pv.subject_id
     WHERE pv.status = 'unsourced'
       AND (%(material_slug)s::text IS NULL OR m.slug = %(material_slug)s)
-    ORDER BY m.slug, pd.sort_order, pd.key;
+"""
+
+# --include-missing only: every (material, property_definition) pair with no
+# property_value row at all -- regardless of status, since "no row" and "a
+# row that happens to be unsourced" are different gaps (the former is what a
+# brand-new material has for every property). applies_to_fields is honoured
+# the same way the UI would honour it: empty means "applies to every field",
+# otherwise the material's field key must be in the array.
+GAPS_MISSING_QUERY = """
+    SELECT
+        m.slug                 AS material_slug,
+        pd.key                 AS property_key,
+        pd.name_en             AS property_name_en,
+        pd.name_fa             AS property_name_fa,
+        pd.canonical_unit      AS unit,
+        pd.plausible_min       AS plausible_min,
+        pd.plausible_max       AS plausible_max,
+        pd.sort_order          AS sort_order,
+        NULL::double precision AS value_min,
+        NULL::double precision AS value_max,
+        NULL::double precision AS value_typical,
+        NULL::text             AS value_text,
+        NULL::text             AS value_enum,
+        NULL::boolean          AS value_bool
+    FROM material m
+    JOIN field f ON f.id = m.field_id
+    CROSS JOIN property_definition pd
+    WHERE (%(material_slug)s::text IS NULL OR m.slug = %(material_slug)s)
+      AND (pd.applies_to_fields = '{}' OR f.key = ANY(pd.applies_to_fields))
+      AND NOT EXISTS (
+          SELECT 1 FROM property_value pv
+          WHERE pv.subject_type = 'material'
+            AND pv.subject_id = m.id
+            AND pv.property_id = pd.id
+      )
 """
 
 SOURCES_QUERY = """
@@ -66,11 +113,23 @@ SOURCES_QUERY = """
 """
 
 
-def export_gaps(conn, material_slug: str | None, out_path: Path = GAPS_CSV_PATH) -> int:
+def export_gaps(
+    conn,
+    material_slug: str | None,
+    out_path: Path = GAPS_CSV_PATH,
+    include_missing: bool = False,
+) -> int:
     with conn.cursor() as cur:
         cur.execute(GAPS_QUERY, {"material_slug": material_slug})
         columns = [d.name for d in cur.description]
         rows = [dict(zip(columns, row)) for row in cur.fetchall()]
+
+    if include_missing:
+        with conn.cursor() as cur:
+            cur.execute(GAPS_MISSING_QUERY, {"material_slug": material_slug})
+            columns = [d.name for d in cur.description]
+            rows.extend(dict(zip(columns, row)) for row in cur.fetchall())
+        rows.sort(key=lambda r: (r["material_slug"], r["sort_order"], r["property_key"]))
 
     CURATION_DIR.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", newline="", encoding=CSV_ENCODING) as f:
@@ -146,6 +205,16 @@ def main() -> None:
         default=None,
         help="Export gaps for one material only, e.g. ldpe. Default: all materials.",
     )
+    parser.add_argument(
+        "--include-missing",
+        action="store_true",
+        help=(
+            "Also include (material, property) pairs with no property_value row at all "
+            "yet, not just unsourced ones. current_value is blank for these. This is what "
+            "makes a material just created by import_materials.py show up in gaps.csv. "
+            "Default: off, unchanged existing behaviour."
+        ),
+    )
     # Path overrides exist so the test suite can write to an isolated
     # directory instead of clobbering the curator's in-progress worksheet.
     parser.add_argument("--gaps-csv", type=Path, default=GAPS_CSV_PATH)
@@ -157,7 +226,7 @@ def main() -> None:
 
     conn = get_connection()
     try:
-        gap_count = export_gaps(conn, args.material, args.gaps_csv)
+        gap_count = export_gaps(conn, args.material, args.gaps_csv, args.include_missing)
         source_count = export_sources(conn, args.sources_csv)
         # Read-only session: nothing was written, but close the transaction
         # psycopg opened for the SELECTs cleanly.

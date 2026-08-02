@@ -17,6 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CURATION_DIR = REPO_ROOT / "curation"
 GAPS_CSV_PATH = CURATION_DIR / "gaps.csv"
 SOURCES_CSV_PATH = CURATION_DIR / "sources.csv"
+NEW_MATERIALS_CSV_PATH = CURATION_DIR / "new_materials.csv"
 DB_ENV_PATH = REPO_ROOT / "db" / ".env"
 
 # ---------------------------------------------------------------------------
@@ -74,6 +75,30 @@ SOURCES_FIELDNAMES = [
 # Locator columns, in the order the CHECK constraint on citation.locator
 # cares about (any one is sufficient -- see V5).
 LOCATOR_FIELDS = ["page", "table", "figure", "section"]
+
+# curation/new_materials.csv -- import_materials.py's input, the counterpart
+# to GAPS_FIELDNAMES for creating a material rather than citing one. Order
+# matches the table in the task/README: identity + classification columns
+# first, then the free-text/optional ones.
+NEW_MATERIALS_FIELDNAMES = [
+    "slug",
+    "field_key",
+    "family_key",
+    "family_name_fa",
+    "family_name_en",
+    "name_fa",
+    "name_en",
+    "code",
+    "cas",
+    "resin_code",
+    "discovery_year",
+    "overview_fa",
+    "overview_en",
+    "chain_type",
+]
+
+# Columns that must be non-blank for every real (non-comment) row.
+NEW_MATERIALS_REQUIRED_FIELDS = ["slug", "field_key", "family_key", "name_fa", "name_en"]
 
 QUALIFIERS = {"<", ">", "~", ">=", "<="}
 

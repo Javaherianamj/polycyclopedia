@@ -36,9 +36,12 @@ from common import get_connection
 from export_gaps import export_gaps, export_sources
 from import_values import (
     LOCATOR_FIELDS,
+    RowError,
     execute_plan,
     load_existing_sources,
     load_live_values,
+    load_materials,
+    load_property_definitions,
     load_source_documents,
     load_test_methods,
     validate_row,
@@ -527,3 +530,144 @@ def test_late_bad_row_prevents_earlier_good_row_from_landing(tmp_path):
         check_conn.close()
 
     assert status == "unsourced", "the earlier, individually-valid row must not have been committed"
+
+
+# ---------------------------------------------------------------------------
+# New rows: property_value created when no live row exists at all
+# ---------------------------------------------------------------------------
+#
+# ldpe/izod_impact is used as the fixture here rather than a fabricated
+# material: LDPE is seeded with 54 of the 55 properties that apply to it
+# (see test_curation.py's "expected 54 LDPE gaps" assertion) -- izod_impact
+# is the one property with no property_value row at all for ldpe, which is
+# exactly the "no live value" case these tests are about. Real seeded data,
+# same as every other test in this module; nothing here is fabricated and
+# nothing is committed.
+
+
+def test_include_missing_emits_value_less_property_row(db_conn, tmp_path):
+    """Without --include-missing, ldpe's value-less izod_impact never
+    appears (matches today's documented 54-row LDPE export). With it, the
+    row appears with a blank current_value."""
+    gaps_path = tmp_path / "gaps.csv"
+
+    count_without = export_gaps(db_conn, "ldpe", gaps_path, include_missing=False)
+    with gaps_path.open(encoding="utf-8-sig", newline="") as f:
+        rows_without = list(csv.DictReader(f))
+    assert count_without == 54
+    assert not any(r["property_key"] == "izod_impact" for r in rows_without)
+
+    count_with = export_gaps(db_conn, "ldpe", gaps_path, include_missing=True)
+    with gaps_path.open(encoding="utf-8-sig", newline="") as f:
+        rows_with = list(csv.DictReader(f))
+    assert count_with == 55
+
+    izod_rows = [r for r in rows_with if r["property_key"] == "izod_impact"]
+    assert len(izod_rows) == 1
+    assert izod_rows[0]["material_slug"] == "ldpe"
+    assert izod_rows[0]["current_value"] == ""
+    assert izod_rows[0]["unit"] == "J/m"
+
+
+def test_import_creates_property_value_for_property_with_no_existing_row(db_conn):
+    """V8 extended: material and property both real, but no live
+    property_value row -- the importer creates one instead of rejecting."""
+    live_values = load_live_values(db_conn)
+    assert ("ldpe", "izod_impact") not in live_values, (
+        "fixture assumption broken: ldpe/izod_impact is expected to have no live value"
+    )
+
+    materials = load_materials(db_conn)
+    property_defs = load_property_definitions(db_conn)
+    sources_by_key = {
+        "polymer-handbook-4e": {"title": "Polymer Handbook", "kind": "handbook", "tier": "peer_reviewed_handbook"}
+    }
+    test_methods = load_test_methods(db_conn)
+
+    row = make_gaps_row(
+        "ldpe", "izod_impact", value_typical="30", source_key="polymer-handbook-4e", page="200"
+    )
+    plan = validate_row(2, row, live_values, sources_by_key, {}, test_methods, materials, property_defs)
+    assert plan.is_new_row is True
+
+    execute_plan(db_conn, [plan])
+
+    with db_conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT pv.status, pv.value_typical, pv.subject_id
+            FROM property_value pv
+            JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
+            JOIN property_definition pd ON pd.id = pv.property_id
+            WHERE m.slug = 'ldpe' AND pd.key = 'izod_impact';
+            """
+        )
+        row_out = cur.fetchone()
+        assert row_out is not None, "expected a brand-new property_value row to have been created"
+        status, value_typical, subject_id = row_out
+        assert status == "published"
+        assert float(value_typical) == 30.0
+        assert subject_id == materials["ldpe"]["id"]
+
+        cur.execute("SELECT count(*) FROM evidence e JOIN property_value pv ON pv.id = e.property_value_id "
+                    "WHERE pv.subject_id = %s AND pv.property_id = %s;",
+                    (materials["ldpe"]["id"], property_defs["izod_impact"]["id"]))
+        assert cur.fetchone()[0] == 1
+
+
+def test_new_row_with_citation_but_no_value_is_rejected(db_conn):
+    """The current_value fallback exists to let a citation-only row keep the
+    existing number -- but a brand-new row has no existing number to fall
+    back on, so it must be rejected with a message explaining why, not
+    silently accepted with no value (which would violate
+    property_value_has_a_value_chk anyway, just with a worse error)."""
+    live_values = load_live_values(db_conn)
+    materials = load_materials(db_conn)
+    property_defs = load_property_definitions(db_conn)
+    sources_by_key = {
+        "polymer-handbook-4e": {"title": "Polymer Handbook", "kind": "handbook", "tier": "peer_reviewed_handbook"}
+    }
+
+    row = make_gaps_row("ldpe", "izod_impact", source_key="polymer-handbook-4e", page="200")
+    with pytest.raises(RowError) as exc:
+        validate_row(2, row, live_values, sources_by_key, {}, {}, materials, property_defs)
+    message = exc.value.render()
+    assert "brand-new" in message
+    assert "no existing database value to fall back on" in message
+
+
+def test_row_naming_nonexistent_material_is_rejected(db_conn):
+    """A gaps.csv row can't be used to smuggle in a new material -- only
+    import_materials.py creates materials. A row with a made-up
+    material_slug must be rejected with a plain-language message, not
+    silently ignored or used to create anything."""
+    live_values = load_live_values(db_conn)
+    materials = load_materials(db_conn)
+    property_defs = load_property_definitions(db_conn)
+    sources_by_key = {
+        "polymer-handbook-4e": {"title": "Polymer Handbook", "kind": "handbook", "tier": "peer_reviewed_handbook"}
+    }
+
+    row = make_gaps_row(
+        "__test_nonexistent_material__", "density", value_typical="1.0",
+        source_key="polymer-handbook-4e", page="1",
+    )
+    with pytest.raises(RowError) as exc:
+        validate_row(2, row, live_values, sources_by_key, {}, {}, materials, property_defs)
+    message = exc.value.render()
+    assert "__test_nonexistent_material__" in message
+    assert "doesn't match any material" in message
+
+
+def test_new_row_path_unreachable_without_materials_and_property_defs(db_conn):
+    """Backward compatibility: existing callers that don't pass the new
+    materials/property_defs arguments keep getting the original V8
+    rejection message for an unmatched pair, rather than a crash."""
+    live_values = load_live_values(db_conn)
+    sources_by_key = {
+        "polymer-handbook-4e": {"title": "Polymer Handbook", "kind": "handbook", "tier": "peer_reviewed_handbook"}
+    }
+    row = make_gaps_row("ldpe", "izod_impact", value_typical="30", source_key="polymer-handbook-4e", page="1")
+    with pytest.raises(RowError) as exc:
+        validate_row(2, row, live_values, sources_by_key, {}, {})
+    assert "doesn't match any current value in the database" in exc.value.render()

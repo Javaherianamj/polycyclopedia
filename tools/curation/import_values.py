@@ -19,6 +19,13 @@ the rule table alone:
 * If the value being cited already has evidence (i.e. this is a re-citation,
   not the first one), the old property_value row is superseded rather than
   updated in place -- FR-7.1, never destroy history.
+* If material_slug + property_key are both real but there is no live
+  property_value row for that pair at all (e.g. a material just created by
+  import_materials.py, or a property this material never had a row for), a
+  new property_value row is created rather than the row being rejected. The
+  current_value fallback above does NOT apply here -- there is nothing to
+  fall back to, so such a row must supply value_min/value_max or
+  value_typical itself (see the V1 check in validate_row).
 * Any single invalid row aborts the entire file. Nothing is written unless
   every non-blank, non-skipped row passes all ten validation rules.
 """
@@ -116,9 +123,17 @@ def row_is_skipped(row: dict) -> bool:
 
 @dataclass
 class LiveValue:
-    """The current live property_value row for one (material, property)."""
+    """The current live property_value row for one (material, property).
 
-    pv_id: int
+    pv_id is None for a row synthesised by validate_row() when no live
+    property_value exists yet -- see the "new row" path in validate_row and
+    load_materials/load_property_definitions below. Every other field is
+    still populated (from property_definition, with all value_* fields
+    None) so the rest of validate_row/execute_plan doesn't need to branch
+    on whether the row is new at every access site.
+    """
+
+    pv_id: int | None
     subject_id: int
     property_id: int
     data_type: str
@@ -200,6 +215,36 @@ def load_live_values(conn) -> dict[tuple[str, str], LiveValue]:
     return out
 
 
+def load_materials(conn) -> dict[str, dict]:
+    """material_slug -> {id}. Used only for the "no live value yet" path in
+    validate_row, to tell "material doesn't exist" apart from "property
+    doesn't exist" apart from "both exist, there's just no row yet" --
+    load_live_values() alone can't distinguish these, since it only returns
+    pairs that already have a row.
+    """
+    with conn.cursor() as cur:
+        cur.execute("SELECT slug, id FROM material;")
+        return {slug: {"id": mid} for slug, mid in cur.fetchall()}
+
+
+def load_property_definitions(conn) -> dict[str, dict]:
+    """property_key -> {id, data_type, canonical_unit, plausible_min, plausible_max}."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT key, id, data_type, canonical_unit, plausible_min, plausible_max FROM property_definition;"
+        )
+        return {
+            key: {
+                "id": pid,
+                "data_type": data_type,
+                "canonical_unit": canonical_unit,
+                "plausible_min": plausible_min,
+                "plausible_max": plausible_max,
+            }
+            for key, pid, data_type, canonical_unit, plausible_min, plausible_max in cur.fetchall()
+        }
+
+
 def load_test_methods(conn) -> dict[str, int]:
     with conn.cursor() as cur:
         cur.execute("SELECT id, standard_body, code FROM test_method;")
@@ -250,6 +295,7 @@ class PlannedRow:
     note_fa: str | None
     confidence: float
     warnings: list[str] = field(default_factory=list)
+    is_new_row: bool = False
 
 
 def context_label(material_slug: str, property_key: str) -> str:
@@ -302,20 +348,74 @@ def validate_row(
     sources_by_key: dict[str, dict],
     fallback_sources_by_key: dict[str, int],
     test_methods: dict[str, int],
+    materials: dict[str, dict] | None = None,
+    property_defs: dict[str, dict] | None = None,
 ) -> PlannedRow:
     material_slug = (row.get("material_slug") or "").strip()
     property_key = (row.get("property_key") or "").strip()
     context = context_label(material_slug, property_key)
 
-    # --- V8: material_slug + property_key must resolve to a real, live value ---
+    # --- V8: material_slug + property_key must resolve to a real material
+    # and a real property. If there's no *live* value yet for that pair,
+    # that's no longer automatically a rejection: as long as both sides are
+    # real (e.g. a material import_materials.py just created, which starts
+    # with zero property_value rows), a fresh row is created -- see the
+    # is_new_row plumbing through to execute_plan(). materials/property_defs
+    # are optional purely so existing callers (tests, older code) that only
+    # ever pass already-existing pairs don't need to change; the "row is
+    # genuinely new" path is unreachable unless both dicts are supplied.
     live = live_values.get((material_slug, property_key))
+    is_new_row = False
     if live is None:
-        raise RowError(
-            row_number,
-            f"material_slug '{material_slug}' + property_key '{property_key}' doesn't match any "
-            "current value in the database. Don't edit those two columns -- if this row looks wrong, "
-            "re-run export_gaps.py and copy your edits into the fresh file.",
-            context,
+        if materials is None or property_defs is None:
+            raise RowError(
+                row_number,
+                f"material_slug '{material_slug}' + property_key '{property_key}' doesn't match any "
+                "current value in the database. Don't edit those two columns -- if this row looks "
+                "wrong, re-run export_gaps.py and copy your edits into the fresh file.",
+                context,
+            )
+        material = materials.get(material_slug)
+        if material is None:
+            raise RowError(
+                row_number,
+                f"material_slug '{material_slug}' doesn't match any material in the database. Don't "
+                "edit that column by hand -- use import_materials.py to create a new material first, "
+                "or re-run export_gaps.py and copy your edits into the fresh file.",
+                context,
+            )
+        property_def = property_defs.get(property_key)
+        if property_def is None:
+            raise RowError(
+                row_number,
+                f"property_key '{property_key}' doesn't match any property definition in the "
+                "database. Don't edit that column by hand -- re-run export_gaps.py and copy your "
+                "edits into the fresh file.",
+                context,
+            )
+        is_new_row = True
+        live = LiveValue(
+            pv_id=None,
+            subject_id=material["id"],
+            property_id=property_def["id"],
+            data_type=property_def["data_type"],
+            canonical_unit=property_def["canonical_unit"],
+            plausible_min=property_def["plausible_min"],
+            plausible_max=property_def["plausible_max"],
+            value_min=None,
+            value_max=None,
+            value_typical=None,
+            value_text=None,
+            value_enum=None,
+            value_bool=None,
+            unit_display=None,
+            qualifier=None,
+            test_method_id=None,
+            conditions={},
+            note_en=None,
+            note_fa=None,
+            confidence=None,
+            has_evidence=False,
         )
 
     # --- V3 (+ scope guard): numeric columns only apply to numeric/range properties ---
@@ -348,6 +448,15 @@ def validate_row(
             live.value_min is not None or live.value_max is not None or live.value_typical is not None
         )
         if not effective_has_value:
+            if is_new_row:
+                raise RowError(
+                    row_number,
+                    "no value given, and this is a brand-new property row -- there is no existing "
+                    "database value to fall back on (that fallback only works for citing a value "
+                    "that's already there). Fill in value_min/value_max (a range) or value_typical "
+                    "(a single number).",
+                    context,
+                )
             raise RowError(
                 row_number,
                 "no value given, and there isn't one in the database yet either. Fill in value_min/"
@@ -509,6 +618,7 @@ def validate_row(
         note_fa=note_fa,
         confidence=confidence,
         warnings=warnings,
+        is_new_row=is_new_row,
     )
 
 
@@ -629,7 +739,38 @@ def execute_plan(conn, plans: list[PlannedRow]) -> list[str]:
             "confidence": plan.confidence,
         }
 
-        if live.has_evidence:
+        if plan.is_new_row:
+            # No live property_value row exists for this (material,
+            # property) pair at all -- nothing to supersede, nothing to
+            # update in place. Same INSERT shape as the supersede branch
+            # below, just without a prior row to flip to 'superseded'.
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO property_value (
+                        subject_type, subject_id, property_id,
+                        value_min, value_max, value_typical, value_text, value_enum, value_bool,
+                        unit_display, qualifier, test_method_id, conditions,
+                        note_en, note_fa, confidence, status, created_by
+                    ) VALUES (
+                        'material', %(subject_id)s, %(property_id)s,
+                        %(value_min)s, %(value_max)s, %(value_typical)s, %(value_text)s,
+                        %(value_enum)s, %(value_bool)s, %(unit_display)s, %(qualifier)s,
+                        %(test_method_id)s, %(conditions)s, %(note_en)s, %(note_fa)s,
+                        %(confidence)s, 'published', %(created_by)s
+                    ) RETURNING id;
+                    """,
+                    {
+                        "subject_id": live.subject_id,
+                        "property_id": live.property_id,
+                        "created_by": CREATED_BY,
+                        **write_fields,
+                    },
+                )
+                new_pv_id = cur.fetchone()[0]
+            target_pv_id = new_pv_id
+            action = "created"
+        elif live.has_evidence:
             with conn.cursor() as cur:
                 # Order matters: uq_property_value_live is a partial unique
                 # index on (subject_type, subject_id, property_id,
@@ -734,6 +875,8 @@ def main() -> None:
     conn = get_connection()
     try:
         live_values = load_live_values(conn)
+        materials = load_materials(conn)
+        property_defs = load_property_definitions(conn)
         test_methods = load_test_methods(conn)
         existing_sources = load_existing_sources(conn)
         fallback_sources_by_key: dict[str, int] = {}
@@ -758,7 +901,10 @@ def main() -> None:
                 skip_count += 1
                 continue
             try:
-                plan = validate_row(row_number, row, live_values, sources_by_key, fallback_sources_by_key, test_methods)
+                plan = validate_row(
+                    row_number, row, live_values, sources_by_key, fallback_sources_by_key, test_methods,
+                    materials, property_defs,
+                )
                 plans.append(plan)
                 warnings.extend(plan.warnings)
             except RowError as exc:

@@ -127,6 +127,62 @@ work loaded.
 
 ---
 
+## Adding a brand-new polymer
+
+`gaps.csv` only lists polymers that are **already** in the database. To add a new
+one (PP, PLA, anything), you first declare it in a different small file — then it
+shows up in `gaps.csv` like everything else.
+
+**1. Get a blank form**
+
+```bash
+tools/etl/.venv/bin/python tools/curation/import_materials.py --template
+```
+
+That writes `curation/new_materials.csv` with a header and one example row
+(commented out with `#`, so it is ignored).
+
+**2. Fill in one row per new polymer**
+
+Only five things are required: `slug`, `field_key`, `family_key`, `name_fa`,
+`name_en`. Everything else is optional.
+
+| Column                                                                                    | What to type                                                                                                                        |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `slug`                                                                                    | short id, lowercase, no spaces — `pla`, `pp`                                                                                        |
+| `field_key`                                                                               | one of: `thermoplastics`, `thermosets`, `elastomers`, `biopolymers`, `composites`, `high_performance_polymers`                      |
+| `family_key`                                                                              | e.g. `polyolefins`. If it doesn't exist yet, it will be created — but then you must also fill `family_name_fa` and `family_name_en` |
+| `name_fa` / `name_en`                                                                     | the polymer's name                                                                                                                  |
+| `code`, `cas`, `resin_code`, `discovery_year`, `overview_fa`, `overview_en`, `chain_type` | optional                                                                                                                            |
+
+**3. Check, then create**
+
+```bash
+tools/etl/.venv/bin/python tools/curation/import_materials.py --dry-run
+tools/etl/.venv/bin/python tools/curation/import_materials.py
+```
+
+**4. Now get its properties**
+
+```bash
+tools/etl/.venv/bin/python tools/curation/export_gaps.py --include-missing
+```
+
+`--include-missing` is the important part: a new polymer has no values yet, so a
+normal export would show nothing for it. With the flag, `gaps.csv` gets a blank
+row for **every** property that applies to it — all 55 for a thermoplastic.
+
+Then fill in `gaps.csv` and run `import_values.py` exactly as before.
+
+> For a brand-new row you **must** type a number. When citing a polymer that is
+> already in the database you can leave the value blank and just add the
+> citation, because the number is already there — but a new row has nothing to
+> fall back on.
+
+New polymers are created as `draft`, same as LDPE and HDPE.
+
+---
+
 ## Two rules
 
 **Never invent a page number.** If you cannot find it, leave the row blank. A
