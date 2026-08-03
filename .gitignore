@@ -31,3 +31,6 @@ api/.env
 # spreadsheet as authoritative.
 curation/*.csv
 curation/*.xlsx
+
+# Obsidian vault config — per-user editor state, not project source
+.obsidian/
