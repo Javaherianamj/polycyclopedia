@@ -3,6 +3,12 @@
 PostgreSQL 16 schema for the polymer encyclopedia. Plain SQL migrations, no ORM
 — Drizzle or Prisma can be layered on later by introspection without a rewrite.
 
+> **Before your next schema session, read [DATA-GAPS.md](DATA-GAPS.md).** It
+> lists everything the prototype UI shows that this schema cannot yet store —
+> producers, trade names, quiz questions, simulator reference data — plus the
+> unpopulated `applies_to_fields` column, which the rebuilt frontend now depends
+> on. Each item says what it breaks and what the fix looks like.
+
 ## Quick start
 
 ```bash

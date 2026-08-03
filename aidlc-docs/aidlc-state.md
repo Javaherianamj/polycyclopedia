@@ -58,6 +58,26 @@ Phase 1 of the approved roadmap: stand up the real database and data model, seed
 - [x] Code Generation — migrations 0001–0009, seeds 0001–0005, `tools/etl/`
 - [~] Build and Test — schema suite passing (16/16); ETL test suite in progress
 
+### INCEPTION — frontend rebuild (FE-0 … FE-9) — COMPLETE
+
+- [x] Workspace Detection — SKIPPED. Brownfield established, artifacts current
+- [x] Reverse Engineering — SKIPPED. No frontend code drift since the artifacts were written
+- [x] Requirements Analysis — COMPLETE (standard depth). 34 questions across two rounds, all answered (`inception/requirements/frontend-questions.md`, `frontend-questions-2.md`). Requirements are recorded as decisions D1–D34 and rules R1–R32 in the frontend plan rather than a separate requirements document, consistent with U5/U5b
+- [x] Findings — `inception/requirements/frontend-prototype-findings.md` (§3 superseded by the plan)
+- [x] User Stories — COMPLETE. `inception/user-stories/frontend-stories.md`: 4 personas, 14 stories with acceptance criteria, coverage check. Executed rather than skipped because D1 commits to four distinct audiences
+- [x] Workflow Planning — COMPLETE. `inception/plans/frontend-plan.md`
+- [x] Application Design — SKIPPED. No new service boundary; the API contract (U2) is unchanged and the frontend is a client of it
+- [x] Units Generation — COMPLETE. FE-0 … FE-9, replacing U3/U7/U8/U9 in `project-plan.md`
+- [x] Prototype-vs-database coverage audit — `db/DATA-GAPS.md`, 11 gaps (G0–G10)
+
+**Technology decision**: Astro with React islands. Reasoning in frontend-plan.md §4.
+**Open before FE-0 is signed off**: IRANSansX licence (Estedad is the working fallback);
+confirmation of the Q3 and Q21 interpretations; G0 scheduled.
+
+### CONSTRUCTION — FE-0 `visual-identity`
+
+- [ ] Not started. Awaiting approval to begin.
+
 ### OPERATIONS
 
 - [ ] Operations (placeholder — not started, out of scope)
