@@ -179,9 +179,19 @@ SELECT pg_temp.assert(
 \echo ''
 \echo 'REGISTRY'
 
+-- A floor, not a fixed count: the registry is designed to grow by seed
+-- insert (0006 added 6 thermoset-specific properties on top of the original
+-- 55 from src/types/polymer.ts), so asserting an exact total here would
+-- make this test fail every time the registry is legitimately extended --
+-- the opposite of what it exists to guard.
 SELECT pg_temp.assert(
-    (SELECT count(*) FROM property_definition WHERE key <> '__test_swelling_ratio__') = 55,
-    '55 property definitions seeded from src/types/polymer.ts');
+    (SELECT count(*) FROM property_definition WHERE key <> '__test_swelling_ratio__') >= 55,
+    'at least the original 55 property definitions from src/types/polymer.ts are present');
+
+SELECT pg_temp.assert(
+    (SELECT count(*) FROM property_definition WHERE key = 'hardness_barcol'
+       AND 'thermosets' = ANY(applies_to_fields)) = 1,
+    'thermoset-specific properties (e.g. hardness_barcol) are seeded and correctly scoped');
 
 SELECT pg_temp.assert(
     (SELECT count(*) FROM property_group) = 6,

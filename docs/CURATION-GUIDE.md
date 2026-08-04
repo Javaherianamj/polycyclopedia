@@ -32,16 +32,30 @@ mistake, you fix the spreadsheet and run step 3 again — nothing is damaged.
 
 ## Step 1 — Get your worksheet
 
+**One polymer at a time.** Add `--preset` for a shorter, curated property list
+instead of everything in the registry — use `polyolefins` for LDPE/HDPE/PP-type
+materials, or `thermoset-resins` for cure-based resins (epoxy, phenolic,
+unsaturated polyester):
+
 ```bash
-python tools/curation/export_gaps.py --material ldpe
+python tools/curation/export_gaps.py --material ldpe --preset polyolefins
 ```
 
-This creates two files in the `curation/` folder:
+This writes **`curation/ldpe.csv`** — one file, named after the polymer, with
+only the ~28 "solid" polyolefin properties (not all 61 in the registry) as
+rows. Run the same command with `--material pp --preset polyolefins` later and
+you get `curation/pp.csv` with the identical property list in the identical
+order — every polyolefin's file looks the same, so once you know one you know
+them all.
 
-- **`gaps.csv`** — every value that still needs a source
-- **`sources.csv`** — the books and documents you are citing
+It also writes **`curation/sources.csv`** — the shared bibliography, the same
+one file no matter which polymer you're working on.
 
-Open both in Excel or Google Sheets.
+Leave off `--preset` to get every applicable property instead (the original,
+longer worksheet) — useful once you're citing carefully for a specific,
+already-mostly-filled material rather than doing a first bulk pass.
+
+Open both files in Excel or LibreOffice Calc.
 
 > **If Persian text looks like `Ø¨Ø§Ù„Ø§`** — the file is fine, Excel just
 > guessed the encoding wrong. Use _Data → From Text/CSV_ and choose **UTF-8**

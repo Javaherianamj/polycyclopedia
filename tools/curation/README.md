@@ -1,5 +1,10 @@
 # Adding data by hand
 
+The full curator workflow, column meanings, validator messages, and citation
+rules are in [docs/CURATION-GUIDE.md](../../docs/CURATION-GUIDE.md) — read that
+first if you're new. This file gives the exact commands/paths for this tool and,
+below "For developers", the internals.
+
 ## Where do I type the 109 values?
 
 **In this file:**
@@ -50,56 +55,20 @@ tools/etl/.venv/bin/python tools/curation/import_values.py
 
 ## Which columns do I fill?
 
-The first 8 columns are **already filled in**. Don't touch them — they tell the
-script which value you mean.
-
-| Already filled                          | Meaning                                            |
-| --------------------------------------- | -------------------------------------------------- |
-| `material_slug`                         | `ldpe` or `hdpe`                                   |
-| `property_key`                          | which property, e.g. `density`                     |
-| `property_name_en` / `property_name_fa` | the readable name                                  |
-| `unit`                                  | the unit your number must be in                    |
-| `plausible_min` / `plausible_max`       | if your number is outside this, something is wrong |
-| `current_value`                         | what the old site claimed, for comparison          |
-
-These are **yours to fill**:
-
-| Column                         | What to type                               | Example               |
-| ------------------------------ | ------------------------------------------ | --------------------- |
-| `value_min`                    | bottom of a range                          | `0.910`               |
-| `value_max`                    | top of a range                             | `0.925`               |
-| `value_typical`                | a single number (use instead of min/max)   | `-110`                |
-| `qualifier`                    | only for "less than" / "about"             | `<` or `~`            |
-| `source_key`                   | short name of the book, from `sources.csv` | `polymer-handbook-4e` |
-| `page`                         | **required** — the page you read it on     | `45`                  |
-| `table` / `figure` / `section` | instead of, or as well as, a page          | `3-2`                 |
-| `test_method`                  | if the book says one                       | `ASTM D1238`          |
-| `conditions`                   | if the book says                           | `190C/2.16kg`         |
-| `note_en` / `note_fa`          | anything worth remembering                 |                       |
-| `confidence`                   | leave blank (defaults to 0.9)              |                       |
-| `skip`                         | type `y` to ignore this row                |                       |
-
-**Most rows need only four things: a number, a `source_key`, a `page`, and
-nothing else.**
-
-You do not have to fill the whole file. Do ten rows, run steps 3 and 4, come
-back tomorrow. Empty rows are ignored.
+Full column-by-column reference (which are pre-filled, which are yours to type,
+and what each one means) is in
+[docs/CURATION-GUIDE.md](../../docs/CURATION-GUIDE.md), Step 2 — same columns,
+same rule that `page` is required. **Most rows need only four things: a
+number, a `source_key`, a `page`, and nothing else.** You do not have to fill
+the whole file; blank rows are simply ignored.
 
 ### Adding a new book
 
-Add a row to `curation/sources.csv`:
-
-| source_key                   | title              | authors      | publisher             | edition | year | kind       | tier                     |
-| ---------------------------- | ------------------ | ------------ | --------------------- | ------- | ---- | ---------- | ------------------------ |
-| `brydson-plastics-materials` | Plastics Materials | J.A. Brydson | Butterworth-Heinemann | 7th     | 1999 | `handbook` | `peer_reviewed_handbook` |
-
-`source_key` is a short nickname you invent. Use it in `gaps.csv`.
-
-`tier` is one of: `peer_reviewed_handbook`, `standard`, `manufacturer_datasheet`,
-`vendor_marketing`, `community`.
-
-`kind` is one of: `handbook`, `textbook`, `standard`, `datasheet`,
-`journal_article`, `encyclopedia`, `website`, `internal`.
+Add a row to `curation/sources.csv` — see CURATION-GUIDE.md's `sources.csv`
+section for the column table, an example row, and what each `tier` value
+means. This tool also reads a `kind` column, not covered there: one of
+`handbook`, `textbook`, `standard`, `datasheet`, `journal_article`,
+`encyclopedia`, `website`, `internal`.
 
 ---
 
@@ -183,15 +152,11 @@ New polymers are created as `draft`, same as LDPE and HDPE.
 
 ---
 
-## Two rules
+## The rules
 
-**Never invent a page number.** If you cannot find it, leave the row blank. A
-made-up citation cannot be detected later and destroys the point of the project.
-
-**Cite the book you actually read.** If Brydson quotes a 1963 paper and you read
-Brydson, cite Brydson.
-
----
+Same as CURATION-GUIDE.md's "The rules that matter" (never invent a page
+number, cite the book you actually read, prefer ranges, record disagreements)
+— nothing tool-specific to add.
 
 ## Checking your progress
 
@@ -200,10 +165,7 @@ docker exec polypedia-pg psql -U polypedia -d polypedia \
   -c "SELECT * FROM v_citation_coverage;"
 ```
 
-Today it says 0%. That number going up is the best measure of the project
-becoming real.
-
----
+Today it says 0% — see CURATION-GUIDE.md for what that number means.
 
 ---
 
@@ -239,6 +201,7 @@ source.
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `common.py`           | DB connection, CSV column contracts (`GAPS_FIELDNAMES` / `SOURCES_FIELDNAMES` / `NEW_MATERIALS_FIELDNAMES`), shared helpers           |
 | `export_gaps.py`      | unsourced (+ `--include-missing`: value-less) `property_value` + `property_definition` → `gaps.csv`; `source` → `sources.csv`         |
+| `family_presets.py`   | Curated property-key lists per family (`polyolefins`, `thermoset-resins`), consumed by `export_gaps.py --preset`                      |
 | `import_values.py`    | Validates (V1–V10) and writes → `source` / `source_document` / `citation` / `property_value` / `evidence`, one transaction            |
 | `import_materials.py` | `curation/new_materials.csv` → `field` (lookup only) / `family` (create if new) / `material` / `material_identifier`, one transaction |
 | `export_workbook.py`  | Optional `.xlsx` front-end over the same data                                                                                         |
@@ -247,6 +210,31 @@ source.
 Both export scripts accept `--material` and `--gaps-csv` / `--sources-csv`
 overrides. Full design, including all ten validation rules:
 [`curation-design.md`](../../aidlc-docs/construction/curation-workflow/functional-design/curation-design.md).
+
+### `--preset` — one file per polymer, a shorter property list
+
+```bash
+python export_gaps.py --material ldpe --preset polyolefins
+```
+
+Filters both `GAPS_QUERY` and `GAPS_MISSING_QUERY` to
+`family_presets.FAMILY_PRESETS[preset]` (a plain `list[str]` of property
+keys — no separate importer, no new file shape). **`import_values.py` is
+unchanged and unaware this flag exists**: a preset-filtered file has the
+same `GAPS_FIELDNAMES` columns as always, just fewer rows, so it round-trips
+through the existing importer with zero modifications.
+
+When `--material` is given and `--gaps-csv` is not, the output filename
+defaults to `curation/{slug}.csv` instead of the shared `curation/gaps.csv`
+— that's the "one file per polymer" part. Passing `--gaps-csv` explicitly
+always overrides this, exactly as before.
+
+This replaces an earlier, abandoned design (a wide, one-row-per-material
+pivoted format with per-cell `@page` override syntax) that solved a problem
+the curator didn't actually have — they wanted the existing columns kept
+exactly as they were, just split into a shorter file per polymer. If you
+find references to that design elsewhere (e.g. in git history or an old
+`aidlc-docs` file), it does not reflect what got built.
 
 ## Design decisions the spec left open
 

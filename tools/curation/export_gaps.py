@@ -4,10 +4,26 @@ to curation/sources.csv.
     python export_gaps.py                          # every unsourced material value
     python export_gaps.py --material ldpe           # one material only (pilot use)
     python export_gaps.py --include-missing         # also rows with no value at all
+    python export_gaps.py --material ldpe --preset polyolefins
+                                                     # one polymer's file, curated
+                                                     # to the ~28 "solid" polyolefin
+                                                     # properties instead of all 61
+                                                     # in the registry -- written to
+                                                     # curation/ldpe.csv, not the
+                                                     # shared curation/gaps.csv,
+                                                     # since --material was given
+                                                     # (see --gaps-csv below)
 
 Both files are written UTF-8 with a BOM (utf-8-sig) so Excel opens Persian
 text (name_fa, note_fa) correctly instead of guessing a codepage and
 mangling it -- see common.py's CSV_ENCODING comment.
+
+--preset (default: none, unchanged existing behaviour -- every applicable
+property is offered) narrows the property list to one of family_presets.py's
+curated sets. Same column shape as always (common.GAPS_FIELDNAMES); only the
+row count changes. This exists because handing a curator all 61 properties at
+once is what made the file overwhelming to work with -- the fix is a shorter,
+family-appropriate property list, not a different file shape.
 
 gaps.csv covers `material` subjects only (subject_type = 'material'), per
 curation-design.md section 2: U5 targets the generic material, not grades --
@@ -47,6 +63,7 @@ from common import (
     get_connection,
     slugify_source_key,
 )
+from family_presets import FAMILY_PRESETS
 
 GAPS_QUERY = """
     SELECT
@@ -69,6 +86,7 @@ GAPS_QUERY = """
     JOIN material m ON pv.subject_type = 'material' AND m.id = pv.subject_id
     WHERE pv.status = 'unsourced'
       AND (%(material_slug)s::text IS NULL OR m.slug = %(material_slug)s)
+      AND (%(preset_keys)s::text[] IS NULL OR pd.key = ANY(%(preset_keys)s))
 """
 
 # --include-missing only: every (material, property_definition) pair with no
@@ -98,6 +116,7 @@ GAPS_MISSING_QUERY = """
     CROSS JOIN property_definition pd
     WHERE (%(material_slug)s::text IS NULL OR m.slug = %(material_slug)s)
       AND (pd.applies_to_fields = '{}' OR f.key = ANY(pd.applies_to_fields))
+      AND (%(preset_keys)s::text[] IS NULL OR pd.key = ANY(%(preset_keys)s))
       AND NOT EXISTS (
           SELECT 1 FROM property_value pv
           WHERE pv.subject_type = 'material'
@@ -118,15 +137,23 @@ def export_gaps(
     material_slug: str | None,
     out_path: Path = GAPS_CSV_PATH,
     include_missing: bool = False,
+    preset: str | None = None,
 ) -> int:
+    if preset is not None and preset not in FAMILY_PRESETS:
+        raise ValueError(
+            f"unknown preset {preset!r}; choose one of {sorted(FAMILY_PRESETS)}"
+        )
+    preset_keys = FAMILY_PRESETS[preset] if preset is not None else None
+    params = {"material_slug": material_slug, "preset_keys": preset_keys}
+
     with conn.cursor() as cur:
-        cur.execute(GAPS_QUERY, {"material_slug": material_slug})
+        cur.execute(GAPS_QUERY, params)
         columns = [d.name for d in cur.description]
         rows = [dict(zip(columns, row)) for row in cur.fetchall()]
 
     if include_missing:
         with conn.cursor() as cur:
-            cur.execute(GAPS_MISSING_QUERY, {"material_slug": material_slug})
+            cur.execute(GAPS_MISSING_QUERY, params)
             columns = [d.name for d in cur.description]
             rows.extend(dict(zip(columns, row)) for row in cur.fetchall())
         rows.sort(key=lambda r: (r["material_slug"], r["sort_order"], r["property_key"]))
@@ -215,18 +242,41 @@ def main() -> None:
             "Default: off, unchanged existing behaviour."
         ),
     )
+    parser.add_argument(
+        "--preset",
+        choices=sorted(FAMILY_PRESETS),
+        default=None,
+        help=(
+            "Narrow the property list to a curated, family-appropriate set "
+            "(see family_presets.py) instead of every applicable property. "
+            "Same columns, fewer rows. Default: none, unchanged existing behaviour."
+        ),
+    )
     # Path overrides exist so the test suite can write to an isolated
     # directory instead of clobbering the curator's in-progress worksheet.
-    parser.add_argument("--gaps-csv", type=Path, default=GAPS_CSV_PATH)
+    # --gaps-csv defaults to None here (not GAPS_CSV_PATH) so main() can tell
+    # "the curator didn't pass one" apart from "they explicitly asked for
+    # curation/gaps.csv" -- the former gets the one-file-per-polymer default
+    # below when --material is set; an explicit path always wins either way.
+    parser.add_argument("--gaps-csv", type=Path, default=None)
     parser.add_argument("--sources-csv", type=Path, default=SOURCES_CSV_PATH)
     args = parser.parse_args()
 
-    args.gaps_csv.parent.mkdir(parents=True, exist_ok=True)
+    if args.gaps_csv is not None:
+        gaps_csv = args.gaps_csv
+    elif args.material:
+        gaps_csv = CURATION_DIR / f"{args.material}.csv"
+    else:
+        gaps_csv = GAPS_CSV_PATH
+
+    gaps_csv.parent.mkdir(parents=True, exist_ok=True)
     args.sources_csv.parent.mkdir(parents=True, exist_ok=True)
 
     conn = get_connection()
     try:
-        gap_count = export_gaps(conn, args.material, args.gaps_csv, args.include_missing)
+        gap_count = export_gaps(
+            conn, args.material, gaps_csv, args.include_missing, args.preset
+        )
         source_count = export_sources(conn, args.sources_csv)
         # Read-only session: nothing was written, but close the transaction
         # psycopg opened for the SELECTs cleanly.
@@ -235,7 +285,9 @@ def main() -> None:
         conn.close()
 
     scope = f"material={args.material}" if args.material else "all materials"
-    print(f"Wrote {args.gaps_csv} ({gap_count} rows, {scope})")
+    if args.preset:
+        scope += f", preset={args.preset}"
+    print(f"Wrote {gaps_csv} ({gap_count} rows, {scope})")
     print(f"Wrote {args.sources_csv} ({source_count} rows)")
 
 
