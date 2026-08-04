@@ -4,15 +4,24 @@ These drive the real CLI entry points against the real database, because the
 value of this tooling is almost entirely in whether it talks to Postgres
 correctly. Mocking the database would test the mock.
 
-Every test that writes restores the database afterwards (see the `clean_db`
-fixture), so the suite is safe to run against the seeded development database
-and leaves no fabricated citations behind.
+Tests that need to cite/re-cite a value do it against a dedicated, isolated
+test material (`test_material` fixture below) rather than a real seeded
+material. This is not incidental caution: an earlier version of this suite
+used `ldpe`/`density` as its scratch pad on the assumption that no real
+citation would ever exist there. Once real curation work published a real
+citation for LDPE density, that assumption broke -- the suite's cleanup logic
+(built to "put back whatever was unsourced before") could not distinguish its
+own test writes from the real one, and it left the real citation's row
+mismarked as `superseded` with an orphaned duplicate beside it. The fixture
+below sidesteps the whole class of bug: the material does not exist before
+the test and does not exist after it, so there is nothing for real data to
+collide with, regardless of what has been cited by the time these tests run.
 
-That last point is not incidental. An earlier build of this tool was tested by
-importing a citation to "Polymer Handbook, page 45" and leaving it in the
-database -- a completely invented page number sitting in a table whose entire
-purpose is verifiable provenance. Tests here use obviously-fake source titles
-and clean up after themselves.
+Tests that export or read real seeded data (the two `Export` tests below,
+which intentionally exercise the actual `ldpe` material) compute their
+expectations from the live database rather than hardcoding a row count or a
+specific property's Persian name -- both of those are exactly the kind of
+fact that legitimate curation work changes over time.
 """
 
 from __future__ import annotations
@@ -39,6 +48,14 @@ PYTHON = sys.executable
 TEST_SOURCE_KEY = "__test_source__"
 TEST_SOURCE_TITLE = "__test_source__ Fictional Reference For Tests"
 
+# Material slug is validated as lowercase-and-hyphens (see
+# tests/test_import_materials.py), so this follows that file's "zz-test-"
+# convention rather than the "__test_..." convention used for free-text
+# fields like source titles elsewhere in this module.
+TEST_MATERIAL_SLUG = "zz-test-curation-material"
+TEST_MATERIAL_FIELD_KEY = "thermoplastics"
+TEST_MATERIAL_FAMILY_KEY = "polyolefins"
+
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -53,11 +70,81 @@ def conn():
 
 
 @pytest.fixture
-def clean_db():
-    """Snapshot the citation-related state, then restore it after the test.
+def test_material():
+    """A material that exists only for the duration of one test.
 
-    Deletes anything the test created (matched via the test source title) and
-    resets any property_value the test published back to 'unsourced'.
+    Seeded with a single 'unsourced' density value (0.910-0.925), matching
+    the shape the tests already assume -- so `gap_row()`'s default target is
+    always available and always disposable, regardless of what real curation
+    work has published elsewhere. Torn down completely afterward, including
+    the material row itself.
+    """
+    c = get_connection()
+    try:
+        with c.cursor() as cur:
+            cur.execute("SELECT id FROM field WHERE key = %s", (TEST_MATERIAL_FIELD_KEY,))
+            field_id = cur.fetchone()[0]
+            cur.execute("SELECT id FROM family WHERE key = %s", (TEST_MATERIAL_FAMILY_KEY,))
+            family_id = cur.fetchone()[0]
+            cur.execute(
+                """
+                INSERT INTO material (slug, field_id, family_id, name_fa, name_en, status)
+                VALUES (%s, %s, %s, 'ماده آزمایشی', 'Test Material', 'draft')
+                RETURNING id
+                """,
+                (TEST_MATERIAL_SLUG, field_id, family_id),
+            )
+            material_id = cur.fetchone()[0]
+
+            cur.execute("SELECT id FROM property_definition WHERE key = 'density'")
+            property_id = cur.fetchone()[0]
+            cur.execute(
+                """
+                INSERT INTO property_value
+                    (subject_type, subject_id, property_id, value_min, value_max, status)
+                VALUES ('material', %s, %s, 0.910, 0.925, 'unsourced')
+                """,
+                (material_id, property_id),
+            )
+        c.commit()
+    finally:
+        c.close()
+
+    yield TEST_MATERIAL_SLUG
+
+    c = get_connection()
+    try:
+        with c.cursor() as cur:
+            cur.execute("SELECT id FROM material WHERE slug = %s", (TEST_MATERIAL_SLUG,))
+            row = cur.fetchone()
+            if row is not None:
+                material_id = row[0]
+                cur.execute(
+                    """
+                    DELETE FROM evidence WHERE property_value_id IN (
+                        SELECT id FROM property_value
+                        WHERE subject_type = 'material' AND subject_id = %s
+                    )
+                    """,
+                    (material_id,),
+                )
+                cur.execute(
+                    "DELETE FROM property_value WHERE subject_type = 'material' AND subject_id = %s",
+                    (material_id,),
+                )
+                cur.execute("DELETE FROM material_identifier WHERE material_id = %s", (material_id,))
+                cur.execute("DELETE FROM material WHERE id = %s", (material_id,))
+        c.commit()
+    finally:
+        c.close()
+
+
+@pytest.fixture
+def clean_db():
+    """Removes any source/citation the test created, matched by the fake
+    title prefix. Value-level state is the `test_material` fixture's job;
+    this only ever needs to clean up bibliography rows, which are global
+    and not scoped to a single material.
     """
     yield
     c = get_connection()
@@ -87,30 +174,6 @@ def clean_db():
                 "(SELECT id FROM source WHERE title LIKE '\\_\\_test\\_%')"
             )
             cur.execute("DELETE FROM source WHERE title LIKE '\\_\\_test\\_%'")
-            # Undo any supersede. Order matters: the replacement row is still
-            # referenced by the original's superseded_by FK, so the pointer has
-            # to be cleared before the row it points at can be deleted.
-            cur.execute(
-                "SELECT array_agg(superseded_by) FROM property_value "
-                "WHERE superseded_by IS NOT NULL"
-            )
-            replacement_ids = cur.fetchone()[0] or []
-            cur.execute(
-                "UPDATE property_value SET superseded_by = NULL WHERE superseded_by IS NOT NULL"
-            )
-            if replacement_ids:
-                cur.execute(
-                    "DELETE FROM evidence WHERE property_value_id = ANY(%s)",
-                    (replacement_ids,),
-                )
-                cur.execute(
-                    "DELETE FROM property_value WHERE id = ANY(%s)", (replacement_ids,)
-                )
-            cur.execute(
-                "UPDATE property_value SET status = 'unsourced' "
-                "WHERE status IN ('published', 'superseded') "
-                "AND id NOT IN (SELECT property_value_id FROM evidence)"
-            )
         c.commit()
     finally:
         c.close()
@@ -162,7 +225,7 @@ def write_sources(path: Path, extra: list[dict] | None = None) -> None:
 
 
 def gap_row(**kw) -> dict:
-    base = {"material_slug": "ldpe", "property_key": "density", "unit": "g/cm³"}
+    base = {"material_slug": TEST_MATERIAL_SLUG, "property_key": "density", "unit": "g/cm³"}
     base.update(kw)
     return base
 
@@ -192,21 +255,34 @@ def count(conn, sql: str) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Export
+# Export -- against the real ldpe material, so expectations are computed
+# from the live database rather than hardcoded, per the note at the top of
+# this file.
 # ---------------------------------------------------------------------------
 
 
-def test_export_produces_rows_with_no_curator_data_prefilled(workdir):
+def test_export_produces_rows_with_no_curator_data_prefilled(workdir, conn):
     """The curator's columns must come back empty.
 
     A pre-filled source_key or page in an exported worksheet is an invented
     citation waiting to be imported by someone who assumes it was checked.
     """
+    expected_count = count(
+        conn,
+        """
+        SELECT count(*) FROM v_unsourced_values uv
+        JOIN material m ON m.id = uv.subject_id AND uv.subject_type = 'material'
+        WHERE m.slug = 'ldpe'
+        """,
+    )
+
     r = run_export(workdir, "--material", "ldpe")
     assert r.returncode == 0, r.stderr
 
     rows = list(csv.DictReader((workdir / "gaps.csv").open(encoding="utf-8-sig")))
-    assert len(rows) == 54, f"expected 54 LDPE gaps, got {len(rows)}"
+    assert len(rows) == expected_count, (
+        f"expected {expected_count} LDPE gaps (per v_unsourced_values), got {len(rows)}"
+    )
 
     curator_fields = ["value_min", "value_max", "value_typical", "qualifier",
                       "source_key", "page", "table", "figure", "section"]
@@ -215,11 +291,28 @@ def test_export_produces_rows_with_no_curator_data_prefilled(workdir):
         assert not filled, f"row {i} has pre-filled curator data: {filled}"
 
 
-def test_export_is_utf8_bom_so_excel_shows_persian(workdir):
+def test_export_is_utf8_bom_so_excel_shows_persian(workdir, conn):
+    # Any currently-unsourced LDPE property's Persian name will do -- this
+    # must not hardcode a specific property, since which properties are
+    # still unsourced is exactly what real curation work changes.
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT pd.name_fa FROM v_unsourced_values uv
+            JOIN material m ON m.id = uv.subject_id AND uv.subject_type = 'material'
+            JOIN property_definition pd ON pd.id = uv.property_id
+            WHERE m.slug = 'ldpe' AND pd.name_fa IS NOT NULL
+            LIMIT 1
+            """
+        )
+        row = cur.fetchone()
+    assert row is not None, "ldpe has no unsourced property left to check Persian rendering against"
+    persian_name = row[0]
+
     run_export(workdir, "--material", "ldpe")
     raw = (workdir / "gaps.csv").read_bytes()
     assert raw.startswith(b"\xef\xbb\xbf"), "missing BOM; Excel will mangle Persian text"
-    assert "چگالی" in raw.decode("utf-8-sig")
+    assert persian_name in raw.decode("utf-8-sig")
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +320,7 @@ def test_export_is_utf8_bom_so_excel_shows_persian(workdir):
 # ---------------------------------------------------------------------------
 
 
-def test_missing_locator_is_rejected_readably(workdir, clean_db):
+def test_missing_locator_is_rejected_readably(workdir, clean_db, test_material):
     """V5. Must be caught in validation, not surface as a DB constraint error."""
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
@@ -243,7 +336,7 @@ def test_missing_locator_is_rejected_readably(workdir, clean_db):
     assert "CheckViolation" not in out
 
 
-def test_implausible_value_is_rejected_with_unit_hint(workdir, clean_db):
+def test_implausible_value_is_rejected_with_unit_hint(workdir, clean_db, test_material):
     """V4. 920 kg/m³ entered where g/cm³ was expected -- the classic 1000x slip."""
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
@@ -254,7 +347,7 @@ def test_implausible_value_is_rejected_with_unit_hint(workdir, clean_db):
     assert "plausible" in (r.stdout + r.stderr).lower()
 
 
-def test_inverted_range_is_rejected(workdir, clean_db):
+def test_inverted_range_is_rejected(workdir, clean_db, test_material):
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
         gap_row(value_min="0.925", value_max="0.910", source_key=TEST_SOURCE_KEY, page="45"),
@@ -264,7 +357,7 @@ def test_inverted_range_is_rejected(workdir, clean_db):
     assert "inverted" in (r.stdout + r.stderr).lower() or "greater than" in (r.stdout + r.stderr).lower()
 
 
-def test_unknown_source_key_is_rejected(workdir, clean_db):
+def test_unknown_source_key_is_rejected(workdir, clean_db, test_material):
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
         gap_row(value_min="0.910", value_max="0.925", source_key="no-such-source", page="45"),
@@ -274,7 +367,7 @@ def test_unknown_source_key_is_rejected(workdir, clean_db):
     assert "no-such-source" in (r.stdout + r.stderr)
 
 
-def test_blank_rows_are_ignored(workdir, clean_db):
+def test_blank_rows_are_ignored(workdir, clean_db, test_material):
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [gap_row(), gap_row(property_key="tg", unit="°C")])
     r = run_import(workdir, "--dry-run")
@@ -287,7 +380,7 @@ def test_blank_rows_are_ignored(workdir, clean_db):
 # ---------------------------------------------------------------------------
 
 
-def test_dry_run_writes_nothing(workdir, conn, clean_db):
+def test_dry_run_writes_nothing(workdir, conn, clean_db, test_material):
     before = count(conn, "SELECT count(*) FROM citation")
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
@@ -298,7 +391,7 @@ def test_dry_run_writes_nothing(workdir, conn, clean_db):
     assert count(conn, "SELECT count(*) FROM citation") == before
 
 
-def test_import_builds_the_full_citation_chain(workdir, conn, clean_db):
+def test_import_builds_the_full_citation_chain(workdir, conn, clean_db, test_material):
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
         gap_row(value_min="0.910", value_max="0.925",
@@ -319,8 +412,9 @@ def test_import_builds_the_full_citation_chain(workdir, conn, clean_db):
             JOIN citation ct ON ct.id = e.citation_id
             JOIN source_document sd ON sd.id = ct.source_document_id
             JOIN source s ON s.id = sd.source_id
-            WHERE m.slug = 'ldpe' AND pd.key = 'density'
-            """
+            WHERE m.slug = %s AND pd.key = 'density'
+            """,
+            (test_material,),
         )
         row = cur.fetchone()
 
@@ -334,7 +428,7 @@ def test_import_builds_the_full_citation_chain(workdir, conn, clean_db):
     assert method == "manual"
 
 
-def test_import_moves_value_out_of_the_unsourced_worklist(workdir, conn, clean_db):
+def test_import_moves_value_out_of_the_unsourced_worklist(workdir, conn, clean_db, test_material):
     before = count(conn, "SELECT count(*) FROM v_unsourced_values")
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
@@ -344,7 +438,7 @@ def test_import_moves_value_out_of_the_unsourced_worklist(workdir, conn, clean_d
     assert count(conn, "SELECT count(*) FROM v_unsourced_values") == before - 1
 
 
-def test_new_source_row_is_created_once_not_duplicated(workdir, conn, clean_db):
+def test_new_source_row_is_created_once_not_duplicated(workdir, conn, clean_db, test_material):
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
         gap_row(value_min="0.910", value_max="0.925", source_key=TEST_SOURCE_KEY, page="45"),
@@ -355,7 +449,7 @@ def test_new_source_row_is_created_once_not_duplicated(workdir, conn, clean_db):
     assert count(conn, f"SELECT count(*) FROM source WHERE title = '{TEST_SOURCE_TITLE}'") == 1
 
 
-def test_one_bad_row_rolls_back_the_whole_file(workdir, conn, clean_db):
+def test_one_bad_row_rolls_back_the_whole_file(workdir, conn, clean_db, test_material):
     """All-or-nothing. A half-applied import is worse than none, because the
     curator cannot tell which half landed."""
     before_citations = count(conn, "SELECT count(*) FROM citation")
@@ -374,7 +468,7 @@ def test_one_bad_row_rolls_back_the_whole_file(workdir, conn, clean_db):
     assert count(conn, "SELECT count(*) FROM v_unsourced_values") == before_unsourced
 
 
-def test_persian_notes_round_trip(workdir, conn, clean_db):
+def test_persian_notes_round_trip(workdir, conn, clean_db, test_material):
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
         gap_row(value_min="0.910", value_max="0.925", source_key=TEST_SOURCE_KEY,
@@ -387,14 +481,15 @@ def test_persian_notes_round_trip(workdir, conn, clean_db):
             SELECT pv.note_fa FROM property_value pv
             JOIN property_definition pd ON pd.id = pv.property_id
             JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
-            WHERE m.slug = 'ldpe' AND pd.key = 'density' AND pv.note_fa IS NOT NULL
-            """
+            WHERE m.slug = %s AND pd.key = 'density' AND pv.note_fa IS NOT NULL
+            """,
+            (test_material,),
         )
         row = cur.fetchone()
     assert row is not None and row[0] == "یادداشت آزمایشی"
 
 
-def test_reciting_an_existing_value_supersedes_rather_than_overwrites(workdir, conn, clean_db):
+def test_reciting_an_existing_value_supersedes_rather_than_overwrites(workdir, conn, clean_db, test_material):
     """FR-7.1: history is never destroyed."""
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [

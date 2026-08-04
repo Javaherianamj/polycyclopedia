@@ -538,30 +538,45 @@ def test_late_bad_row_prevents_earlier_good_row_from_landing(tmp_path):
 # ---------------------------------------------------------------------------
 #
 # ldpe/izod_impact is used as the fixture here rather than a fabricated
-# material: LDPE is seeded with 54 of the 55 properties that apply to it
-# (see test_curation.py's "expected 54 LDPE gaps" assertion) -- izod_impact
-# is the one property with no property_value row at all for ldpe, which is
-# exactly the "no live value" case these tests are about. Real seeded data,
-# same as every other test in this module; nothing here is fabricated and
-# nothing is committed.
+# material: it is the one property applicable to ldpe with no property_value
+# row at all, which is exactly the "no live value" case these tests are
+# about. Real seeded data, same as every other test in this module; nothing
+# here is fabricated and nothing is committed.
+#
+# The expected row counts are computed from the live database rather than
+# hardcoded. They used to be a fixed 54/55, back when nothing had been
+# cited yet -- but citing a value moves it out of v_unsourced_values, so
+# --include-missing=False's row count (unsourced only) shrinks as real
+# curation work publishes real citations. Only the "how many applicable
+# properties have zero rows at all" count (here, 1: izod_impact) is stable
+# against that, since citing an *existing* row doesn't remove the row.
 
 
 def test_include_missing_emits_value_less_property_row(db_conn, tmp_path):
     """Without --include-missing, ldpe's value-less izod_impact never
-    appears (matches today's documented 54-row LDPE export). With it, the
-    row appears with a blank current_value."""
+    appears. With it, the row appears with a blank current_value."""
     gaps_path = tmp_path / "gaps.csv"
+
+    with db_conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT count(*) FROM v_unsourced_values uv
+            JOIN material m ON m.id = uv.subject_id AND uv.subject_type = 'material'
+            WHERE m.slug = 'ldpe'
+            """
+        )
+        expected_unsourced_count = cur.fetchone()[0]
 
     count_without = export_gaps(db_conn, "ldpe", gaps_path, include_missing=False)
     with gaps_path.open(encoding="utf-8-sig", newline="") as f:
         rows_without = list(csv.DictReader(f))
-    assert count_without == 54
+    assert count_without == expected_unsourced_count
     assert not any(r["property_key"] == "izod_impact" for r in rows_without)
 
     count_with = export_gaps(db_conn, "ldpe", gaps_path, include_missing=True)
     with gaps_path.open(encoding="utf-8-sig", newline="") as f:
         rows_with = list(csv.DictReader(f))
-    assert count_with == 55
+    assert count_with == expected_unsourced_count + 1
 
     izod_rows = [r for r in rows_with if r["property_key"] == "izod_impact"]
     assert len(izod_rows) == 1
