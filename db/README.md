@@ -21,6 +21,13 @@ docker compose -f db/docker-compose.yml up -d
 `run.sh --reset` drops and recreates the schema first. `run.sh --migrate` skips
 seeds.
 
+**Already set up, container just isn't running?** `docker start polypedia-pg`
+is all you need — this is by far the most common error (`connection refused`)
+across every script in `db/`, `tools/etl/`, and `tools/curation/`. If that
+doesn't bring it back (rare — the container's port publishing can get stuck),
+rebuild it against the same data volume, no data lost:
+`docker stop polypedia-pg && docker rm polypedia-pg && docker compose -f db/docker-compose.yml up -d`.
+
 ## Layout
 
 | Path | Purpose |

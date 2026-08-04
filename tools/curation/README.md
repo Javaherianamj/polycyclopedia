@@ -5,6 +5,10 @@ rules are in [docs/CURATION-GUIDE.md](../../docs/CURATION-GUIDE.md) — read tha
 first if you're new. This file gives the exact commands/paths for this tool and,
 below "For developers", the internals.
 
+> **Getting `connection refused` / `connection failed`?** The database isn't
+> running. `docker start polypedia-pg`, wait a couple seconds, try again. See
+> CURATION-GUIDE.md's Step 0 if that doesn't fix it.
+
 ## Where do I type the 109 values?
 
 **In this file:**

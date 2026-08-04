@@ -30,6 +30,31 @@ mistake, you fix the spreadsheet and run step 3 again — nothing is damaged.
 
 ---
 
+## Step 0 — Start the database
+
+Every command below talks to a database running in Docker. It does not stay
+running forever — if you get `connection refused` or `connection failed`, this
+is almost always why. Start it first:
+
+```bash
+docker start polypedia-pg
+```
+
+Wait a couple of seconds, then run your command.
+
+**If that doesn't fix it** (rare — the container's networking can get stuck
+and `docker start` reports success but nothing actually listens), rebuild the
+container. Your data is safe either way — it lives in a separate Docker
+volume, not inside the container:
+
+```bash
+docker stop polypedia-pg
+docker rm polypedia-pg
+docker compose -f db/docker-compose.yml up -d
+```
+
+---
+
 ## Step 1 — Get your worksheet
 
 **One polymer at a time.** Add `--preset` for a shorter, curated property list
