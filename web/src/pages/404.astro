@@ -1,0 +1,55 @@
+---
+// FR-D8: the static host's error document. ArvanCloud object-storage
+// static-website hosting serves this file for any unmatched path, so it must
+// exist as /404.html in the build output. Deliberately dependency-free — it
+// fetches nothing from the API, so it renders even when the database is down
+// and can never fail the build. Bilingual (fa default + en), matching the
+// site's two locale trees.
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const locale = 'fa' as const;
+---
+
+<BaseLayout locale={locale} title="۴۰۴">
+  <main class="notfound" dir="rtl">
+    <p class="notfound__code">404</p>
+
+    <section class="notfound__block" lang="fa" dir="rtl">
+      <h1>صفحه پیدا نشد</h1>
+      <p>نشانی‌ای که دنبال آن بودید وجود ندارد یا جابه‌جا شده است.</p>
+      <p><a href="/fa/">بازگشت به خانه</a></p>
+    </section>
+
+    <section class="notfound__block" lang="en" dir="ltr">
+      <h1>Page not found</h1>
+      <p>The address you were looking for doesn’t exist or has moved.</p>
+      <p><a href="/en/">Back to home</a></p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .notfound {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    text-align: center;
+  }
+  .notfound__code {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0 0 1.5rem;
+    opacity: 0.4;
+  }
+  .notfound__block {
+    margin: 2rem 0;
+  }
+  .notfound__block h1 {
+    font-size: 1.5rem;
+    margin: 0 0 0.5rem;
+  }
+  .notfound__block p {
+    margin: 0.25rem 0;
+  }
+</style>
