@@ -129,9 +129,9 @@ Whatever is chosen, it is removed at public launch (after data + article).
 
 ### Code / config (this repo — I can do)
 - [x] Confirm static output + existing deploy tooling (`astro.config.mjs`, `web/deploy.sh`).
-- [ ] **Add `web/src/pages/404.astro`** so static hosting has an error document (FR-D8).
-- [ ] **Draft `.github/workflows/deploy.yml`** (tag-triggered reproducible build + deploy).
-- [ ] Ensure `build:search-index` runs as part of the deploy build.
+- [x] **Add `web/src/pages/404.astro`** so static hosting has an error document (FR-D8). Dependency-free; `astro check` clean.
+- [x] **One-command local deploy** `web/build-and-deploy.sh` — guards (API reachable, creds present) → `build:search-index` → `build` → `deploy.sh`. This is the v1 CD.
+- [ ] **Automated `.github/workflows/deploy.yml`** (tag-triggered, DB reproduced from committed source) — DEFERRED until (a) the owner's Arvan secrets exist as GitHub Actions secrets, and (b) a full DB rebuild from committed migrations+seeds+curation CSVs is verified to reproduce the real data. Not shipped unverified.
 
 ### Owner actions (panel / accounts — only the owner can)
 - [ ] Create the Arvan object-storage bucket; enable static-website hosting; set index + `404.html`; make objects public.
