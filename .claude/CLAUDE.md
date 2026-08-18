@@ -171,3 +171,32 @@ Future scope: deployment planning/execution, monitoring/observability, incident 
 ```
 
 **CRITICAL RULE**: Application code → workspace root, NEVER in `aidlc-docs/`. Documentation → `aidlc-docs/` only. Project structure patterns → see `code-generation.md`.
+
+---
+
+# COMMIT DISCIPLINE — commit early, commit often (MANDATORY)
+
+Uncommitted work is unbacked work. A large pile of uncommitted changes is a
+project risk, not a work-in-progress convenience.
+
+**Rules for every session in this project:**
+
+1. **Never let uncommitted work accumulate.** After each logically-complete unit
+   of work — a migration written, a route added, a doc section finished, a test
+   passing — commit it. Do not batch a whole session into one giant commit.
+2. **Delegate commit messages to a Haiku subagent** to keep it cheap and constant.
+   Spawn a `claude` (or general-purpose) subagent with `model: haiku` whose sole
+   job is: run `git status`/`git diff --stat`, group the changes logically, and
+   produce one or more conventional-commit messages (`feat:`, `fix:`, `db:`,
+   `docs:`, `chore:`), then commit. Keep unrelated changes in separate commits.
+3. **A good cadence is every ~10–15 minutes of active work, or after any file
+   that would hurt to lose.** When in doubt, commit.
+4. **Push to `origin` (the private repo) after committing** so work is never
+   only on one machine. `origin` = private `polycyclopedia`; `public` = the
+   legacy association repo — never push project work there without explicit ask.
+5. **Never commit secrets.** `.env`, `db/.env`, `api/.env`, `*.local` are
+   gitignored; keep them that way. `.neon` (org/project ids only) is safe.
+
+> For fully-automatic commits, a `Stop` hook can be added via the settings; ask
+> the maintainer before enabling, since auto-commit hooks can capture unintended
+> files. The default here is disciplined manual/Haiku-assisted commits.
