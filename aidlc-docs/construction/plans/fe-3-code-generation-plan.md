@@ -64,15 +64,23 @@ incomplete data.
       the four already-present-but-unprojected `material` columns), add a
       coverage join (same pattern `MATERIALS_LIST_SQL` already uses), add
       three new parallel queries (producers, applications, processing
-      techniques) to the existing `Promise.all`.
+      techniques) to the existing `Promise.all`. (partially done — overview/
+      discoveryYear/chainType/coverage join and the `processingTechniques`
+      query all landed; the producers and applications queries were cut per
+      this file's own 2026-08-05 scope-narrowing note and were never added)
 - [ ] `web/src/lib/api/types.ts`: `MaterialDetail` gains `overviewFa`,
       `overviewEn`, `discoveryYear: string | null`, `chainType: string | null`,
       `coverage: { totalValues, citedValues, coveragePct }`, `producers:
       Producer[]`, `tradeNames: TradeName[]`, `applications: Application[]`,
-      `processingTechniques: ProcessingTechnique[]`.
+      `processingTechniques: ProcessingTechnique[]`. (partially done — every
+      field except `producers`/`tradeNames`/`applications` is present on
+      `MaterialDetail` in `web/src/lib/api/types.ts`; those three were cut
+      along with the query above)
 - [ ] `api/test/api.test.ts`: assertions for the new fields against real LDPE
       data (overview, coverage) and a fixture-backed test for producers
       (0 real rows today, same reasoning as FE-2's citation fixture).
+      (overview/coverage/processingTechniques assertions exist; no producer
+      fixture test exists, since producers were cut from scope, not shipped)
 
 ## 2. Assembling the page: registry diff, not a second data model
 
@@ -100,32 +108,33 @@ without re-deriving it.
 
 ## 3. Page structure
 
-- [ ] `web/src/pages/fa/m/[slug].astro`, `web/src/pages/en/m/[slug].astro` —
+- [x] `web/src/pages/fa/m/[slug].astro`, `web/src/pages/en/m/[slug].astro` —
       `getStaticPaths()` enumerates all materials from `getMaterials()` at
       build time (R13: every material a real, prerenderable, linkable
       address). A slug present in one locale's build and absent from the
       other is a build failure, not a partial site.
-- [ ] Section order, top to bottom: identity (name, code, overview, coverage
+- [x] Section order, top to bottom: identity (name, code, overview, coverage
       badge, grade-selector slot) → sticky rail + scrolling regions
       (processing, thermal, mechanical, physical, electrical, molecular,
       producers, applications, chemical resistance, market share) → bottom
       bar (Learn bridge already threaded through each section, "similar to
-      this" + quick-compare links).
-- [ ] Every section carries a stable `id` matching its registry `key` (S2:
+      this" + quick-compare links). (producers/applications regions not
+      built — cut from scope, per the file-header note)
+- [x] Every section carries a stable `id` matching its registry `key` (S2:
       "every section has a stable anchor URL that survives sharing").
 
 ## 4. New shared pieces
 
-- [ ] `web/src/components/datasheet/SectionRail.astro` + `section-rail.ts` —
+- [x] `web/src/components/datasheet/SectionRail.astro` + `section-rail.ts` —
       ports FE-0's `.rail` markup/CSS (already gate-tested, including the
       FE-0 build-and-test fix for the grid-item `min-inline-size: 0` bug that
       made it silently unscrollable on phones) rather than rebuilding it.
       Adds scroll-spy (`IntersectionObserver`, one shared instance) — new
       behaviour FE-0's static prototype never needed, required by S2's "rail
       … reflects scroll position."
-- [ ] `web/src/components/datasheet/CoverageBadge.astro` — D3's "above the
+- [x] `web/src/components/datasheet/CoverageBadge.astro` — D3's "above the
       fold" indicator, from the new `coverage` field.
-- [ ] `web/src/components/datasheet/PropertySection.astro` — one registry
+- [x] `web/src/components/datasheet/PropertySection.astro` — one registry
       group rendered as a heading + a `ValueAtom` per candidate property
       (§2), reused six times (processing → molecular) rather than six
       hand-written sections.
@@ -133,17 +142,19 @@ without re-deriving it.
       `ApplicationList.astro` — thin, D3/R5-honest renderers over the new API
       arrays; empty state matches `EmptyState.astro`'s pattern from FE-1.
       Trade names render nested under their producer per S8, not as a
-      separate flat list.
-- [ ] `web/src/components/datasheet/LearnBridge.astro` — one card per
+      separate flat list. (never built — producers/trade-names/applications
+      were cut from FE-3's scope on approval 2026-08-05, per this file's own
+      header note; no such components exist in `web/src/components/datasheet/`)
+- [x] `web/src/components/datasheet/LearnBridge.astro` — one card per
       section, per R28/S10. The group-key → Learn-tool mapping is a small
       static config object (`web/src/lib/datasheet/learn-bridge-map.ts`),
       **declared once, referenced by every section** — S10's literal
       acceptance criterion. This is frontend information architecture, not
       curated content, so it is code, not a database table.
-- [ ] `web/src/components/datasheet/GradeSelectorSlot.astro` — R16: reserves
+- [x] `web/src/components/datasheet/GradeSelectorSlot.astro` — R16: reserves
       the layout position and renders a disabled control. 0 real grades
       exist (checked), so "inert" is accurate today, not a simplification.
-- [ ] `web/src/components/datasheet/BottomLinks.astro` — "similar to this"
+- [x] `web/src/components/datasheet/BottomLinks.astro` — "similar to this"
       (S7) and quick-compare (S6) as outbound links, **not** built features:
       S7's actual acceptance criterion is "pre-fills the search with this
       material's values," which needs FE-5 (search) to exist; S6 is FE-6's
@@ -171,16 +182,20 @@ without re-deriving it.
 
 ## 6. Tests
 
-- [ ] `api/test/api.test.ts` — new fields, per §1.
-- [ ] `web/src/lib/pages/material-detail.test.ts` — the registry-scoping
+- [ ] `api/test/api.test.ts` — new fields, per §1. (overview/coverage/
+      processingTechniques assertions exist; no producer assertions, since
+      producers were cut from scope — see §1)
+- [x] `web/src/lib/pages/material-detail.test.ts` — the registry-scoping
       diff (§2): a property scoped to a different field is excluded
       entirely (not rendered as missing); an unscoped property with no value
       renders missing; a present value is passed through unchanged; order
       follows registry `sort_order`.
 - [ ] `web/src/components/datasheet/*.test.ts` where there is real logic to
       test (scroll-spy's active-section calculation; coverage badge's
-      percentage formatting is the API's, not re-derived here per R3).
-- [ ] Manual/browser verification (R30, same method as FE-0/FE-1/FE-2's
+      percentage formatting is the API's, not re-derived here per R3). (no
+      such test file exists; `construction/fe-3/build-and-test.md` records
+      scroll-spy as verified live in-browser instead of unit-tested)
+- [x] Manual/browser verification (R30, same method as FE-0/FE-1/FE-2's
       gates): no overflow at 320/375/768 with the rail in both its mobile
       chip-bar and desktop sticky forms; Ctrl+F reaches a value without
       expanding anything (S2); every section anchor survives a direct visit;

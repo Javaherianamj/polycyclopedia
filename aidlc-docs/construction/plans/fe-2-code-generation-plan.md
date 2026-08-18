@@ -120,26 +120,26 @@ record's explicit carry-forward instruction.
 
 ## 3. Files
 
-- [ ] `api/src/routes/materials.ts` — `MATERIAL_CITATIONS_SQL` joins
+- [x] `api/src/routes/materials.ts` — `MATERIAL_CITATIONS_SQL` joins
       `source_document` and `source`; `mapPropertyValueRow`'s citation mapping
       gains `sourceTitle`/`sourceEdition`. `api/test/api.test.ts` gains
       assertions on the new fields.
-- [ ] `web/src/lib/api/types.ts` — `Citation` gains `sourceTitle: string`,
+- [x] `web/src/lib/api/types.ts` — `Citation` gains `sourceTitle: string`,
       `sourceEdition: string | null`.
-- [ ] `web/src/i18n/fa.json` / `en.json` — value-atom strings, Persian ported
+- [x] `web/src/i18n/fa.json` / `en.json` — value-atom strings, Persian ported
       verbatim from `design/fe-0/data.js`'s `strings` (D21's exact wording is
       already settled; this is not a place to improvise new copy).
-- [ ] `web/src/components/value-atom/ValueAtom.astro` — the component:
+- [x] `web/src/components/value-atom/ValueAtom.astro` — the component:
       property label + ⓘ, the value display string (R3 — rendered as-is, no
       client-side number formatting), the provenance mark, both popovers.
-- [ ] `web/src/components/value-atom/value-atom.css` — imported once into
+- [x] `web/src/components/value-atom/value-atom.css` — imported once into
       `global.css`; not scoped per-instance, since this component appears
       dozens of times per page and Astro's per-component scoping would
       duplicate the same rules dozens of times in the output.
-- [ ] `web/src/components/value-atom/popover-hover.ts` — the desktop-hover
+- [x] `web/src/components/value-atom/popover-hover.ts` — the desktop-hover
       progressive enhancement, one shared script for every value atom on a
       page rather than one listener per instance.
-- [ ] `web/src/pages/fa/index.astro`, `en/index.astro` — the FE-1 placeholder
+- [x] `web/src/pages/fa/index.astro`, `en/index.astro` — the FE-1 placeholder
       pages gain one new section rendering a handful of `ValueAtom`s against
       real data from `getMaterial('ldpe')` (R9 — real, mostly-uncited data,
       not hand-picked examples), covering all three states plus a numeric,
@@ -148,13 +148,13 @@ record's explicit carry-forward instruction.
 
 ## 4. Tests
 
-- [ ] `api/test/api.test.ts` — new assertions for `sourceTitle`/`sourceEdition`
+- [x] `api/test/api.test.ts` — new assertions for `sourceTitle`/`sourceEdition`
       in the citations response.
-- [ ] `web/src/components/value-atom/*.test.ts` (Vitest + a DOM environment) —
+- [x] `web/src/components/value-atom/*.test.ts` (Vitest + a DOM environment) —
       state selection logic (missing/uncited/cited from `value`/`citations`),
       string selection per locale, multi-citation and `conflicting`-role
       rendering.
-- [ ] Manual/browser verification (per R30): both popovers open via
+- [x] Manual/browser verification (per R30): both popovers open via
       click/tap/keyboard, hover-opens on a fine-pointer viewport and does not
       on a touch-sized one, no overflow at 320/375/768 (R27) with a popover
       open near a page edge specifically — the exact failure class the FE-0

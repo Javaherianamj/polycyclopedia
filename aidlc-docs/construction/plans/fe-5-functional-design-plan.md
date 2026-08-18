@@ -39,9 +39,9 @@ previous three didn't.
 - [x] Step 4 — Save plan to `aidlc-docs/construction/plans/fe-5-functional-design-plan.md`
 - [x] Step 5 — Collect and analyze answers (Auto Mode default: A on all 8, no ambiguity to resolve since every default was authored as unambiguous)
 - [x] Step 6 — Generate functional design artifacts: `business-logic-model.md`, `business-rules.md`, `domain-entities.md`, `frontend-components.md` under `aidlc-docs/construction/fe-5/functional-design/`
-- [ ] Step 7 — Present completion message
-- [ ] Step 8 — Wait for explicit approval
-- [ ] Step 9 — Record approval, update `aidlc-state.md`
+- [x] Step 7 — Present completion message
+- [x] Step 8 — Wait for explicit approval
+- [x] Step 9 — Record approval, update `aidlc-state.md`
 
 ---
 

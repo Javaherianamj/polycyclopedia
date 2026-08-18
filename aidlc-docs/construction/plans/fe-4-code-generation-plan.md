@@ -40,62 +40,62 @@ Replaces FE-1's placeholder content in `web/src/pages/{fa,en}/index.astro`
 entirely — those pages said "not a product screen" from the start,
 specifically because FE-4 was going to become the real one.
 
-- [ ] Hero: wordmark/site name, one-sentence mission statement (citable
+- [x] Hero: wordmark/site name, one-sentence mission statement (citable
       polymer reference — the same claim the root README opens with, not a
       new one invented for marketing), two CTAs as visual equals per D6:
       "Browse the catalog" → `/{locale}/catalog`, "Search by property" →
       `/{locale}/search` (FE-5, does not exist yet — same documented-gap
       pattern as every other forward link this frontend has shipped so far).
-- [ ] Real stats line (§1's numbers), not decorative — each number links to
+- [x] Real stats line (§1's numbers), not decorative — each number links to
       where it's substantiated (materials count → catalog, properties count →
       a material page's rail).
-- [ ] A handful (4–6) of real material cards as a browse preview, reusing
+- [x] A handful (4–6) of real material cards as a browse preview, reusing
       the same `MaterialCard` component the catalog uses (§4) — not a
       separate hand-styled preview, so there is exactly one card design to
       keep on-brand.
-- [ ] No heavy client islands. §6's 60 kB gzip JS budget for the homepage is
+- [x] No heavy client islands. §6's 60 kB gzip JS budget for the homepage is
       the tightest of any route — this page should ship close to zero JS
       beyond the shared theme-toggle/popover-hover scripts every page
       already carries.
 
 ## 3. Catalog (`/{locale}/catalog`)
 
-- [ ] Static at build time: every material fetched via `getMaterials()`,
+- [x] Static at build time: every material fetched via `getMaterials()`,
       grouped by family (only families with ≥1 material get a heading —
       4 of the 8 seeded families are currently empty; an empty heading with
       nothing under it is navigation noise, not honesty about scope, which
       the homepage's real stats line already carries).
-- [ ] Text search is **client-side substring filtering over the already-
+- [x] Text search is **client-side substring filtering over the already-
       rendered card list**, not a live API call. With 7 materials, shipping
       the full static list and filtering in the browser is simpler, faster,
       and far lighter than a network round-trip — and it is honestly scoped:
       real property-based search is FE-5/API-1's job (still outstanding
       per §7 of the frontend plan), not something to half-build here under a
       different name.
-- [ ] The filter reflects into the URL (`?q=…`) via `history.replaceState`,
+- [x] The filter reflects into the URL (`?q=…`) via `history.replaceState`,
       satisfying R13's "every result state has its own URL" without needing
       a backend — reading `?q=` on load restores a shared/bookmarked filter.
-- [ ] Family filter as a secondary control (chips, one per non-empty
+- [x] Family filter as a secondary control (chips, one per non-empty
       family), combinable with the text filter, same client-side mechanism.
 
 ## 4. `MaterialCard` — one component, two consumers
 
-- [ ] `web/src/components/catalog/MaterialCard.astro`: name (fa/en per
+- [x] `web/src/components/catalog/MaterialCard.astro`: name (fa/en per
       locale), code, family, a compact coverage indicator (reuses the same
       percentage `CoverageBadge` already renders on the datasheet — not a
       new coverage visualisation), links to `/{locale}/m/{slug}`.
-- [ ] `web/src/components/catalog/catalog-filter.ts`: the client-side
+- [x] `web/src/components/catalog/catalog-filter.ts`: the client-side
       filter logic (text substring + family chip), plain DOM, no framework —
       consistent with `popover-hover.ts`'s precedent of a shared vanilla
       script rather than a React island for something this small.
 
 ## 5. Tests
 
-- [ ] `web/src/components/catalog/catalog-filter.test.ts` — the pure
+- [x] `web/src/components/catalog/catalog-filter.test.ts` — the pure
       matching logic (name-fa/name-en/code substring match, family filter,
       combined), extracted from the DOM-manipulation script so it is
       testable without a browser environment.
-- [ ] Manual/browser verification (same method as FE-0–3's gates): no
+- [x] Manual/browser verification (same method as FE-0–3's gates): no
       overflow at 320/375/768, both themes, both locales; the text filter
       and family chips actually filter the rendered cards; the URL reflects
       the filter and restores it on reload; homepage and catalog JS payload
