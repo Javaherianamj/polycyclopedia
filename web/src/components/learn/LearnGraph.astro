@@ -1,0 +1,48 @@
+---
+// L3 — «شبکه» / GRAPH (lab-concepts-spec.md). Ported from design/fe-0/lab/
+// graph.html + graph.css + graph.js — same shape (hero, legend + SVG
+// figure, live reading panel, outcomes strip, closing honesty note), the
+// same structure/CSS-here + logic/island-there split MAP's
+// LearnMap.astro/MapIsland.tsx already established for this codebase. What
+// changed going from the FE-0 prototype to this app is exactly what changed
+// for MAP: the prototype hardcoded LDPE (its only material); this reads
+// whichever material the reader picks or arrives bound to, live from the
+// API — GraphIsland.tsx's header has the full account of what else that
+// generalisation required.
+//
+// ROUTE DECISION: a separate route, `/{locale}/learn/graph`, sibling to
+// `/{locale}/learn` (SCALE) and `/{locale}/learn/map` (MAP) — exactly the
+// seam LearnMap.astro's own header laid out for this agent to follow: "one
+// Astro page per file, nested directory coexisting with the top-level
+// file, no new routing pattern invented." NOTEBOOK is the fourth and final
+// instance of this same seam.
+//
+// Structure/layout is Astro + CSS (learn-graph.css); the interactive
+// diagram, live panel, outcomes strip and relations list are ONE island
+// (GraphIsland.tsx) for the same reason MAP's are one island — the marker's
+// position, the panel's live readings and the pulse animation all share one
+// piece of state (`causeState`) that would otherwise have to be prop-drilled
+// back out to page-level `<script>`, exactly the pattern FE-8's islands
+// architecture exists to avoid.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import LearnConceptNav from './LearnConceptNav.astro';
+import GraphIsland from '../../islands/GraphIsland';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<main class="learn-page">
+  <header class="learn-hero">
+    <LearnConceptNav locale={locale} current="graph" />
+    <p class="learn-kicker">{t(locale, 'learn.graph.kicker')}</p>
+    <h1>{t(locale, 'learn.graph.title')}</h1>
+    <p class="learn-hero-lead">{t(locale, 'learn.graph.intro')}</p>
+  </header>
+
+  <GraphIsland client:load locale={locale} />
+</main>

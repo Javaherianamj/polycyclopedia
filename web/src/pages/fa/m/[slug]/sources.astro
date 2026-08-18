@@ -1,0 +1,101 @@
+---
+// FE-7 — per-material sources surface, Persian route. See the English
+// route (en/m/[slug]/sources.astro) for the full comment on why this is a
+// dedicated route rather than a datasheet section -- identical reasoning,
+// just the locale.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import CoverageBadge from '../../../../components/datasheet/CoverageBadge.astro';
+import SourcesTable from '../../../../components/sources/SourcesTable.astro';
+import { getMaterial, getMaterials, getProperties } from '../../../../lib/api/client';
+import { buildMaterialSourceData } from '../../../../components/sources/material-sources';
+import { t } from '../../../../i18n/t';
+import { gateMaterials } from '../../../../lib/publish';
+
+const locale = 'fa' as const;
+
+export async function getStaticPaths() {
+  const result = await getMaterials({ limit: 200 });
+  if (!result.ok) {
+    throw new Error(`Failed to list materials for static paths: ${result.error.message}`);
+  }
+  return gateMaterials(result.data.data).map((material) => ({ params: { slug: material.slug } }));
+}
+
+const { slug } = Astro.params;
+const [materialResult, propertiesResult] = await Promise.all([getMaterial(slug), getProperties()]);
+
+if (!materialResult.ok) {
+  throw new Error(`Failed to fetch material '${slug}': ${materialResult.error.message}`);
+}
+if (!propertiesResult.ok) {
+  throw new Error(`Failed to fetch property registry: ${propertiesResult.error.message}`);
+}
+
+const material = materialResult.data;
+const registry = propertiesResult.data.data;
+const sourceData = buildMaterialSourceData(registry, material);
+const hasAnything = sourceData.totalRowCount > 0;
+---
+
+<BaseLayout locale={locale} title={`${t(locale, 'sources.pageTitle')} — ${material.nameFa}`}>
+  <main class="wrap src-wrap">
+    <a class="src-back" href={`/${locale}/m/${material.slug}`} data-testid="sources-back-link">
+      &rarr; {material.nameFa}
+    </a>
+    <h1>{t(locale, 'sources.pageTitle')}</h1>
+    <p class="src-lead">{t(locale, 'sources.materialPageLead')}</p>
+    <CoverageBadge coverage={material.coverage} locale={locale} />
+
+    {
+      hasAnything ? (
+        <SourcesTable
+          materialGroups={sourceData.materialGroups}
+          gradeClasses={sourceData.gradeClasses}
+          locale={locale}
+        />
+      ) : (
+        <p class="sec-empty">{t(locale, 'sources.materialEmpty')}</p>
+      )
+    }
+
+    <a class="src-sitewide-link" href={`/${locale}/sources`} data-testid="sources-sitewide-link">
+      {t(locale, 'sources.siteWideLink')}
+    </a>
+  </main>
+</BaseLayout>
+
+<style>
+  .src-wrap {
+    max-inline-size: var(--measure-page, 1120px);
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  .src-back {
+    display: inline-block;
+    font-size: var(--fs-small);
+    color: var(--muted);
+    margin-block-end: 14px;
+  }
+
+  h1 {
+    font-family: var(--font-display-fa);
+    font-size: var(--fs-h1);
+    margin-block: 0 8px;
+  }
+
+  .src-lead {
+    max-inline-size: 62ch;
+    color: var(--ink-2);
+    line-height: 1.9;
+    margin-block-end: 18px;
+  }
+
+  .src-sitewide-link {
+    display: inline-block;
+    margin-block-start: 30px;
+    font-size: var(--fs-small);
+    color: var(--accent);
+    border-block-end: 1px dashed currentColor;
+  }
+</style>

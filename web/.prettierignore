@@ -1,0 +1,9 @@
+dist/
+.astro/
+node_modules/
+
+# Build-time generated static assets (web/scripts/build-search-index.ts) --
+# compact JSON on purpose (BR12/perf budget), never hand-edited or
+# reformatted, and not meant to be committed in the first place.
+public/search-materials.json
+public/search-properties.json

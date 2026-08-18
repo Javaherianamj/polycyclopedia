@@ -1,0 +1,126 @@
+/* TYPE SCALE — tokens only. No colour, no spacing, no component rules.
+ *
+ * FE-0 close-out, Agent B (aidlc-docs/construction/fe-0/closeout-spec.md).
+ * The owner's single biggest complaint about the old prototype was font
+ * problems (round-2 Q34): Estedad (Persian) and Newsreader (Latin) share a
+ * line constantly in this product — Persian prose containing Latin numerals
+ * and Latin technical terms — and their vertical metrics do not match at the
+ * same nominal font-size. This file is the fix, defined once so both faces
+ * honour it everywhere instead of the two sizes that happened to be in use.
+ *
+ * This file does not decide which element gets which step — that is FE-1's
+ * job once these tokens are consolidated. It only names the steps and proves
+ * (see type.html) that the pairing holds at every one of them.
+ */
+
+:root {
+  /* ------------------------------------------------------------ the scale
+   * Modular scale, ratio 1.125 (a "major second"). Chosen over a wider ratio
+   * (1.2, 1.25...) because this is a dense technical datasheet with 8 named
+   * steps — a wide ratio makes --fs-micro unreadably small and --fs-display
+   * absurd long before you reach 8 steps. 1.125 keeps every step usable.
+   *
+   * --fs-body is fixed at 15.5px (0.969rem @ 16px root) to match the size
+   * already established in themes/e-press.css and lab/lab.css — continuity
+   * for the token consolidation pass, not a new decision.
+   *
+   * step  = body * 1.125^n   (n = distance from body, +up/-down)
+   *
+   *   --fs-micro    body * 1.125⁻³  = 0.680rem  (10.9px)
+   *   --fs-caption  body * 1.125⁻²  = 0.765rem  (12.2px)
+   *   --fs-small    body * 1.125⁻¹  = 0.861rem  (13.8px)
+   *   --fs-body     body            = 0.969rem  (15.5px)
+   *   --fs-h3       body * 1.125¹   = 1.090rem  (17.4px)
+   *   --fs-h2       body * 1.125²   = 1.226rem  (19.6px)
+   *   --fs-h1       body * 1.125³   = 1.379rem  (22.1px) ... fluid, see below
+   *   --fs-display  body * 1.125⁴   = 1.552rem  (24.8px) ... fluid, see below
+   */
+  --fs-micro: 0.68rem;
+  --fs-caption: 0.765rem;
+  --fs-small: 0.861rem;
+  --fs-body: 0.969rem; /* 15.5px @ 16px root */
+  --fs-h3: 1.09rem;
+  --fs-h2: 1.226rem;
+
+  /* Fluid — display and h1 only, per spec; body does not scale with viewport.
+     Formula: clamp(minRem, remAtMinVW + slopeVw, maxRem), interpolated over a
+     320px -> 1280px viewport range (the widths this product is actually
+     checked at, R27). --fs-h1's max (2.2rem) matches the h1 size already in
+     use in themes/e-press.css's .hero h1 — same continuity reasoning as
+     --fs-body above. --fs-display's max continues the same ratio two more
+     steps past h1 (1.125^2 further), since nothing in the existing pages
+     needed a size bigger than h1 yet — a display step is new. */
+  --fs-h1: clamp(1.379rem, 1.106rem + 1.368vw, 2.2rem);
+  --fs-display: clamp(1.552rem, 1.141rem + 2.054vw, 2.784rem);
+
+  /* ------------------------------------------------------- line height
+   * Persian needs more leading than Latin at the same size — the vertical
+   * metrics comment above applies to leading too, not just size. Body
+   * matches the 1.9 already used site-wide. Headings tighten step by step,
+   * since a heading is a short line and heavy leading there just looks
+   * loose. --lh-small/caption/micro are UI-label contexts (badges, meta,
+   * table cells) more often than running paragraphs, so they sit below body
+   * but still comfortably above heading tightness — that split is a
+   * judgement call, not a measured value; flagged in the close-out report.
+   */
+  --lh-display: 1.15;
+  --lh-h1: 1.2;
+  --lh-h2: 1.3;
+  --lh-h3: 1.4;
+  --lh-body: 1.9;
+  --lh-small: 1.7;
+  --lh-caption: 1.6;
+  --lh-micro: 1.5;
+
+  /* ------------------------------------------------- Latin-size correction
+   * MEASURED, not guessed. Both faces' OS/2 tables were read directly with
+   * fontTools (pip: fonttools 4.61.1, available in this environment — no
+   * substitute method was needed):
+   *
+   *   Estedad Variable   unitsPerEm 1000   sCapHeight 655  ->  0.655 of em
+   *   Newsreader (wght400 upright, latin) unitsPerEm 2000  sCapHeight 1340 -> 0.670 of em
+   *
+   * Verified against actual glyph outlines (fontTools BoundsPen), not just
+   * the OS/2 header fields:
+   *   Estedad "ا" (alef, an ascending letter — Arabic script's nearest
+   *     analogue to a Latin cap): outline height 653/1000 = 0.653, matches
+   *     sCapHeight (655) almost exactly.
+   *   Newsreader "0": outline yMax 1360/2000 = 0.680, matches sCapHeight
+   *     (1340, i.e. 0.670) closely. Confirmed via the font's GSUB feature
+   *     list (liga, pnum, rvrn, tnum — no "onum") that Newsreader has no
+   *     oldstyle-figure alternate: its default digits are lining figures
+   *     that sit at cap-height, not x-height.
+   *
+   * cap-height was used, not x-height, because the value this token actually
+   * corrects is `.num` (digits) and short Latin acronyms (MFI, BUR, CTE,
+   * ICI — see data.js) — both of which are cap-height-anchored glyph sets,
+   * not lowercase prose. Measuring x-height instead would answer a different
+   * question (would a lowercase Latin WORD sit correctly in Persian prose?)
+   * and gives a materially different, opposite-direction number: Estedad
+   * sxHeight 490/1000=0.49 vs Newsreader sxHeight 852/2000=0.426 implies
+   * scaling Newsreader UP by ~1.15x, which would make digits — already
+   * cap-height-anchored and therefore already the taller of the two
+   * measurements — even more oversized. Flagged in the close-out report as
+   * a real methodology choice, not a settled fact.
+   *
+   *   --latin-size-adj = Estedad sCapHeight-ratio / Newsreader sCapHeight-ratio
+   *                    = 0.655 / 0.670 = 0.9776  ->  0.978
+   *
+   * i.e. Newsreader is very slightly oversized relative to Estedad at the
+   * same nominal font-size, and needs a small downward correction so a
+   * digit's cap-height lines up with the height of an Estedad ascender
+   * (alef/lam) sitting next to it. Applied as a multiplier on font-size, so
+   * it composes with every step above rather than being a fixed size.
+   */
+  --latin-size-adj: 0.978;
+}
+
+/* `.num` is already the numeral class (see lab.css); `[dir='ltr']` covers the
+   inline technical-term case where no `.num` is present (e.g. an English
+   proper noun embedded in Persian prose). Scoped to `span` per spec wording
+   ("applied to .num / [dir='ltr'] spans") so this never resizes a block-level
+   RTL/LTR container by accident. */
+.num,
+span[dir='ltr'] {
+  font-size: calc(1em * var(--latin-size-adj));
+}

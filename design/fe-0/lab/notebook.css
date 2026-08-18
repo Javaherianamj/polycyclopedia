@@ -1,0 +1,646 @@
+/* L4 — «دفترچه» / NOTEBOOK
+ *
+ * The shape the lab has to grow into: a published article with live figures
+ * embedded in the argument, not a tool grid. Two columns — a ~62ch reading
+ * measure plus a Tufte-style margin column for sidenotes — using the classic
+ * float technique (a note floats into reserved space in the margin and lands
+ * close to, not exactly beside, its reference point; that imprecision is the
+ * known trade-off of the technique, not a bug).
+ *
+ * ALTERNATING SPREAD (owner request): the article is built from three
+ * .nb-block sections (notebook.js). Odd sections are --r (text pinned to the
+ * physical right edge, notes float physical-left, exactly the original single-
+ * sided layout). Even sections are --l, mirrored: text pinned physical-left,
+ * notes float physical-right. This is a deliberate magazine-style mirroring,
+ * not an RTL/LTR distinction, which is why both variants are pinned in
+ * PHYSICAL terms rather than logical inline-start/end — same reasoning as the
+ * note float below, just parametrised per block instead of fixed for the
+ * whole page.
+ */
+
+.wrap {
+  max-inline-size: var(--measure);
+}
+
+/* --------------------------------------------------------- reading progress */
+
+.read-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  block-size: 3px;
+  background: transparent;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.read-progress i {
+  display: block;
+  block-size: 100%;
+  background: var(--act);
+  inline-size: 0%;
+}
+
+/* ------------------------------------------------------------------ masthead */
+
+.nb-head {
+  padding-block: 40px 6px;
+}
+
+.nb-head .eyebrow {
+  font-size: 0.95rem;
+}
+
+.nb-head h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.85rem, 1.3rem + 2.2vw, 2.7rem);
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+  margin: 10px 0 14px;
+  max-inline-size: 20ch;
+}
+
+.nb-standfirst {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.12rem;
+  line-height: 1.75;
+  color: var(--ink-2);
+  max-inline-size: 58ch;
+  margin: 0 0 20px;
+}
+
+.nb-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  padding-block: 16px;
+  border-block: 1px solid var(--line);
+  margin-block-end: 26px;
+}
+
+.nb-byline b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.nb-byline .dot {
+  color: var(--muted-2);
+}
+
+/* --------------------------------------------------------------- review block */
+
+.nb-review {
+  max-inline-size: 640px;
+  margin: 0 0 34px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--act);
+  border-radius: var(--r-md);
+  background: var(--panel);
+}
+
+.nb-review h2 {
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  color: var(--act);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.nb-review p {
+  font-size: 0.93rem;
+  line-height: 1.85;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+.nb-cite {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* the provenance mark, reused per house convention (render.js valueAtom) */
+.mark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 17px;
+  block-size: 17px;
+  border-radius: 5px;
+  font-size: 0.64rem;
+  font-family: var(--font-num);
+  border: 1px solid var(--ok-line);
+  color: var(--ok);
+  flex: none;
+}
+
+.mark .pop {
+  position: absolute;
+  inset-block-end: calc(100% + 8px);
+  inset-inline-start: 0;
+  /* Never wider than the viewport it has to fit inside. Anchoring is still
+     naive — a mark near the inline edge clips — see FE-1's popover item. */
+  inline-size: min(250px, calc(100vw - 32px));
+  padding: 11px 13px;
+  display: grid;
+  gap: 5px;
+  text-align: start;
+  white-space: normal;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: 0 14px 32px -12px rgba(10, 14, 26, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity var(--t),
+    transform var(--t),
+    visibility var(--t);
+  z-index: 30;
+}
+
+.mark:hover .pop,
+.mark:focus-visible .pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* unsourced variant — colourless on purpose, dashed grey (D21) */
+.mark.mark-unsourced {
+  border-color: var(--line-2);
+  border-style: dashed;
+  color: var(--muted-2);
+}
+
+.mark.mark-unsourced .pop b {
+  color: var(--muted-2);
+}
+
+.pop b {
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pop-meta {
+  font-family: var(--font-num);
+  font-size: 0.72rem;
+  color: var(--muted-2);
+  direction: ltr;
+  text-align: end;
+}
+
+/* -------------------------------------------------------------------- layout */
+
+.nb-wrap {
+  max-inline-size: 960px;
+  margin-inline: auto;
+  padding-inline: var(--pad-x);
+}
+
+.nb-body {
+  padding-block: 4px 20px;
+}
+
+.article {
+  font-size: 1.01rem;
+  line-height: 1.95;
+}
+
+/* Below the breakpoint every block is full-width and stacks normally — the
+   640px reading measure comes from .nb-block itself, not from .article, so it
+   applies equally to both mirrored variants. */
+.nb-block {
+  max-inline-size: 640px;
+}
+
+@media (min-width: 1040px) {
+  /* Odd sections: text at the physical right edge (the original layout). */
+  .nb-block--r {
+    margin-inline: 0;
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  /* Even sections: mirrored — text at the physical left edge. */
+  .nb-block--l {
+    margin-inline: 0;
+    margin-left: 0;
+    margin-right: auto;
+  }
+}
+
+.nb-block + .nb-block {
+  margin-block-start: 10px;
+}
+
+.article h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 46px 0 14px;
+  scroll-margin-block-start: 90px;
+}
+
+.nb-block:first-child h2 {
+  margin-block-start: 0;
+}
+
+.article p {
+  color: var(--ink-2);
+  margin: 0 0 20px;
+}
+
+/* -------------------------------------------------------------------- sidenotes */
+
+.note {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+
+.note-ref {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  font-size: 0.62rem;
+  font-family: var(--font-num);
+  color: var(--act);
+  border: 1px solid var(--act-line);
+  vertical-align: super;
+  margin-inline: 2px;
+}
+
+@media (min-width: 1040px) {
+  .note-ref {
+    display: none;
+  }
+
+  /* Framed box, not a bare line of text — makes a note read as its own
+     object against the page instead of blending into the background. */
+  .note {
+    display: block !important;
+    inline-size: 232px;
+    margin-block: 2px 16px;
+    padding: 10px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  /* --r blocks (text right): notes float physical-left of the text column,
+     bordered/padded on the edge facing it (physical-right = inline-start in
+     this RTL page — the one place logical properties are correct here,
+     because that edge genuinely is the inline-start edge). */
+  .nb-block--r .note {
+    float: left;
+    clear: left;
+    margin-left: -270px;
+    margin-right: 0;
+  }
+
+  /* --l blocks (text left, mirrored): notes float physical-right of the text
+     column instead — the opposite physical side, opposite margin sign. */
+  .nb-block--l .note {
+    float: right;
+    clear: right;
+    margin-right: -270px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1039px) {
+  .note {
+    display: none;
+    margin-block: 8px 4px;
+    padding: 10px 13px;
+    background: var(--panel-2);
+    border-radius: var(--r-sm);
+  }
+
+  .note.is-open {
+    display: block;
+  }
+}
+
+/* --------------------------------------------------------------------- figures */
+
+.fig {
+  margin: 30px 0 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 18px 20px 16px;
+}
+
+.fig svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  margin-block-end: 6px;
+}
+
+.fig-cap {
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--muted);
+  margin: 10px 0 0;
+}
+
+.fig-cap b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.fig-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  color: var(--act);
+  border: 1px solid var(--act-line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin-block-end: 10px;
+}
+
+.fig-live-badge i {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--act);
+  flex: none;
+}
+
+/* ------------------------------------------------------------------- figure 1 */
+
+.fig1-chain {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fig1-branch {
+  fill: none;
+  stroke: var(--act);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.fig1-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  fill: var(--muted);
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+/* -------------------------------------------------------------- live figure 2 */
+
+.fig2-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.fig2-track-wrap {
+  flex: 1 1 260px;
+  min-inline-size: 0;
+}
+
+.fig2-track {
+  position: relative;
+  block-size: 34px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+
+.fig2-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: 999px;
+  background: var(--act-bg);
+}
+
+.fig2-handle {
+  position: absolute;
+  inset-block-start: 50%;
+  inline-size: 26px;
+  block-size: 26px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--act);
+  transform: translate(50%, -50%);
+  cursor: grab;
+  touch-action: none;
+}
+
+.fig2-handle:active {
+  cursor: grabbing;
+}
+
+.fig2-readout {
+  flex: none;
+  min-inline-size: 150px;
+  text-align: end;
+}
+
+.fig2-readout .num {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fig2-readout .lbl {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-block-start: 2px;
+}
+
+.fig2-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--muted-2);
+  margin-block-start: 6px;
+  direction: ltr;
+}
+
+/* ------------------------------------------------------------------ pull-quote */
+
+.pull {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: var(--ink);
+  border-inline-start: 3px solid var(--act);
+  padding-inline-start: 18px;
+  margin: 32px 0 34px;
+}
+
+/* -------------------------------------------------------------------- term */
+
+.term {
+  position: relative;
+  color: var(--ink);
+  border-block-end: 1px dashed var(--act-line);
+  cursor: help;
+}
+
+.term .pop {
+  position: absolute;
+  inset-block-end: calc(100% + 8px);
+  inset-inline-start: 50%;
+  transform: translate(-50%, 4px);
+  inline-size: min(240px, calc(100vw - 32px));
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  line-height: 1.75;
+  font-style: normal;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: 0 14px 30px -12px rgba(10, 14, 26, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--t),
+    transform var(--t),
+    visibility var(--t);
+  z-index: 30;
+}
+
+.term:hover .pop,
+.term:focus-visible .pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/* ------------------------------------------------------------------------ toc */
+
+.toc-rail {
+  position: fixed;
+  inset-inline-end: 22px;
+  inset-block-start: 130px;
+  inline-size: 190px;
+  display: none;
+  font-size: 0.8rem;
+}
+
+@media (min-width: 1320px) {
+  .toc-rail {
+    display: block;
+  }
+}
+
+.toc-rail h2 {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--muted-2);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.toc-rail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+  border-inline-start: 1px solid var(--line);
+  padding-inline-start: 12px;
+}
+
+.toc-rail a {
+  color: var(--muted);
+  transition: color var(--t);
+}
+
+.toc-rail a:hover {
+  color: var(--ink);
+}
+
+.toc-rail a.on {
+  color: var(--act);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------- closing */
+
+.nb-closing {
+  border-block-start: 1px solid var(--line);
+  padding-block: 22px 44px;
+}
+
+.nb-closing p {
+  max-inline-size: 640px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.9;
+}
+
+/* Same correction as base.css: a popover whose containing block is the inline
+   trigger opens wherever that trigger sits, so one near the inline edge lands
+   half outside the page. Below 1040px the surrounding block becomes the
+   containing block and the popover spans it. The bound is 1320px, not the
+   1040px layout breakpoint: it is only at 1320px that the margin-note column
+   appears and leaves the article enough room either side. */
+@media (max-width: 1319px) {
+  .nb-cite,
+  .article p {
+    position: relative;
+  }
+
+  .mark,
+  .term {
+    position: static;
+  }
+
+  .mark .pop,
+  .term .pop {
+    inset-inline: 0;
+    inline-size: auto;
+    transform: translateY(4px);
+  }
+
+  .mark:hover .pop,
+  .mark:focus-visible .pop,
+  .term:hover .pop,
+  .term:focus-visible .pop {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fig2-handle {
+    transition: none !important;
+  }
+}

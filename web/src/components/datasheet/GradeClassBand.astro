@@ -1,0 +1,128 @@
+---
+// FE-3b: the grade-class band. Owner decision (2026-08-12): inline-expand
+// at the BOTTOM of the datasheet, not a top selector that swaps the page
+// and not a dedicated per-class route -- so the interaction is a plain
+// <details>/<summary> per row (CSS/markup only, no JS, no new library --
+// R24) rather than an island or a client router.
+//
+// D46 (no value inheritance) drives the content model here more than any
+// other section on the page: a grade class's propertyGroups already carry
+// ONLY what was explicitly cited for that resin population (see
+// api/src/routes/materials.ts's MATERIAL_GRADE_CLASS_PROPERTY_VALUES_SQL --
+// it queries subject_type = 'grade_class' alone, never falls back to the
+// parent material's rows), so this component has nothing to reconcile
+// against the full property registry the way PropertySection does for the
+// material itself. It renders exactly what the API returned, through the
+// same ValueAtom every other value on the page uses (R1), so citedness
+// reads identically here as everywhere else on the site.
+//
+// Renders nothing at all when gradeClasses is empty (R7/R4) -- the caller
+// ([slug].astro) is responsible for that guard so an empty band never even
+// reaches this component's markup.
+import type { Locale } from '../../i18n/config';
+import type { GradeClass, PropertyValue } from '../../lib/api/types';
+import { gradeClassValueCounts, propertyValueAsDefinition } from '../../lib/pages/material-detail';
+import ValueAtom from '../value-atom/ValueAtom.astro';
+import ProcessingTechniqueList from './ProcessingTechniqueList.astro';
+import { t } from '../../i18n/t';
+
+interface Props {
+  gradeClasses: GradeClass[];
+  locale: Locale;
+}
+
+const { gradeClasses, locale } = Astro.props;
+
+// [own call, small contained fix — FE-6's compare unit] Two grade-class
+// values sharing a property key but different test conditions (e.g.
+// tensile_strength at `{basis: "yield"}` vs `{basis: "break"}`) were
+// rendering through ValueAtom with the SAME name — the two numbers looked
+// like one value repeated rather than two distinct measurements. ValueAtom
+// itself has no conditions slot (FE-2, frozen), so the fix folds the
+// condition into the name string handed to it, the same way this file
+// already adapts a PropertyValue into a PropertyDefinition via
+// propertyValueAsDefinition. Renders nothing extra when `conditions` is
+// absent or empty — see PropertyValue.conditions' own comment
+// (lib/api/types.ts) for why the API doesn't send it yet.
+function conditionLabel(conditions: PropertyValue['conditions']): string | null {
+  if (!conditions) return null;
+  const values = Object.values(conditions);
+  if (values.length === 0) return null;
+  return values.map((v) => String(v)).join(', ');
+}
+
+function withConditionLabel(value: PropertyValue) {
+  const definition = propertyValueAsDefinition(value);
+  const label = conditionLabel(value.conditions);
+  if (!label) return definition;
+  return {
+    ...definition,
+    nameFa: `${definition.nameFa} (${label})`,
+    nameEn: `${definition.nameEn} (${label})`,
+  };
+}
+---
+
+<section class="grade-band" id="grade-classes" data-testid="datasheet-grade-band">
+  <header class="sec-head">
+    <h2>{t(locale, 'datasheet.gradeClasses.heading')}</h2>
+  </header>
+  <p class="grade-band-hint">{t(locale, 'datasheet.gradeClasses.hint')}</p>
+  <div class="grade-list">
+    {
+      gradeClasses.map((gradeClass) => {
+        const counts = gradeClassValueCounts(gradeClass);
+        const isEmpty = counts.total === 0 && gradeClass.processingTechniques.length === 0;
+        return (
+          <details class="grade-row" data-testid={`datasheet-grade-class-${gradeClass.key}`}>
+            <summary class="grade-row-summary">
+              <span class="grade-row-name">
+                {locale === 'fa' ? gradeClass.nameFa : gradeClass.nameEn}
+              </span>
+              <span class="grade-row-count">
+                {t(locale, 'datasheet.gradeClasses.rowCoverage')
+                  .replace('{cited}', String(counts.cited))
+                  .replace('{total}', String(counts.total))}
+              </span>
+            </summary>
+            <div class="grade-row-body">
+              {(locale === 'fa' ? gradeClass.descriptionFa : gradeClass.descriptionEn) && (
+                <p class="grade-row-desc">
+                  {locale === 'fa' ? gradeClass.descriptionFa : gradeClass.descriptionEn}
+                </p>
+              )}
+              {isEmpty ? (
+                <p class="sec-empty">{t(locale, 'datasheet.gradeClasses.empty')}</p>
+              ) : (
+                <>
+                  {gradeClass.propertyGroups.map((group) => (
+                    <div class="grade-group">
+                      <h3 class="grade-group-heading">
+                        {locale === 'fa' ? group.nameFa : group.nameEn}
+                      </h3>
+                      <div class="sec-body">
+                        {group.properties.map((value) => (
+                          <ValueAtom
+                            property={withConditionLabel(value)}
+                            value={value}
+                            locale={locale}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {gradeClass.processingTechniques.length > 0 && (
+                    <ProcessingTechniqueList
+                      techniques={gradeClass.processingTechniques}
+                      locale={locale}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          </details>
+        );
+      })
+    }
+  </div>
+</section>

@@ -30,171 +30,171 @@ ON CONFLICT (material_id, type, value) DO NOTHING;
 INSERT INTO material_identifier (material_id, type, value)
 SELECT (SELECT id FROM material WHERE slug = 'ldpe'), 'resin_code', '4'
 ON CONFLICT (material_id, type, value) DO NOTHING;
-INSERT INTO material_structure (material_id, atoms, unit_cell)
-SELECT (SELECT id FROM material WHERE slug = 'ldpe'), '[{"element": "C", "x": 0.0, "y": 0.0, "z": 0.0}, {"element": "C", "x": 1.52, "y": 0.0, "z": 0.0}, {"element": "C", "x": 2.28, "y": 1.25, "z": 0.0}, {"element": "C", "x": 3.8, "y": 1.25, "z": 0.0}, {"element": "C", "x": 1.52, "y": -1.25, "z": 0.0}, {"element": "H", "x": -0.5, "y": 0.88, "z": 0.0}, {"element": "H", "x": -0.5, "y": -0.88, "z": 0.0}, {"element": "H", "x": 2.02, "y": 0.88, "z": 0.88}, {"element": "H", "x": 2.02, "y": 0.88, "z": -0.88}]'::jsonb, '7.4, 4.93, 2.55 Å (Orthorhombic)'
+INSERT INTO material_structure (material_id, atoms)
+SELECT (SELECT id FROM material WHERE slug = 'ldpe'), '[{"element": "C", "x": 0.0, "y": 0.0, "z": 0.0}, {"element": "C", "x": 1.52, "y": 0.0, "z": 0.0}, {"element": "C", "x": 2.28, "y": 1.25, "z": 0.0}, {"element": "C", "x": 3.8, "y": 1.25, "z": 0.0}, {"element": "C", "x": 1.52, "y": -1.25, "z": 0.0}, {"element": "H", "x": -0.5, "y": 0.88, "z": 0.0}, {"element": "H", "x": -0.5, "y": -0.88, "z": 0.0}, {"element": "H", "x": 2.02, "y": 0.88, "z": 0.88}, {"element": "H", "x": 2.02, "y": 0.88, "z": -0.88}]'::jsonb
 ON CONFLICT (material_id) DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'process_temp'), 180.0, 230.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mfi'), 0.2, 20.0, NULL, NULL, 'g/10min', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'bur'), NULL, NULL, NULL, '2:1 تا 4:1', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'tg'), NULL, NULL, -110.0, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'tm'), 105.0, 115.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_exp'), 115.0, 160.0, NULL, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_100_cryst'), NULL, NULL, 293.0, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'degradation_temp'), 300.0, 400.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hdt'), 45.0, 70.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'vicat'), 85.0, 95.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'conductivity'), 0.33, 0.4, NULL, NULL, 'W/m·K', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'cte'), 150.0, 200.0, NULL, NULL, 'µm/°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'tensile_strength'), 8.0, 15.0, NULL, NULL, 'MPa', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'young_modulus'), 0.15, 0.35, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'elongation_at_break'), 100.0, 650.0, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'flexural_modulus'), 0.2, 0.4, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hardness_shore_d'), 40.0, 50.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'density'), 0.91, 0.925, NULL, NULL, 'g/cm³', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'water_absorption'), NULL, 0.01, NULL, NULL, '%', '<', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'refractive_index'), NULL, NULL, 1.51, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'oxygen_permeability'), 400.0, 600.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'co2_permeability'), 1500.0, 2000.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'appearance'), NULL, NULL, NULL, 'نیمه‌شفاف (Translucent)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_constant'), 2.25, 2.35, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_strength'), 20.0, 30.0, NULL, NULL, 'kV/mm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'volume_resistivity'), 1e+16, 1e+18, NULL, NULL, 'Ω·cm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dissipation_factor'), NULL, NULL, 0.0002, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'monomer_name'), NULL, NULL, NULL, 'اتیلن (Ethylene)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'monomer_formula'), NULL, NULL, NULL, 'C2H4', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'monomer_molar_mass'), NULL, NULL, 28.05, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'repeating_unit'), NULL, NULL, NULL, '[CH2 - CH2]n', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'crystallinity'), 40.0, 55.0, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'unit_cell'), NULL, NULL, NULL, '7.4, 4.93, 2.55 Å (Orthorhombic)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'lamella_thickness'), 10.0, 20.0, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'spherulite_size'), 10.0, 50.0, NULL, NULL, 'µm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mechanism'), NULL, NULL, NULL, 'رادیکال آزاد (فشار بالا 1000-3000 بار و دمای 200-300 °C با آغازگر پراکسید آلی)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'kinetic_notes'), NULL, NULL, NULL, 'وقوع مکرر واکنش‌های انتقال زنجیر (Chain Transfer) و Backbiting عامل اصلی ایجاد شاخه‌های کوتاه و بلند در زنجیر است.', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mw'), 100000.0, 300000.0, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mn'), 20000.0, 80000.0, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'pdi'), 3.0, 12.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dp_range'), 1500.0, 15000.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'entanglement_mw'), NULL, NULL, 1300.0, NULL, 'g/mol', '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'radius_of_gyration'), 20.0, 40.0, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'zero_shear_viscosity'), 10000.0, 1000000.0, NULL, NULL, 'Pa·s', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'power_law_index'), 0.3, 0.5, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'rheology_notes'), NULL, NULL, NULL, 'رفتار ویسکوزیته مذاب از نوع شبه‌پلاستیک (Shear-Thinning) با استحکام مذاب (Melt Strength) بالا به دلیل گره‌خوردگی شاخه‌های بلند است.', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'solubility_parameter'), 16.0, 17.0, NULL, NULL, 'MPa^0.5', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hansen_d'), NULL, NULL, 16.0, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hansen_p'), NULL, NULL, 0.0, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hansen_h'), NULL, NULL, 0.0, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'flory_huggins_chi'), 0.1, 0.3, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'ffv'), 0.16, 0.2, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'persistence_length'), NULL, NULL, 0.7, NULL, 'nm', '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'thermo_notes'), NULL, NULL, NULL, 'مقدار آنتالپی ذوب تجربی برای LDPE کاملاً بلوری (100% فرضی) برابر با 293 J/g می‌باشد که مبنای محاسبات تجربی بلورینگی است.', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'process_temp'), 180.0, 230.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mfi'), 0.2, 20.0, NULL, NULL, NULL, 'g/10min', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'bur'), NULL, NULL, NULL, '2:1 تا 4:1', '2:1 to 4:1', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'tg'), NULL, NULL, -110.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'tm'), 105.0, 115.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_exp'), 115.0, 160.0, NULL, NULL, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_100_cryst'), NULL, NULL, 293.0, NULL, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'degradation_temp'), 300.0, 400.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hdt'), 45.0, 70.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'vicat'), 85.0, 95.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'conductivity'), 0.33, 0.4, NULL, NULL, NULL, 'W/m·K', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'cte'), 150.0, 200.0, NULL, NULL, NULL, 'µm/°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'tensile_strength'), 8.0, 15.0, NULL, NULL, NULL, 'MPa', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'young_modulus'), 0.15, 0.35, NULL, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'elongation_at_break'), 100.0, 650.0, NULL, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'flexural_modulus'), 0.2, 0.4, NULL, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hardness_shore_d'), 40.0, 50.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'density'), 0.91, 0.925, NULL, NULL, NULL, 'g/cm³', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'water_absorption'), NULL, 0.01, NULL, NULL, NULL, '%', '<', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'refractive_index'), NULL, NULL, 1.51, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'oxygen_permeability'), 400.0, 600.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'co2_permeability'), 1500.0, 2000.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'appearance'), NULL, NULL, NULL, 'نیمه‌شفاف', 'Translucent', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_constant'), 2.25, 2.35, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_strength'), 20.0, 30.0, NULL, NULL, NULL, 'kV/mm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'volume_resistivity'), 1e+16, 1e+18, NULL, NULL, NULL, 'Ω·cm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dissipation_factor'), NULL, NULL, 0.0002, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'monomer_name'), NULL, NULL, NULL, 'اتیلن', 'Ethylene', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'monomer_formula'), NULL, NULL, NULL, 'C2H4', 'C2H4', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'monomer_molar_mass'), NULL, NULL, 28.05, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'repeating_unit'), NULL, NULL, NULL, '[CH2 - CH2]n', '[CH2 - CH2]n', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'crystallinity'), 40.0, 55.0, NULL, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'unit_cell'), NULL, NULL, NULL, '7.4، 4.93، 2.55 آنگستروم (اورتورومبیک)', '7.4, 4.93, 2.55 Å (Orthorhombic)', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'lamella_thickness'), 10.0, 20.0, NULL, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'spherulite_size'), 10.0, 50.0, NULL, NULL, NULL, 'µm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mechanism'), NULL, NULL, NULL, 'رادیکال آزاد (فشار بالا 1000-3000 بار و دمای 200-300 °C با آغازگر پراکسید آلی)', 'Free radical (high pressure, 1000-3000 bar and 200-300 °C, with an organic peroxide initiator)', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'kinetic_notes'), NULL, NULL, NULL, 'وقوع مکرر واکنش‌های انتقال زنجیر (Chain Transfer) و Backbiting عامل اصلی ایجاد شاخه‌های کوتاه و بلند در زنجیر است.', 'Frequent chain transfer and backbiting reactions are the main cause of the short- and long-chain branches along the chain.', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mw'), 100000.0, 300000.0, NULL, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'mn'), 20000.0, 80000.0, NULL, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'pdi'), 3.0, 12.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'dp_range'), 1500.0, 15000.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'entanglement_mw'), NULL, NULL, 1300.0, NULL, NULL, 'g/mol', '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'radius_of_gyration'), 20.0, 40.0, NULL, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'zero_shear_viscosity'), 10000.0, 1000000.0, NULL, NULL, NULL, 'Pa·s', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'power_law_index'), 0.3, 0.5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'rheology_notes'), NULL, NULL, NULL, 'رفتار ویسکوزیته مذاب از نوع شبه‌پلاستیک (Shear-Thinning) با استحکام مذاب (Melt Strength) بالا به دلیل گره‌خوردگی شاخه‌های بلند است.', 'Melt viscosity is pseudoplastic (shear-thinning), with high melt strength owing to long-chain-branch entanglement.', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'solubility_parameter'), 16.0, 17.0, NULL, NULL, NULL, 'MPa^0.5', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hansen_d'), NULL, NULL, 16.0, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hansen_p'), NULL, NULL, 0.0, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'hansen_h'), NULL, NULL, 0.0, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'flory_huggins_chi'), 0.1, 0.3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'ffv'), 0.16, 0.2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'persistence_length'), NULL, NULL, 0.7, NULL, NULL, 'nm', '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'ldpe'), (SELECT id FROM property_definition WHERE key = 'thermo_notes'), NULL, NULL, NULL, 'مقدار آنتالپی ذوب تجربی برای LDPE کاملاً بلوری (100% فرضی) برابر با 293 J/g می‌باشد که مبنای محاسبات تجربی بلورینگی است.', 'The experimental enthalpy of fusion for fully crystalline LDPE (a hypothetical 100%) is 293 J/g, the basis for empirical crystallinity calculations.', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
 INSERT INTO market_share_datum (material_id, segment_fa, percentage, status)
 SELECT (SELECT id FROM material WHERE slug = 'ldpe'), 'بسته‌بندی منعطف (فیلم)', 58.8, 'unsourced'
 WHERE NOT EXISTS (
@@ -309,174 +309,174 @@ ON CONFLICT (material_id, type, value) DO NOTHING;
 INSERT INTO material_identifier (material_id, type, value)
 SELECT (SELECT id FROM material WHERE slug = 'hdpe'), 'resin_code', '2'
 ON CONFLICT (material_id, type, value) DO NOTHING;
-INSERT INTO material_structure (material_id, atoms, unit_cell)
-SELECT (SELECT id FROM material WHERE slug = 'hdpe'), '[{"element": "C", "x": 0.0, "y": 0.0, "z": 0.0}, {"element": "C", "x": 1.52, "y": 0.0, "z": 0.0}, {"element": "C", "x": 2.28, "y": 1.25, "z": 0.0}, {"element": "C", "x": 3.8, "y": 1.25, "z": 0.0}, {"element": "C", "x": 4.56, "y": 0.0, "z": 0.0}, {"element": "H", "x": -0.5, "y": 0.88, "z": 0.0}, {"element": "H", "x": -0.5, "y": -0.88, "z": 0.0}, {"element": "H", "x": 2.02, "y": -0.88, "z": 0.0}, {"element": "H", "x": 2.02, "y": 0.88, "z": 0.88}]'::jsonb, '7.42, 4.95, 2.55 Å (Orthorhombic)'
+INSERT INTO material_structure (material_id, atoms)
+SELECT (SELECT id FROM material WHERE slug = 'hdpe'), '[{"element": "C", "x": 0.0, "y": 0.0, "z": 0.0}, {"element": "C", "x": 1.52, "y": 0.0, "z": 0.0}, {"element": "C", "x": 2.28, "y": 1.25, "z": 0.0}, {"element": "C", "x": 3.8, "y": 1.25, "z": 0.0}, {"element": "C", "x": 4.56, "y": 0.0, "z": 0.0}, {"element": "H", "x": -0.5, "y": 0.88, "z": 0.0}, {"element": "H", "x": -0.5, "y": -0.88, "z": 0.0}, {"element": "H", "x": 2.02, "y": -0.88, "z": 0.0}, {"element": "H", "x": 2.02, "y": 0.88, "z": 0.88}]'::jsonb
 ON CONFLICT (material_id) DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'process_temp'), 200.0, 240.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mfi'), 0.02, 20.0, NULL, NULL, 'g/10min', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'bur'), NULL, NULL, NULL, '2:1 تا 6:1', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'tg'), NULL, NULL, -120.0, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'tm'), 130.0, 138.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_exp'), 200.0, 250.0, NULL, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_100_cryst'), NULL, NULL, 293.0, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'degradation_temp'), 350.0, 450.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hdt'), 60.0, 85.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'vicat'), 110.0, 130.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'conductivity'), 0.45, 0.55, NULL, NULL, 'W/m·K', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'cte'), 120.0, 180.0, NULL, NULL, 'µm/°C', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'tensile_strength'), 25.0, 40.0, NULL, NULL, 'MPa', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'young_modulus'), 0.5, 1.5, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'elongation_at_break'), 50.0, 600.0, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'flexural_modulus'), 0.5, 1.5, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hardness_shore_d'), 55.0, 65.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'izod_impact'), 20.0, 60.0, NULL, NULL, 'J/m', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'density'), 0.94, 0.97, NULL, NULL, 'g/cm³', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'water_absorption'), NULL, 0.01, NULL, NULL, '%', '<', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'refractive_index'), NULL, NULL, 1.54, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'oxygen_permeability'), 150.0, 300.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'co2_permeability'), 500.0, 1000.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'appearance'), NULL, NULL, NULL, 'کدر / کدر متمایل به سفید (Opaque)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_constant'), 2.3, 2.4, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_strength'), 25.0, 35.0, NULL, NULL, 'kV/mm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'volume_resistivity'), 1e+16, 1e+18, NULL, NULL, 'Ω·cm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dissipation_factor'), NULL, NULL, 0.0003, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'monomer_name'), NULL, NULL, NULL, 'اتیلن (Ethylene)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'monomer_formula'), NULL, NULL, NULL, 'C2H4', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'monomer_molar_mass'), NULL, NULL, 28.05, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'repeating_unit'), NULL, NULL, NULL, '[CH2 - CH2]n', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'crystallinity'), 70.0, 90.0, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'unit_cell'), NULL, NULL, NULL, '7.42, 4.95, 2.55 Å (Orthorhombic)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'lamella_thickness'), 20.0, 30.0, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'spherulite_size'), 5.0, 50.0, NULL, NULL, 'µm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mechanism'), NULL, NULL, NULL, 'کاتالیزوری (فشار 1-50 بار و دمای 70-120 °C با کاتالیزور زیگلر-ناتا، کروم فیلیپس یا متالوسن)', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'kinetic_notes'), NULL, NULL, NULL, 'کاهش شدید واکنش‌های انتقال زنجیر، منجر به تولید زنجیرهای کاملاً خطی با تراکم شاخه کمتر از 5 در هر 1000 کربن می‌شود.', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mw'), 50000.0, 300000.0, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mn'), 15000.0, 50000.0, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'pdi'), 3.0, 12.0, NULL, NULL, NULL, NULL, 'در متالوسن ~ 2', NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dp_range'), 3500.0, 15000.0, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'entanglement_mw'), NULL, NULL, 1000.0, NULL, 'g/mol', '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'radius_of_gyration'), 15.0, 30.0, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'zero_shear_viscosity'), 1000.0, 1000000.0, NULL, NULL, 'Pa·s', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'power_law_index'), 0.3, 0.5, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'rheology_notes'), NULL, NULL, NULL, 'رفتار ویسکوزیته مذاب شبه‌پلاستیک است. زمان خنک‌سازی آن در قالب به علت بلورینگی سریع، کوتاه است.', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'solubility_parameter'), 16.0, 17.5, NULL, NULL, 'MPa^0.5', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hansen_d'), NULL, NULL, 16.5, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hansen_p'), NULL, NULL, 0.0, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hansen_h'), NULL, NULL, 0.0, NULL, NULL, '~', NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'flory_huggins_chi'), 0.1, 0.3, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'ffv'), 0.1, 0.15, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'persistence_length'), NULL, NULL, 0.7, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
-INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, unit_display, qualifier, note_fa, note_en, status)
-SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'thermo_notes'), NULL, NULL, NULL, 'به دلیل درصد بلورینگی بالاتر نسبت به LDPE، میزان کسر حجم آزاد کمتر است و نفوذپذیری گازها کاهش می‌یابد.', NULL, NULL, NULL, NULL, 'unsourced'
-ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'process_temp'), 200.0, 240.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mfi'), 0.02, 20.0, NULL, NULL, NULL, 'g/10min', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'bur'), NULL, NULL, NULL, '2:1 تا 6:1', '2:1 to 6:1', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'tg'), NULL, NULL, -120.0, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'tm'), 130.0, 138.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_exp'), 200.0, 250.0, NULL, NULL, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'enthalpy_100_cryst'), NULL, NULL, 293.0, NULL, NULL, 'J/g', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'degradation_temp'), 350.0, 450.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hdt'), 60.0, 85.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'vicat'), 110.0, 130.0, NULL, NULL, NULL, '°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'conductivity'), 0.45, 0.55, NULL, NULL, NULL, 'W/m·K', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'cte'), 120.0, 180.0, NULL, NULL, NULL, 'µm/°C', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'tensile_strength'), 25.0, 40.0, NULL, NULL, NULL, 'MPa', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'young_modulus'), 0.5, 1.5, NULL, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'elongation_at_break'), 50.0, 600.0, NULL, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'flexural_modulus'), 0.5, 1.5, NULL, NULL, NULL, 'GPa', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hardness_shore_d'), 55.0, 65.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'izod_impact'), 20.0, 60.0, NULL, NULL, NULL, 'J/m', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'density'), 0.94, 0.97, NULL, NULL, NULL, 'g/cm³', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'water_absorption'), NULL, 0.01, NULL, NULL, NULL, '%', '<', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'refractive_index'), NULL, NULL, 1.54, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'oxygen_permeability'), 150.0, 300.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'co2_permeability'), 500.0, 1000.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'appearance'), NULL, NULL, NULL, 'کدر / کدر متمایل به سفید', 'Opaque / off-white opaque', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_constant'), 2.3, 2.4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dielectric_strength'), 25.0, 35.0, NULL, NULL, NULL, 'kV/mm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'volume_resistivity'), 1e+16, 1e+18, NULL, NULL, NULL, 'Ω·cm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dissipation_factor'), NULL, NULL, 0.0003, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'monomer_name'), NULL, NULL, NULL, 'اتیلن', 'Ethylene', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'monomer_formula'), NULL, NULL, NULL, 'C2H4', 'C2H4', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'monomer_molar_mass'), NULL, NULL, 28.05, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'repeating_unit'), NULL, NULL, NULL, '[CH2 - CH2]n', '[CH2 - CH2]n', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'crystallinity'), 70.0, 90.0, NULL, NULL, NULL, '%', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'unit_cell'), NULL, NULL, NULL, '7.42، 4.95، 2.55 آنگستروم (اورتورومبیک)', '7.42, 4.95, 2.55 Å (Orthorhombic)', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'lamella_thickness'), 20.0, 30.0, NULL, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'spherulite_size'), 5.0, 50.0, NULL, NULL, NULL, 'µm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mechanism'), NULL, NULL, NULL, 'کاتالیزوری (فشار 1-50 بار و دمای 70-120 °C با کاتالیزور زیگلر-ناتا، کروم فیلیپس یا متالوسن)', 'Catalytic (1-50 bar and 70-120 °C, with a Ziegler-Natta, Phillips chromium or metallocene catalyst)', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'kinetic_notes'), NULL, NULL, NULL, 'کاهش شدید واکنش‌های انتقال زنجیر، منجر به تولید زنجیرهای کاملاً خطی با تراکم شاخه کمتر از 5 در هر 1000 کربن می‌شود.', 'Sharply reduced chain transfer yields fully linear chains with a branch density below 5 per 1000 carbons.', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mw'), 50000.0, 300000.0, NULL, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'mn'), 15000.0, 50000.0, NULL, NULL, NULL, 'g/mol', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'pdi'), 3.0, 12.0, NULL, NULL, NULL, NULL, NULL, 'در متالوسن ~ 2', NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'dp_range'), 3500.0, 15000.0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'entanglement_mw'), NULL, NULL, 1000.0, NULL, NULL, 'g/mol', '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'radius_of_gyration'), 15.0, 30.0, NULL, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'zero_shear_viscosity'), 1000.0, 1000000.0, NULL, NULL, NULL, 'Pa·s', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'power_law_index'), 0.3, 0.5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'rheology_notes'), NULL, NULL, NULL, 'رفتار ویسکوزیته مذاب شبه‌پلاستیک است. زمان خنک‌سازی آن در قالب به علت بلورینگی سریع، کوتاه است.', 'Melt viscosity is pseudoplastic. In-mould cooling time is short because crystallisation is rapid.', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'solubility_parameter'), 16.0, 17.5, NULL, NULL, NULL, 'MPa^0.5', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hansen_d'), NULL, NULL, 16.5, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hansen_p'), NULL, NULL, 0.0, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'hansen_h'), NULL, NULL, 0.0, NULL, NULL, NULL, '~', NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'flory_huggins_chi'), 0.1, 0.3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'ffv'), 0.1, 0.15, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'persistence_length'), NULL, NULL, 0.7, NULL, NULL, 'nm', NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
+INSERT INTO property_value (subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)
+SELECT 'material', (SELECT id FROM material WHERE slug = 'hdpe'), (SELECT id FROM property_definition WHERE key = 'thermo_notes'), NULL, NULL, NULL, 'به دلیل درصد بلورینگی بالاتر نسبت به LDPE، میزان کسر حجم آزاد کمتر است و نفوذپذیری گازها کاهش می‌یابد.', 'Because crystallinity is higher than in LDPE, the free volume fraction is lower and gas permeability decreases.', NULL, NULL, NULL, NULL, 'unsourced'
+ON CONFLICT (subject_type, subject_id, property_id, conditions) WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;
 INSERT INTO market_share_datum (material_id, segment_fa, percentage, status)
 SELECT (SELECT id FROM material WHERE slug = 'hdpe'), 'بسته‌بندی صلب (بطری و ظروف)', 41.2, 'unsourced'
 WHERE NOT EXISTS (

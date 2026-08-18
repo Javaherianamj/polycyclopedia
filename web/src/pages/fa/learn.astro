@@ -1,0 +1,20 @@
+---
+// The Learn surface, Persian route. RESTRUCTURED: the page was a flat stack
+// of five tool panels; it is now the scale axis D50 chose, built from the
+// FE-0 prototype (design/fe-0/lab/scale.*). Everything that made the page
+// work — the five islands, their family scoping, their material seeding,
+// their illustrative-vs-measured labelling, the ?material= URL contract — is
+// untouched; only where a tool SITS changed. See LearnScale.astro's header.
+//
+// Both routes are three lines of difference (the locale) for the same reason
+// every other paired route in this app is: one component, two entry points.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LearnScale from '../../components/learn/LearnScale.astro';
+import { t } from '../../i18n/t';
+
+const locale = 'fa' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.pageTitle')} surface="lab">
+  <LearnScale locale={locale} />
+</BaseLayout>

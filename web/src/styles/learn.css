@@ -1,0 +1,1175 @@
+/* FE-8 step 1 — the Learn surface shell + the two universal-concept tools.
+ *
+ * R19/D37: Learn is deliberately the OTHER surface. `data-surface="lab"`
+ * (BaseLayout's new `surface` prop) swaps every token this file uses --
+ * --bg/--panel/--ink/... all resolve to the cool slate-green/indigo palette
+ * (tokens/colour.css) instead of the datasheet's warm cream/ember, with zero
+ * conditional logic here. The one token this surface never had a value for
+ * until now is --r-lg (global.css's comment flagged this as "a later unit's
+ * problem" -- that unit is this one): lab.css's source value was 18px vs the
+ * datasheet's 16, so it is set here, scoped to the surface, rather than
+ * touching the frozen tokens/colour.css pipeline (global.css's own header
+ * comment: "Do not edit them here; edit the FE-0 source and re-copy").
+ *
+ * R34: two colour systems, never mixed. --ramp-* (glass/rubber/melt/burn)
+ * encodes a NUMBER -- temperature/phase -- and appears ONLY in
+ * StateSimulator. Everything else here (--ok, --muted, --act) is the status
+ * palette, carrying the SAME meanings D36 gave it on the datasheet
+ * (provenance satisfied / absent / actionable) -- e.g. the "uncited" note
+ * uses --muted for exactly the reason R22 established: grey, worded as
+ * in-progress, never amber or red.
+ */
+
+:root[data-surface='lab'] {
+  --r-lg: 18px;
+}
+
+.learn-page {
+  max-inline-size: var(--measure-page, 1120px);
+  margin-inline: auto;
+  padding: var(--sec-gap) var(--pad-x) 80px;
+}
+
+/* ------------------------------------------------------------------ hero */
+
+.learn-hero {
+  max-inline-size: 64ch;
+  margin-block-end: var(--sec-gap);
+}
+
+.learn-kicker {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--act);
+  margin: 0 0 10px;
+}
+
+.learn-hero h1 {
+  font-family: var(--font-display, serif);
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  color: var(--ink);
+  margin: 0 0 14px;
+}
+
+.learn-hero-lead {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* -------------------------------------------------------------- sr-only */
+
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------- tool rail */
+
+.learn-tools {
+  display: grid;
+  gap: 28px;
+}
+
+.learn-tool {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: 0 14px 36px -18px rgb(0 0 0 / 35%);
+  min-inline-size: 0;
+}
+
+.learn-tool-head {
+  margin-block-end: 18px;
+}
+
+.learn-tool-title {
+  font-family: var(--font-display, serif);
+  font-size: var(--fs-h2);
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.learn-tool-intro {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+  max-inline-size: 62ch;
+  margin: 0;
+}
+
+/* ------------------------------------------------------- shared controls */
+
+.learn-field {
+  display: grid;
+  gap: 6px;
+  margin-block-end: 22px;
+  max-inline-size: 420px;
+}
+
+.learn-label {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.learn-select,
+.learn-number,
+.learn-input {
+  font: inherit;
+  font-size: var(--fs-small);
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 8px 12px;
+  inline-size: 100%;
+  min-inline-size: 0;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.learn-select:focus-visible,
+.learn-number:focus-visible,
+.learn-input:focus-visible {
+  outline: 2px solid var(--act);
+  outline-offset: 1px;
+}
+
+.learn-hint {
+  font-size: var(--fs-micro);
+  color: var(--muted);
+}
+
+.learn-note {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.learn-reset {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--act);
+  padding: 6px 4px;
+  border-radius: var(--r-sm, 8px);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.learn-reset:hover {
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------- state simulator */
+
+.state-sim-body {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.state-sim-thermo {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 16px 8px;
+}
+
+.state-sim-thermo-cap {
+  font-size: var(--fs-micro);
+  color: var(--muted);
+}
+
+.state-sim-tube {
+  position: relative;
+  inline-size: 26px;
+  block-size: 180px;
+  border-radius: var(--r-pill, 999px);
+  background: var(--panel);
+  border: 2px solid var(--line-2);
+  overflow: hidden;
+}
+
+.state-sim-fill {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  transition:
+    height var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.state-sim-controls {
+  display: grid;
+  gap: 16px;
+  min-inline-size: 0;
+}
+
+.state-sim-readout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.state-sim-value {
+  font-family: var(--font-num, serif);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+}
+
+.state-sim-slider-wrap {
+  position: relative;
+  padding-block-end: 30px;
+}
+
+.state-sim-slider {
+  inline-size: 100%;
+  accent-color: var(--act);
+}
+
+.state-sim-marks {
+  position: relative;
+  block-size: 26px;
+  margin-block-start: 6px;
+}
+
+.state-sim-mark {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  transform: translateX(-50%);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.state-sim-mark-dot {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.state-sim-phase {
+  background: var(--panel-2);
+  border-inline-start: 4px solid;
+  border-radius: var(--r-sm, 8px);
+  padding: 14px 16px;
+}
+
+.state-sim-phase-title {
+  font-weight: 700;
+  font-size: var(--fs-body);
+  margin: 0 0 6px;
+}
+
+.state-sim-phase-desc {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------- dp calculator */
+
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-block-end: 16px;
+}
+
+.dp-input {
+  display: grid;
+  gap: 6px;
+  min-inline-size: 0;
+}
+
+.dp-outputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-block-start: 18px;
+}
+
+.dp-output {
+  display: grid;
+  gap: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.dp-output-value {
+  font-family: var(--font-num, serif);
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  color: var(--ok);
+}
+
+/* ------------------------------------------------------ branching simulator
+ * FE-8 step 3. R34: none of this is --ramp-* -- that scale is reserved for
+ * StateSimulator's temperature/phase encoding. The architecture buttons and
+ * trend bars use plain structure tokens (--ink/--ink-2/--panel-2/--act),
+ * same convention .learn-select/.state-sim-slider already use for "this is
+ * the interactive/selected thing", not a new meaningful hue (R33).
+ */
+
+.branching-arch-select {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-block-end: 10px;
+}
+
+.branching-arch-btn {
+  font: inherit;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 10px 12px;
+  text-align: start;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.branching-arch-btn.is-active {
+  color: var(--ink);
+  border-color: var(--act);
+  box-shadow: inset 0 0 0 1px var(--act);
+}
+
+.branching-chain {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 14px 16px 10px;
+  margin-block: 16px;
+}
+
+.branching-chain-svg-wrap {
+  overflow-x: auto;
+}
+
+.branching-chain-svg {
+  inline-size: 100%;
+  min-inline-size: 320px;
+  block-size: 120px;
+}
+
+.branching-backbone {
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.branching-branch-short {
+  stroke: var(--muted-2);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.branching-branch-long {
+  stroke: var(--act);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.branching-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: var(--fs-micro);
+  color: var(--ink-2);
+  margin-block-start: 8px;
+}
+
+.branching-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.branching-legend-swatch {
+  inline-size: 14px;
+  block-size: 3px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.branching-legend-swatch-backbone {
+  background: var(--ink);
+}
+
+.branching-legend-swatch-short {
+  background: var(--muted-2);
+}
+
+.branching-legend-swatch-long {
+  background: var(--act);
+}
+
+.branching-trend,
+.tacticity-trend {
+  display: grid;
+  gap: 10px;
+  margin-block: 14px;
+}
+
+.branching-trend-row,
+.tacticity-trend-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 160px) 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.tacticity-trend-row {
+  grid-template-columns: minmax(100px, 200px) auto;
+  justify-content: space-between;
+}
+
+.branching-trend-label,
+.tacticity-trend-label {
+  font-size: var(--fs-caption);
+  color: var(--ink-2);
+}
+
+.branching-trend-bar {
+  block-size: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill, 999px);
+  overflow: hidden;
+}
+
+.branching-trend-bar-fill {
+  block-size: 100%;
+  background: var(--act);
+  border-radius: var(--r-pill, 999px);
+  transition: inline-size var(--dur-slow) var(--ease-out);
+}
+
+.branching-trend-band,
+.tacticity-trend-value {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.branching-real-data {
+  border-inline-start: 3px solid var(--ok);
+  padding-inline-start: 12px;
+  margin-block-start: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+/* -------------------------------------------------------- tacticity simulator */
+
+.tacticity-mode-select {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-block-end: 10px;
+}
+
+.tacticity-mode-btn {
+  font: inherit;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 10px 12px;
+  text-align: center;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.tacticity-mode-btn.is-active {
+  color: var(--ink);
+  border-color: var(--act);
+  box-shadow: inset 0 0 0 1px var(--act);
+}
+
+.tacticity-chain {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 10px 16px 6px;
+  margin-block: 16px;
+  overflow-x: auto;
+}
+
+.tacticity-chain-svg {
+  inline-size: 100%;
+  min-inline-size: 380px;
+  block-size: 140px;
+}
+
+.tacticity-backbone {
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.tacticity-stem {
+  stroke: var(--ink-2);
+  stroke-width: 2.5;
+}
+
+.tacticity-backbone-node {
+  fill: var(--panel);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.tacticity-unit {
+  cursor: pointer;
+}
+
+.tacticity-sidegroup-up {
+  fill: var(--act);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.tacticity-sidegroup-down {
+  fill: var(--ok);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.tacticity-unit:hover .tacticity-sidegroup-up,
+.tacticity-unit:hover .tacticity-sidegroup-down {
+  transform: scale(1.12);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* --------------------------------------------------- hansen space (step 4)
+ * REVISED 2026-08-14: a true rotatable 3D scene (drag/scroll on
+ * `.hansen-scene-svg`) replaces the original three flat 2D panels, and the
+ * solvent cloud is opt-in (search + add) rather than plotted in full — see
+ * HansenSpaceIsland.tsx's header for both corrections.
+ *
+ * R34: --hansen-dot/-cited reuse D36's existing sage/grey provenance
+ * meaning (--ok / --muted-2) -- the SAME meaning value-atom.css's
+ * .mark-cited and sources.css's .src-mark-cited already carry, not a new
+ * hue. The polymer marker uses --act, the same "this is the
+ * selected/interactive thing" token .branching-arch-btn.is-active and
+ * .tacticity-mode-btn.is-active already use. Nothing here is drawn from a
+ * fabricated ranking or an invented radius (see lib/learn/hansen-space.ts's
+ * header) -- colour only ever encodes a real fact already in the data.
+ *
+ * REVISED 2026-08-16 (b): the paragraph that used to end this header said no
+ * sphere is ever drawn, because no material had a real Ro. That is no longer
+ * the data: `hsp_correlation` now carries Hansen's own published sphere fits
+ * and 12 catalog materials are linked to one. The rule is unchanged -- a
+ * sphere renders ONLY at a real linked Ro, never at an invented one -- so
+ * materials without a correlation still get a bare point and
+ * learn.hansen.noRoNote.
+ *
+ * Two channels, not one (R33/R11/D5/D36). Where a sphere exists, RED drives
+ * the dot's FILL and provenance moves to its STROKE (solid = cited, dashed =
+ * not), so the provenance guarantee this site makes everywhere is not eaten
+ * by the new information. Where no sphere exists there is no RED, and the
+ * fill falls back to the sage/grey provenance meaning unchanged.
+ *
+ * Hue is never the only carrier: ~8% of male readers cannot separate green
+ * from red, so each band also has a distinct FILL DENSITY -- good is a solid
+ * disc, boundary is half-filled, poor is an open ring -- and the numeric RED
+ * is in every dot's <title>. Hues reuse the lab surface's existing ramp
+ * tokens (--ok, --ramp-melt, --ramp-burn), the same "good / in between / at
+ * the far end" progression the phase ramp already carries; no new hue is
+ * introduced for this feature.
+ */
+
+.hansen-search {
+  position: relative;
+}
+
+.hansen-search-results {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 4px;
+  max-block-size: 220px;
+  overflow-y: auto;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  display: grid;
+  gap: 2px;
+}
+
+.hansen-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  font-size: var(--fs-small);
+  color: var(--ink);
+  border-radius: var(--r-sm, 8px);
+}
+
+.hansen-search-item:hover {
+  background: var(--panel);
+}
+
+.hansen-search-empty {
+  padding: 6px 8px;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.hansen-add-btn {
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--act);
+  border: 1px solid var(--act);
+  border-radius: var(--r-sm, 8px);
+  padding: 3px 8px;
+  background: transparent;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.hansen-add-btn:hover {
+  background: var(--act);
+  color: var(--panel);
+}
+
+.hansen-selected-chips {
+  margin-block: 16px;
+}
+
+.hansen-chip-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hansen-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-small);
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 6px 4px 10px;
+}
+
+.hansen-chip-remove {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--muted);
+  border-radius: 50%;
+  inline-size: 18px;
+  block-size: 18px;
+  display: grid;
+  place-items: center;
+}
+
+.hansen-chip-remove:hover {
+  color: var(--danger, var(--muted));
+  background: var(--panel);
+}
+
+.hansen-scene-wrap {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 10px;
+  margin-block: 16px;
+}
+
+.hansen-scene-svg {
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 360 / 320;
+  cursor: grab;
+  touch-action: none;
+}
+
+.hansen-scene-svg:active {
+  cursor: grabbing;
+}
+
+/* Gridded floor + back walls (the "mesh") -- deliberately fainter than the
+ * cube edges below: it's a depth-reading aid, not a shape the reader should
+ * be able to trace edge-by-edge the way the box itself is. */
+.hansen-grid-line {
+  stroke: var(--line);
+  stroke-width: 0.5;
+  opacity: 0.45;
+  fill: none;
+}
+
+.hansen-box-edge {
+  stroke: var(--line);
+  stroke-width: 1;
+  fill: none;
+}
+
+.hansen-axis-line {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+
+/* Drop lines: each point's own straight line down to the floor grid.
+ * Dashed so it reads as a construction/reference line, not more data --
+ * the same visual grammar the grid lines use (faint, not the reader's
+ * actual focus), and short-dashed rather than solid so it doesn't compete
+ * with the wireframe cube's edges when a drop line happens to run close to
+ * one. */
+.hansen-drop-line {
+  stroke: var(--muted-2);
+  stroke-width: 0.75;
+  stroke-dasharray: 2 2;
+  opacity: 0.5;
+  fill: none;
+}
+
+/* Owner correction: "all of the spheres must be a bit transparent so that
+ * we can see inside them if other one is really close". fill-opacity (not
+ * the shorthand `opacity`) is deliberate -- it lets the <title> tooltip and
+ * hit-testing stay full-strength while only the visible fill blends, and it
+ * composites correctly with the per-sphere depth-scaled radius
+ * (HansenSpaceIsland's `depthRadius`) without a second opacity layer
+ * fighting it. Values are low enough that two overlapping/nested spheres
+ * visibly show the far one through the near one (the actual bug report),
+ * not just "slightly see-through" cosmetically. Correctness here depends on
+ * paint ORDER, not this opacity value -- see HansenSpaceIsland's `spheres`
+ * comment for the far-to-near sort that makes this opacity mean anything. */
+.hansen-dot {
+  fill: var(--muted-2);
+  fill-opacity: 0.55;
+  stroke: var(--muted-2);
+  stroke-opacity: 0.8;
+  stroke-width: 0.5;
+}
+
+.hansen-dot-cited {
+  fill: var(--ok);
+  fill-opacity: 0.6;
+  stroke: var(--ok);
+  stroke-opacity: 0.85;
+  stroke-width: 0.5;
+}
+
+/* RED bands. FILL only -- stroke belongs to provenance below, and these
+ * three classes must never touch it. Each band pairs its hue with a
+ * different fill DENSITY so the three are still separable without colour
+ * vision: solid disc / half-filled / open ring. */
+.hansen-red-good {
+  fill: var(--ok);
+  fill-opacity: 0.75;
+}
+
+.hansen-red-boundary {
+  fill: var(--ramp-melt);
+  fill-opacity: 0.4;
+}
+
+.hansen-red-poor {
+  /* An OPEN RING: no fill at all is the shape cue, so "outside the sphere"
+   * reads on a greyscale print or to a red-green dichromat. */
+  fill: none;
+  fill-opacity: 1;
+}
+
+/* Provenance, moved from fill to stroke so RED can have the fill. Solid
+ * outline = a recorded citation, dashed = not yet cited -- the same
+ * cited/uncited distinction .mark-cited carries elsewhere, in the one
+ * channel still free once RED took the fill. */
+.hansen-dot-prov-cited {
+  stroke: var(--ok-line, var(--ok));
+  stroke-opacity: 0.95;
+  stroke-width: 1.25;
+  stroke-dasharray: none;
+}
+
+.hansen-dot-prov-uncited {
+  stroke: var(--muted-2);
+  stroke-opacity: 0.95;
+  stroke-width: 1.25;
+  stroke-dasharray: 2 1.6;
+}
+
+.hansen-red-poor.hansen-dot-prov-cited,
+.hansen-red-poor.hansen-dot-prov-uncited {
+  /* The ring is the whole mark when there is no fill, so it needs the
+   * weight the fill would otherwise have carried. */
+  stroke-width: 1.75;
+}
+
+/* The solubility sphere, emitted as two entries in the island's existing
+ * far-to-near sort (see HansenSpaceIsland's `spheres`): the back hemisphere
+ * sorts behind the solvent dots, the front shell in front of them, so an
+ * interior solvent paints over one and under the other. Both are drawn at
+ * the SAME rotation-invariant radius; only their depth key differs.
+ *
+ * The back is a faint wash rather than a solid: it has to read as volume
+ * behind the data without hiding a single dot. The front is essentially
+ * just its outline -- a second opaque layer over every interior dot would
+ * defeat the reason for splitting the sphere in the first place. */
+.hansen-sphere-back {
+  fill: var(--act);
+  fill-opacity: 0.1;
+  stroke: none;
+  pointer-events: none;
+}
+
+.hansen-sphere-front {
+  fill: var(--act);
+  fill-opacity: 0.04;
+  stroke: var(--act);
+  stroke-opacity: 0.55;
+  stroke-width: 1.25;
+  pointer-events: none;
+}
+
+/* The RED key. Rendered only when a sphere is on screen. Logical properties
+ * throughout -- this site is RTL-first and the swatch must sit at the
+ * inline start in both directions. */
+.hansen-red-legend {
+  margin-block: 12px;
+}
+
+.hansen-red-legend-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.hansen-red-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.hansen-red-swatch {
+  inline-size: 14px;
+  block-size: 14px;
+  flex: none;
+}
+
+/* The swatch shows the RED band's hue and fill DENSITY only. It gets a
+ * neutral outline rather than either provenance stroke on purpose: a
+ * legend entry is not a data point and must not appear to claim a
+ * citation state. Without this the 'poor' swatch -- an open ring, so its
+ * outline is the entire mark -- would be a hairline. */
+.hansen-red-swatch circle {
+  stroke: var(--ink-2);
+  stroke-opacity: 0.7;
+  stroke-width: 1.25;
+  stroke-dasharray: none;
+}
+
+.hansen-dot-polymer {
+  fill: var(--act);
+  fill-opacity: 0.65;
+  stroke: var(--panel);
+  stroke-width: 2;
+}
+
+.hansen-axis-label {
+  font-size: 9px;
+  fill: var(--muted);
+  font-family: var(--font-num, serif);
+}
+
+.hansen-scene-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-start: 8px;
+}
+
+.hansen-reset-btn {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--act);
+  padding: 6px 10px;
+  border: 1px solid var(--act);
+  border-radius: var(--r-sm, 8px);
+  white-space: nowrap;
+}
+
+/* Mirrors .hansen-reset-btn, but toggles: aria-pressed carries the state to
+   assistive tech, and the filled variant carries it visually, so the control
+   never relies on colour alone to say which view is active. */
+.hansen-view-btn {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--act);
+  padding: 6px 10px;
+  border: 1px solid var(--act);
+  border-radius: var(--r-sm, 8px);
+  white-space: nowrap;
+}
+
+.hansen-view-btn[aria-pressed='true'] {
+  background: var(--act);
+  color: var(--bg, #fff);
+}
+
+.hansen-nearest {
+  margin-block-start: 18px;
+  border-inline-start: 3px solid var(--act);
+  padding-inline-start: 12px;
+}
+
+.hansen-nearest-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.hansen-nearest-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: var(--fs-small);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  padding: 6px 10px;
+}
+
+.hansen-nearest-name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.hansen-nearest-distance {
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ chain coil
+ * FE-8 foundation layer, part 2 — the FE-0 spec's required 10⁻⁹ live
+ * element (lab-concepts-spec.md, "One live element (required)"). Physics
+ * in lib/learn/random-walk.ts; this styles the SVG + slider + stat pair
+ * (`.dp-output`/`.dp-output-value` are DPCalculator's, reused as-is for
+ * the end-to-end/Rg readout rather than declaring a near-duplicate pair —
+ * same "stat tile" shape, no reason for a second name).
+ *
+ * The SVG scales fluidly (`inline-size: 100%` + `aspect-ratio`, HansenSpace's
+ * own pattern) rather than the branching/tacticity tools' fixed-width +
+ * horizontal-scroll wrapper: the coil's viewBox already contains every DP's
+ * walk by construction (random-walk.ts's `REFERENCE_MAX_EXTENT`), so there
+ * is nothing that needs to overflow its own box the way a wide backbone
+ * diagram does — shrinking the whole scene to fit the viewport loses
+ * nothing.
+ */
+.chain-coil-body {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin-block: 8px 16px;
+}
+
+.chain-coil-svg-wrap {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 10px;
+  min-inline-size: 0;
+}
+
+.chain-coil-svg {
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 300 / 260;
+}
+
+/* Semi-transparent stroke: where the walk doubles back on itself (more
+ * likely at higher DP, once REFERENCE_MAX_EXTENT's fixed scale packs more
+ * bonds into the same visual area — see random-walk.ts's header) the
+ * overlapping segments read visibly darker. That overlap darkening IS the
+ * "denser coil" cue the FE-0 spec asks for, not a separate effect layered
+ * on top of it. */
+.chain-coil-path {
+  fill: none;
+  stroke: var(--act);
+  stroke-width: 1.1;
+  stroke-opacity: 0.6;
+  stroke-linejoin: round;
+}
+
+.chain-coil-start {
+  fill: var(--ok);
+}
+
+.chain-coil-end {
+  fill: var(--act);
+  stroke: var(--panel-2);
+  stroke-width: 1.5;
+}
+
+.chain-coil-controls {
+  display: grid;
+  gap: 16px;
+  min-inline-size: 0;
+}
+
+/* ------------------------------------------------------- spherulite readout
+ * FE-8 foundation layer, part 2 — the 10⁻⁶ station's crystallinity ↔
+ * density table (lib/learn/spherulite-readout.ts). A table, not a chart:
+ * three rows of two real numbers each is exactly what a table is for, and
+ * a scatter/bar chart over three points would spend more pixels implying
+ * a trend line than the honest three-row comparison it actually is.
+ */
+.spherulite-table-wrap {
+  /* R27: the table itself is allowed to be wider than its column at very
+   * narrow widths (long localized material names); this wrapper scrolls
+   * rather than the page. */
+  overflow-x: auto;
+  min-inline-size: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  margin-block: 8px;
+}
+
+.spherulite-table {
+  inline-size: 100%;
+  min-inline-size: 360px;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+
+.spherulite-table th,
+.spherulite-table td {
+  padding: 10px 14px;
+  text-align: start;
+  border-block-end: 1px solid var(--line);
+}
+
+.spherulite-table thead th {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--panel-2);
+}
+
+.spherulite-table tbody th {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.spherulite-table tbody tr:last-child th,
+.spherulite-table tbody tr:last-child td {
+  border-block-end: 0;
+}
+
+/* The bound-material row (part 1 of this unit's brief — "all defaults must
+ * be this polymer"): highlighted, not filtered to alone, since the whole
+ * point of this readout is the COMPARISON across materials. --act-bg/-line
+ * are the status palette's own "this one is selected" pairing, already
+ * used the same way elsewhere in Learn (R34 — never --ramp-* for a
+ * non-numeric highlight). */
+.spherulite-table tbody tr.is-bound {
+  background: var(--act-bg);
+}
+
+.spherulite-table tbody tr.is-bound th {
+  border-inline-start: 3px solid var(--act);
+  padding-inline-start: 11px;
+}
+
+/* ------------------------------------------------------------------ mobile
+ * R27: no horizontal overflow at 320px. The thermometer column collapses
+ * above the controls instead of squeezing beside them. Both new step-3
+ * tools already scroll their SVG horizontally within their own bounded
+ * panel (min-inline-size + overflow-x on the wrapper) rather than forcing
+ * the page to widen -- that pattern needs no extra rule here, just
+ * confirming at 320/375 that the wrapper -- not the page -- is what scrolls.
+ */
+@media (max-width: 640px) {
+  .learn-page {
+    padding-inline: 16px;
+  }
+
+  .state-sim-body {
+    grid-template-columns: 1fr;
+  }
+
+  .state-sim-thermo {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+
+  .state-sim-tube {
+    block-size: 100px;
+  }
+
+  .branching-trend-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .branching-trend-bar {
+    inline-size: 100%;
+  }
+
+  .hansen-scene-wrap {
+    padding: 6px;
+  }
+
+  .hansen-search-results {
+    max-block-size: 160px;
+  }
+
+  .chain-coil-body {
+    grid-template-columns: 1fr;
+  }
+}

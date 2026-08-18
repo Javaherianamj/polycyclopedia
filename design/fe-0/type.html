@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>مقیاس تایپوگرافی — Polypedia FE-0</title>
+
+    <!--
+      Colour: linked from lab/lab.css, not themes/e-press.css. Reasons:
+        1. lab.css already loads both webfonts (@import for @fontsource-variable/
+           estedad AND Google Fonts Newsreader) in one place — e-press.css only
+           loads Newsreader and assumes Estedad is loaded elsewhere by whatever
+           page includes it. Linking lab.css means this page needs one <link>,
+           not a duplicate @import.
+        2. lab.css's body{} rule already sets font-family/size/line-height
+           defaults and RTL-safe resets (box-sizing, overflow-x hidden) that a
+           bare specimen page would otherwise have to redeclare.
+        3. Nothing here depends on which of the two palettes it is — this page
+           is about type, not colour identity — so lab.css's palette is an
+           arbitrary but reasonable choice. Not edited; read-only per the
+           close-out spec's file ownership rule.
+    -->
+    <link rel="stylesheet" href="lab/lab.css" />
+    <link rel="stylesheet" href="tokens/type.css" />
+
+    <style>
+      /* Page-local layout only — no colour, no new type tokens. .wrap itself
+         comes from lab.css (max-inline-size/margin/padding) — reused as-is,
+         not redeclared. */
+
+      .intro {
+        padding-block: 40px 8px;
+      }
+
+      .intro h1 {
+        margin: 8px 0 0;
+        font-size: var(--fs-display);
+        line-height: var(--lh-display);
+        letter-spacing: -0.02em;
+      }
+
+      .intro p {
+        margin: 14px 0 0;
+        max-inline-size: 68ch;
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        color: var(--ink-2);
+      }
+
+      /* the specimen page reuses .num (lab.css) as the ONE mechanism this
+         codebase has for "this inline span is Latin and speaks Newsreader" —
+         it is already used for numerals; this page also puts Latin technical
+         terms (MFI, ICI, CAS...) through it rather than inventing a second
+         class, since nothing else in the codebase switches font-family on
+         [dir='ltr'] alone. Flagged in the close-out report. */
+
+      .adj-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-block: 18px 0;
+        padding: 10px 14px;
+        border: 1px dashed var(--line);
+        border-radius: var(--r-md);
+        font-size: 0.85rem;
+        color: var(--muted);
+        max-inline-size: fit-content;
+      }
+
+      .adj-toggle input {
+        accent-color: var(--act);
+      }
+
+      .adj-off {
+        --latin-size-adj: 1; /* the A/B control: correction neutralised */
+      }
+
+      .scale-steps {
+        padding-block: 30px 10px;
+      }
+
+      .step {
+        padding-block: 22px;
+        border-block-end: 1px solid var(--line);
+      }
+
+      .step:first-child {
+        border-block-start: 1px solid var(--line);
+      }
+
+      .step-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 14px;
+        font-family: var(--font-num);
+        font-size: 0.73rem;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin-block-end: 8px;
+      }
+
+      .step-meta b {
+        color: var(--act);
+        font-weight: 600;
+      }
+
+      .step-sample {
+        color: var(--ink);
+      }
+
+      .fs-display {
+        font-size: var(--fs-display);
+        line-height: var(--lh-display);
+      }
+      .fs-h1 {
+        font-size: var(--fs-h1);
+        line-height: var(--lh-h1);
+      }
+      .fs-h2 {
+        font-size: var(--fs-h2);
+        line-height: var(--lh-h2);
+      }
+      .fs-h3 {
+        font-size: var(--fs-h3);
+        line-height: var(--lh-h3);
+      }
+      .fs-body {
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+      }
+      .fs-small {
+        font-size: var(--fs-small);
+        line-height: var(--lh-small);
+      }
+      .fs-caption {
+        font-size: var(--fs-caption);
+        line-height: var(--lh-caption);
+      }
+      .fs-micro {
+        font-size: var(--fs-micro);
+        line-height: var(--lh-micro);
+      }
+
+      .measure-section {
+        padding-block: 20px 60px;
+      }
+
+      .measure-section h2 {
+        font-size: var(--fs-h2);
+        line-height: var(--lh-h2);
+        border-block-end: 1px solid var(--line);
+        padding-block-end: 10px;
+        margin-block-end: 18px;
+      }
+
+      .measure-box {
+        max-inline-size: 62ch;
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        color: var(--ink);
+      }
+
+      .measure-note {
+        margin-block-start: 10px;
+        font-size: var(--fs-caption);
+        line-height: var(--lh-caption);
+        color: var(--muted);
+      }
+
+      .derivation {
+        padding-block: 10px 60px;
+      }
+
+      .derivation h2 {
+        font-size: var(--fs-h2);
+        line-height: var(--lh-h2);
+        border-block-end: 1px solid var(--line);
+        padding-block-end: 10px;
+        margin-block-end: 18px;
+      }
+
+      .derivation .table-scroll {
+        overflow-x: auto;
+      }
+
+      .derivation table {
+        border-collapse: collapse;
+        font-family: var(--font-num);
+        font-size: var(--fs-small);
+        line-height: 1.5;
+        width: 100%;
+      }
+
+      .derivation caption {
+        text-align: start;
+        font-family: var(--font-body);
+        font-size: var(--fs-caption);
+        color: var(--muted);
+        margin-block-end: 8px;
+      }
+
+      .derivation th,
+      .derivation td {
+        text-align: start;
+        padding: 7px 12px;
+        border: 1px solid var(--line);
+      }
+
+      .derivation th {
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .derivation td.result {
+        color: var(--act);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="labbar">
+      <div class="wrap" style="display: flex; align-items: center; gap: 12px; block-size: 60px">
+        <a class="labbrand" href="lab/index.html">
+          <span dir="ltr">Polypedia</span>
+          <small dir="ltr">Type scale</small>
+        </a>
+        <span class="spacer"></span>
+        <a class="pill act" href="lab/index.html">← بازگشت به آزمایشگاه</a>
+      </div>
+    </header>
+
+    <div class="wrap intro">
+      <div class="eyebrow" dir="ltr">FE-0 · type scale</div>
+      <h1>مقیاس تایپوگرافی</h1>
+      <p>
+        استدد (فارسی) و نیوزریدر (لاتین) دائم روی یک خط می‌نشینند: متن فارسی که در آن عدد لاتین و
+        اصطلاح فنی لاتین جاسازی شده. این صفحه هر پله مقیاس را با متن واقعی
+        <span class="num" dir="ltr">LDPE</span> نشان می‌دهد، نه با متن نمونه بی‌معنی — تا معلوم شود
+        این جفت‌شدن در همه پله‌ها کار می‌کند، نه فقط در دو اندازه‌ای که تا امروز استفاده شده‌اند.
+      </p>
+    </div>
+
+    <div class="wrap">
+      <div class="adj-toggle">
+        <input type="checkbox" id="adj-toggle" />
+        <label for="adj-toggle">
+          خاموش کردن اصلاح اندازه لاتین (<code class="num" dir="ltr">--latin-size-adj</code>) برای
+          مقایسه — همه پله‌ها را با و بدون اصلاح ببین
+        </label>
+      </div>
+    </div>
+
+    <main id="specimen-root" class="wrap scale-steps">
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-display</b>
+          <span>clamp(1.552rem, 1.141rem + 2.054vw, 2.784rem)</span>
+          <span>--lh-display: 1.15</span>
+        </div>
+        <div class="step-sample fs-display">
+          پلی‌اتیلن با چگالی پایین — کد <span class="num" dir="ltr">LDPE</span>، کشف‌شده در
+          <span class="num" dir="ltr">1933</span> توسط <span class="num" dir="ltr">ICI</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-h1</b>
+          <span>clamp(1.379rem, 1.106rem + 1.368vw, 2.2rem)</span>
+          <span>--lh-h1: 1.2</span>
+        </div>
+        <div class="step-sample fs-h1">
+          <span class="num" dir="ltr">LDPE</span> عضو خانواده پلی‌اولفین‌هاست؛ شناسه
+          <span class="num" dir="ltr">CAS</span> آن <span class="num" dir="ltr">9002-88-4</span> است
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-h2</b>
+          <span>1.226rem (19.6px)</span>
+          <span>--lh-h2: 1.3</span>
+        </div>
+        <div class="step-sample fs-h2">
+          شاخص جریان مذاب (<span class="num" dir="ltr">MFI</span>) در بازه
+          <span class="num" dir="ltr">0.2</span> تا <span class="num" dir="ltr">20</span>
+          <span class="num" dir="ltr">g/10min</span> اندازه‌گیری می‌شود
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-h3</b>
+          <span>1.09rem (17.4px)</span>
+          <span>--lh-h3: 1.4</span>
+        </div>
+        <div class="step-sample fs-h3">
+          دمای انتقال شیشه‌ای (<span class="num" dir="ltr">Tg</span>) این پلیمر
+          <span class="num" dir="ltr">-110</span> درجه سلسیوس است
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-body</b>
+          <span>0.969rem (15.5px)</span>
+          <span>--lh-body: 1.9</span>
+        </div>
+        <div class="step-sample fs-body">
+          این پلیمر عضوی از خانواده بزرگ پلی‌اولفین‌ها محسوب می‌شود و اولین بار در سال
+          <span class="num" dir="ltr">1933</span> توسط شرکت
+          <span class="num" dir="ltr">Imperial Chemical Industries</span> در بریتانیا به روش صنعتی
+          تولید شد.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-small</b>
+          <span>0.861rem (13.8px)</span>
+          <span>--lh-small: 1.7</span>
+        </div>
+        <div class="step-sample fs-small">
+          مدول یانگ (<span class="num" dir="ltr">E</span>) این گرید بین
+          <span class="num" dir="ltr">0.15</span> تا <span class="num" dir="ltr">0.35</span>
+          <span class="num" dir="ltr">GPa</span> است
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-caption</b>
+          <span>0.765rem (12.2px)</span>
+          <span>--lh-caption: 1.6</span>
+        </div>
+        <div class="step-sample fs-caption">
+          ضریب شکست (<span class="num" dir="ltr">n</span>) این ماده تقریباً
+          <span class="num" dir="ltr">1.51</span> است
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-meta">
+          <b>--fs-micro</b>
+          <span>0.68rem (10.9px)</span>
+          <span>--lh-micro: 1.5</span>
+        </div>
+        <div class="step-sample fs-micro">
+          <span class="num" dir="ltr">LDPE</span> — کد بازیافت <span class="num" dir="ltr">4</span> ·
+          <span class="num" dir="ltr">0</span> از <span class="num" dir="ltr">54</span> مقدار دارای
+          منبع
+        </div>
+      </div>
+    </main>
+
+    <div class="wrap measure-section">
+      <h2>سنجه خوانایی — تقریباً ۶۲ حرف</h2>
+      <div class="measure-box">
+        پلی‌اتیلن با چگالی پایین که با اختصار <span class="num" dir="ltr">LDPE</span> شناخته می‌شود،
+        یکی از مهم‌ترین و پرکاربردترین پلیمرهای ترموپلاستیک نیمه‌بلوری در جهان است. این پلیمر عضوی
+        از خانواده بزرگ پلی‌اولفین‌ها محسوب می‌شود و اولین بار در سال
+        <span class="num" dir="ltr">1933</span> توسط شرکت
+        <span class="num" dir="ltr">Imperial Chemical Industries</span> در بریتانیا به روش صنعتی
+        تولید شد.
+      </div>
+      <p class="measure-note">
+        متن کامل <span class="num" dir="ltr">overviewFa</span> از <span class="num" dir="ltr">data.js</span
+        >، بدون کوتاه‌سازی — تا فاصله خطوط (leading) در بافت واقعی، نه در یک خط تنها، دیده شود.
+      </p>
+    </div>
+
+    <div class="wrap derivation">
+      <h2>اشتقاق <span class="num" dir="ltr">--latin-size-adj</span></h2>
+      <!-- The table's min-content width is ~356px, wider than a 320px viewport.
+           tabindex + role make the scroll region reachable by keyboard. -->
+      <div class="table-scroll" tabindex="0" role="region" aria-label="جدول اشتقاق">
+        <table>
+        <caption>
+          اندازه‌گیری‌شده با fontTools (نسخه <span class="num" dir="ltr">4.61.1</span>) روی فایل‌های
+          woff2 واقعیِ هر دو فونت — نه یک عدد حدسی.
+        </caption>
+        <thead>
+          <tr>
+            <th>فونت</th>
+            <th><span dir="ltr">unitsPerEm</span></th>
+            <th><span dir="ltr">sCapHeight</span></th>
+            <th>نسبت به em</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">Estedad Variable</span></td>
+            <td>1000</td>
+            <td>655</td>
+            <td>0.655</td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">Newsreader (regular, latin)</span></td>
+            <td>2000</td>
+            <td>1340</td>
+            <td>0.670</td>
+          </tr>
+          <tr>
+            <td colspan="3">--latin-size-adj = 0.655 / 0.670</td>
+            <td class="result">0.978</td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="labfoot">
+      <div class="wrap">
+        صفحه نمونهٔ مقیاس تایپوگرافی — <span dir="ltr">FE-0</span>، عامل <span dir="ltr">B</span>. داده‌ها
+        از <span class="num" dir="ltr">data.js</span> است؛ هیچ مقدار یا منبعی ساخته نشده.
+      </div>
+    </footer>
+
+    <script type="module">
+      import { initTheme, themeButton } from './theme.js';
+      initTheme();
+      document.querySelector('.spacer').after(themeButton());
+
+      const toggle = document.getElementById('adj-toggle');
+      const root = document.getElementById('specimen-root');
+      toggle.addEventListener('change', () => {
+        root.classList.toggle('adj-off', toggle.checked);
+      });
+    </script>
+  </body>
+</html>

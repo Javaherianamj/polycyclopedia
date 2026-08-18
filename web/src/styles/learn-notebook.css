@@ -1,0 +1,614 @@
+/* L4 — «دفترچه» / NOTEBOOK (lab-concepts-spec.md). Ported from
+ * design/fe-0/lab/notebook.css onto this app's real token vocabulary
+ * (the --fs-, --r-, --dur- and --ease- token families instead of that
+ * file's own single --t),
+ * the same adaptation learn-map.css and learn-graph.css already did for
+ * their own FE-0 sources. Every class here is prefixed `nb-` (or `nbv-`
+ * for the one inline-value wrapper) — value-atom.css and the FE-0
+ * prototype BOTH already claim the bare names `.mark`/`.pop`/`.term`/
+ * `.note`/`.note-ref` globally in this codebase (value-atom.css is
+ * imported once, sitewide, in global.css), so reusing them unprefixed
+ * here would silently reskin or break the datasheet's own popovers. This
+ * is a rename, not a re-design — the FE-0 prototype's own class NAMES for
+ * this concept (bare `.mark`/`.term`/`.note`) are what changed; the
+ * VISUAL LANGUAGE (hover+focus-visible popovers, dashed-grey = no
+ * provenance, sage = sourced) is unchanged, matching learn-graph.css's
+ * own `st-sourced`/`st-unsourced`/`st-nodata` convention for the figure's
+ * provenance marks specifically, so this page's live figure reads exactly
+ * like GRAPH's.
+ *
+ * TWO-COLUMN LAYOUT (Tufte sidenotes): ported near-verbatim from the FE-0
+ * source, including its ALTERNATING SPREAD device and its choice to pin
+ * `.nb-block--r`/`--l` and the sidenote float in PHYSICAL terms
+ * (margin-left/margin-right, float:left/right) rather than logical
+ * inline-start/end. That file's own header explains why: the alternation
+ * is a deliberate magazine-style mirror, unrelated to reading direction,
+ * so it stays the SAME physical shape in both locales — "sidenotes in the
+ * margin must work on both sides" (build brief) is satisfied by this
+ * being locale-INDEPENDENT on purpose, not by mirroring it per locale.
+ * Only the PROSE inside each block follows the page's own dir (fa RTL /
+ * en LTR) via normal inheritance — nothing here overrides that.
+ */
+
+.nb-page {
+  position: relative;
+}
+
+/* --------------------------------------------------------- reading progress */
+
+.nb-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 3px;
+  background: transparent;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.nb-progress-fill {
+  display: block;
+  block-size: 100%;
+  background: var(--act);
+  inline-size: 0%;
+}
+
+/* ------------------------------------------------------------------ masthead */
+
+.nb-head {
+  max-inline-size: 68ch;
+}
+
+.nb-title {
+  font-family: var(--font-display, serif);
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  color: var(--ink);
+  margin: 10px 0 14px;
+  max-inline-size: 22ch;
+}
+
+.nb-standfirst {
+  font-family: var(--font-display, serif);
+  font-style: italic;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+  max-inline-size: 58ch;
+  margin: 0 0 20px;
+}
+
+.nb-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  padding-block: 16px;
+  border-block: 1px solid var(--line);
+  margin-block-end: 26px;
+}
+
+.nb-byline b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.nb-dot {
+  color: var(--muted-2);
+}
+
+/* --------------------------------------------------------------- review block */
+
+.nb-review {
+  max-inline-size: 640px;
+  margin: 0 0 var(--sec-gap, 34px);
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--act);
+  border-radius: var(--r-md);
+  background: var(--panel);
+}
+
+.nb-review h2 {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.05em;
+  color: var(--act);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.nb-review p {
+  font-size: var(--fs-small);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+.nb-cite {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------- mark + popover
+ * The provenance/citation badge family, shared by the review block's
+ * sample citation, figure 2's live marks (NotebookFigureIsland — same
+ * class names work from React since they are plain CSS classes) and
+ * InlineCitedValue's `.nbv-missing` fallback. NOT the same mechanism as
+ * value-atom.css's `.mark` (native Popover API + CSS anchor positioning)
+ * — this uses the simpler hover/focus-visible technique GraphIsland's own
+ * `.graph-info`/`.pop` pair already established for a React island's
+ * small inline popovers, so figure 2's marks and the review block's mark
+ * behave identically without plumbing a unique anchor-name through React
+ * props for something this small.
+ */
+.nb-mark,
+.nb-fig-mark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 22px;
+  min-block-size: 22px;
+  padding: 2px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-family: var(--font-num, serif);
+  border: 1px solid var(--ok-line, var(--line));
+  color: var(--ok);
+  flex: none;
+}
+
+.nb-fig-mark.st-unsourced {
+  border-color: var(--line-2);
+  border-style: dashed;
+  color: var(--muted-2);
+}
+
+.nb-fig-mark.st-nodata {
+  border-color: var(--line-2);
+  border-style: dashed;
+  color: var(--muted-2);
+}
+
+.nb-pop,
+.nb-fig-pop {
+  position: absolute;
+  inset-block-end: calc(100% + 8px);
+  inset-inline-start: 0;
+  /* Never wider than the viewport it has to fit inside — same naive-
+   * anchoring caveat FE-1's popover items already carry: a mark near the
+   * inline edge can still clip at very narrow widths. */
+  inline-size: min(250px, calc(100vw - 32px));
+  padding: 11px 13px;
+  display: grid;
+  gap: 5px;
+  text-align: start;
+  white-space: normal;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-2, 0 14px 32px -12px rgb(0 0 0 / 40%));
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    visibility var(--dur-fast) var(--ease-out);
+  z-index: 30;
+}
+
+.nb-mark:hover .nb-pop,
+.nb-mark:focus-visible .nb-pop,
+.nb-fig-mark:hover .nb-fig-pop,
+.nb-fig-mark:focus-visible .nb-fig-pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nb-pop b {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.nb-pop-meta {
+  font-family: var(--font-num, serif);
+  font-size: var(--fs-micro);
+  color: var(--muted-2);
+  direction: ltr;
+  text-align: end;
+}
+
+/* -------------------------------------------------------------------- layout */
+
+.nb-body {
+  padding-block: 4px 20px;
+}
+
+.nb-article {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+/* Below the two-column breakpoint every block is full-width and stacks
+ * normally — the 640px reading measure comes from `.nb-block` itself, not
+ * from `.nb-article`, so it applies to both mirrored variants equally. */
+.nb-block {
+  max-inline-size: 640px;
+}
+
+@media (min-width: 1040px) {
+  .nb-block--r {
+    margin-inline: 0;
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .nb-block--l {
+    margin-inline: 0;
+    margin-left: 0;
+    margin-right: auto;
+  }
+}
+
+.nb-block + .nb-block {
+  margin-block-start: 10px;
+}
+
+.nb-article h2 {
+  font-family: var(--font-display, serif);
+  font-weight: 600;
+  font-size: var(--fs-h2);
+  margin: 46px 0 14px;
+  scroll-margin-block-start: 90px;
+}
+
+.nb-block:first-child h2 {
+  margin-block-start: 0;
+}
+
+.nb-article p {
+  color: var(--ink-2);
+  margin: 0 0 20px;
+}
+
+/* -------------------------------------------------------------------- sidenotes */
+
+.nb-note {
+  color: var(--muted);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-small);
+}
+
+.nb-note-ref {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  font-size: var(--fs-micro);
+  font-family: var(--font-num, serif);
+  color: var(--act);
+  border: 1px solid var(--act-line, var(--act));
+  vertical-align: super;
+  margin-inline: 2px;
+}
+
+@media (min-width: 1040px) {
+  .nb-note-ref {
+    display: none;
+  }
+
+  /* Framed box, not a bare line of text — a note reads as its own object
+   * against the page instead of blending into the background. */
+  .nb-note {
+    display: block !important;
+    inline-size: 232px;
+    margin-block: 2px 16px;
+    padding: 10px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  /* --r blocks (text physical-right): notes float physical-LEFT of the
+   * text column. */
+  .nb-block--r .nb-note {
+    float: left;
+    clear: left;
+    margin-left: -270px;
+    margin-right: 0;
+  }
+
+  /* --l blocks (text physical-left, mirrored): notes float physical-
+   * RIGHT of the text column instead — opposite side, opposite margin
+   * sign, same mechanism. */
+  .nb-block--l .nb-note {
+    float: right;
+    clear: right;
+    margin-right: -270px;
+    margin-left: 0;
+  }
+}
+
+/* Below 1040px: the spec's own words — "collapse inline behind a marker".
+ * `.nb-note-ref` is that marker (a real, 44px-hit-area button via padding
+ * below); `notebook-chrome.ts` toggles `.is-open`. */
+@media (max-width: 1039px) {
+  .nb-note {
+    display: none;
+    margin-block: 8px 4px;
+    padding: 10px 13px;
+    background: var(--panel-2);
+    border-radius: var(--r-sm);
+  }
+
+  .nb-note.is-open {
+    display: block;
+  }
+
+  /* R30: a real 44px hit target. The base rule fixes `.nb-note-ref` at a
+   * literal 20x20px (right for a superscript-sized glyph inline in text);
+   * with the sitewide `box-sizing: border-box` reset (global.css), adding
+   * padding alone does NOT grow that box — min-inline-size/min-block-size
+   * is what actually does, so those are set here rather than relying on
+   * padding the way the visual glyph itself does not need to grow. */
+  .nb-note-ref {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    margin-inline: 4px;
+  }
+}
+
+/* --------------------------------------------------------------------- figures */
+
+.nb-fig {
+  margin: 30px 0 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 18px 20px 16px;
+}
+
+.nb-fig svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  margin-block-end: 6px;
+}
+
+.nb-fig-cap {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-small);
+  color: var(--muted);
+  margin: 10px 0 0;
+}
+
+.nb-fig-cap b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------- figure 1 */
+
+.nb-fig1-chain {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nb-fig1-branch {
+  fill: none;
+  stroke: var(--act);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.nb-fig1-label {
+  font-family: var(--font-body, sans-serif);
+  font-size: 11px;
+  fill: var(--muted);
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+/* -------------------------------------------------------------- live figure 2
+ * `.nb-fig2*` is NotebookFigureIsland's own namespace — a React island, so
+ * these are plain global classes (no Astro scoping) consumed directly by
+ * JSX `className`s. `.learn-field`/`.learn-label`/`.learn-select`/
+ * `.learn-hint`/`.learn-note` are already global (learn.css) and reused
+ * as-is for the material picker, same as MAP/GRAPH's own islands.
+ */
+.nb-fig2-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-micro);
+  color: var(--act);
+  border: 1px solid var(--act-line, var(--act));
+  border-radius: var(--r-pill, 999px);
+  padding: 2px 10px;
+  margin-block-end: 14px;
+}
+
+.nb-fig2-badge i {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--act);
+  flex: none;
+}
+
+.nb-fig2-readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-block: 6px 12px;
+}
+
+.nb-fig2-stat {
+  display: grid;
+  gap: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px 14px;
+}
+
+.nb-fig2-stat-label {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+.nb-fig2-stat-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.nb-fig2-stat-missing {
+  font-size: var(--fs-small);
+  color: var(--muted-2);
+}
+
+/* ------------------------------------------------------------------ pull-quote */
+
+.nb-pull {
+  font-family: var(--font-display, serif);
+  font-style: italic;
+  font-size: var(--fs-h1);
+  line-height: 1.6;
+  color: var(--ink);
+  border-inline-start: 3px solid var(--act);
+  padding-inline-start: 18px;
+  margin: 32px 0 34px;
+}
+
+/* -------------------------------------------------------------------- term */
+
+.nb-term {
+  position: relative;
+  color: var(--ink);
+  border-block-end: 1px dashed var(--act-line, var(--act));
+  cursor: help;
+}
+
+.nb-term .nb-pop {
+  inset-inline-start: 50%;
+  transform: translate(-50%, 4px);
+}
+
+.nb-term:hover .nb-pop,
+.nb-term:focus-visible .nb-pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/* ------------------------------------------------------------------------ toc */
+
+.nb-toc {
+  position: fixed;
+  inset-inline-end: 22px;
+  inset-block-start: 130px;
+  inline-size: 190px;
+  display: none;
+  font-size: var(--fs-small);
+}
+
+@media (min-width: 1320px) {
+  .nb-toc {
+    display: block;
+  }
+}
+
+.nb-toc h2 {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.05em;
+  color: var(--muted-2);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.nb-toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+  border-inline-start: 1px solid var(--line);
+  padding-inline-start: 12px;
+}
+
+.nb-toc a {
+  color: var(--muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.nb-toc a:hover {
+  color: var(--ink);
+}
+
+.nb-toc a.on {
+  color: var(--act);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------- closing */
+
+.nb-closing {
+  border-block-start: 1px solid var(--line);
+  padding-block: 22px 44px;
+}
+
+.nb-closing p {
+  max-inline-size: 640px;
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: var(--lh-body);
+}
+
+.nb-template-note {
+  font-style: italic;
+  color: var(--muted-2) !important;
+}
+
+/* --------------------------------------------------------------------- mobile
+ * R27: no horizontal overflow at 320/375/768. Nothing above sets a fixed
+ * inline-size wider than its own content except `.nb-note`/`.nb-toc`,
+ * both already `display:none` below their own breakpoints, and
+ * `.nb-fig2-readouts`'s grid columns are `minmax(180px, 1fr)` — the SAME
+ * "never plain 1fr" rule `learn-scale.css`'s header already documents for
+ * this exact class of bug.
+ */
+@media (max-width: 640px) {
+  .nb-title {
+    font-size: var(--fs-h1);
+  }
+
+  .nb-fig {
+    padding: 14px 14px 12px;
+  }
+
+  .nb-review {
+    padding: 14px 14px;
+  }
+}

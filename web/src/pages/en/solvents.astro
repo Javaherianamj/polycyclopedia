@@ -1,0 +1,53 @@
+---
+// FE-8 step 4 — the solvent datasheet. Owner's brief: "i want a solvent
+// page too as a datasheet of solvents (all in one) we will deepen it later,
+// lets begin with all we have on this pdf about them and show this". One
+// reference table over every row `GET /api/solvents` returns — not a
+// per-solvent route (that is the deferred "deepen it later" part) — so this
+// page is a single static shell around SolventsIsland, closest in shape to
+// FE-7's site-wide bibliography (pages/en/sources.astro): no build-time
+// data needed here (the table itself needs the live API), so it hydrates
+// client:load and gets DataBoundary's real error/empty states for free.
+//
+// Deliberately on the DATASHEET surface, not Learn's `surface="lab"`: this
+// is a reference table, the same register as /catalog or /sources, not a
+// teaching tool. The Hansen SPACE VISUALISATION (which plots these same
+// solvents alongside a polymer) is the Learn tool and lives on /learn
+// instead (HansenSpaceIsland) — R24 confines heavy libraries to Learn, and
+// this page has none.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SolventsIsland from '../../islands/SolventsIsland';
+import { t } from '../../i18n/t';
+
+const locale = 'en' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'solvents.pageTitle')}>
+  <main class="wrap sv-page">
+    <h1>{t(locale, 'solvents.pageTitle')}</h1>
+    <p class="sv-lead">{t(locale, 'solvents.pageLead')}</p>
+
+    <SolventsIsland client:load locale={locale} />
+  </main>
+</BaseLayout>
+
+<style>
+  .sv-page {
+    max-inline-size: var(--measure-page, 1120px);
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h1);
+    margin-block: 0 8px;
+  }
+
+  .sv-lead {
+    max-inline-size: 68ch;
+    color: var(--ink-2);
+    line-height: 1.9;
+    margin-block-end: 20px;
+  }
+</style>

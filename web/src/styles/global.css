@@ -1,0 +1,304 @@
+/* FE-1 global stylesheet.
+ *
+ * Import order matters (tokens/README.md): colour -> type -> motion. None of
+ * the three depend on each other; this order just keeps the cascade readable.
+ * All three files are copied verbatim from design/fe-0/tokens/ — frozen,
+ * not re-derived. Do not edit them here; edit the FE-0 source and re-copy.
+ */
+@import './tokens/colour.css';
+@import './tokens/type.css';
+@import './tokens/motion.css';
+@import '../components/value-atom/value-atom.css';
+@import '../components/datasheet/datasheet.css';
+@import '../components/catalog/catalog.css';
+@import './search.css';
+@import './compare.css';
+@import './sources.css';
+@import './chrome.css';
+@import './learn.css';
+@import './learn-nav.css';
+@import './learn-scale.css';
+@import './learn-map.css';
+@import './learn-graph.css';
+@import './learn-notebook.css';
+@import './solvents.css';
+
+/* ------------------------------------------------------ [hidden] guard
+ * The UA stylesheet hides `[hidden]` elements, but that rule lives in the
+ * user-agent origin and ANY author `display` declaration beats it, however
+ * low its specificity. `.material-card { display: grid }` was therefore
+ * enough to make catalog family filtering appear completely broken: the
+ * filter correctly set `hidden` on four cards and all eight kept rendering.
+ *
+ * The identical mistake independently broke every ValueAtom popover (see
+ * value-atom.css), so this is a bug class, not a one-off — hence a global
+ * guard rather than another per-component patch. `!important` is warranted
+ * here precisely because the point is to outrank author display rules that
+ * do not know `hidden` is in play.
+ *
+ * Anything wanting an animated hide must use a class, not `hidden`.
+ */
+[hidden] {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------- fonts
+ * Self-hosted, not the FE-0 prototypes' CDN references (jsdelivr for
+ * Estedad, Google Fonts for Newsreader) — same font versions, same
+ * subsets, same weights the type-scale derivation in tokens/type.css
+ * measured against (Estedad Variable wght 400, Newsreader wght 400
+ * upright latin), just served from this origin instead of two external
+ * ones. Matters for the Iran-hosted deployment target (D56) where a
+ * foreign CDN is a reliability risk, and removes an external dependency
+ * this app doesn't need. Licence: SIL OFL for both, texts alongside the
+ * files in public/fonts/*)/OFL.txt.
+ */
+@font-face {
+  font-family: 'Estedad Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/estedad/estedad-variable-arabic.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB,
+    U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22,
+    U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49,
+    U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F,
+    U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E,
+    U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+
+@font-face {
+  font-family: 'Estedad Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/estedad/estedad-variable-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Estedad Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/estedad/estedad-variable-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/newsreader/newsreader-italic-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/newsreader/newsreader-italic-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Newsreader's 400/500/600 upright instances resolve to the same two files
+   (Google's variable-font optimisation collapsed the nearby static requests
+   FE-0's CDN import specified) -- three declarations, two files, exactly
+   mirroring what the CDN version served. */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/newsreader/newsreader-normal-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/newsreader/newsreader-normal-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* House style E "Press" (D35) font and shape values -- match
+   design/fe-0/themes/e-press.css. Not part of tokens/ because FE-0 never
+   extracted these into a token file (only colour, type scale and motion
+   were); owned here instead. Radius values are the datasheet surface's;
+   lab's --r-lg differs (18px vs 16px) and has no --r-pill of its own --
+   a surface-specific override is a later unit's problem, not this shell's. */
+:root {
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-display-fa: 'Estedad Variable', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-num: 'Newsreader', Georgia, serif;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* Structural spacing, same source. --row-pad/--row-gap also apply to
+     value-atom.css's .prop, added here rather than duplicated there once a
+     second consumer (datasheet.css) needed the same numbers. */
+  --pad-x: 28px;
+  --bar-h: 62px;
+  --sec-gap: 50px;
+  --sec-head-gap: 18px;
+  --row-gap: 7px;
+  --row-pad: 13px 18px;
+}
+
+/* ---------------------------------------------------------------- reset
+ * Same as every FE-0 surface: RTL-first (R6), border-box everywhere, and
+ * overflow-x:hidden on the root as the last-resort guard for R27 -- it
+ * hides rather than fixes an overflow, which is exactly why every screen
+ * must still be measured, not just glanced at (see
+ * aidlc-docs/construction/fe-0/build-and-test.md §1).
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+  max-inline-size: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* A theme switch is a setting, not an animation (ported from FE-0's
+   theme.js rationale) -- without this the whole page cross-fades on every
+   toggle, and a backgrounded tab can leave those transitions unresolved. */
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+  transition: none !important;
+}
+
+/* Reduced motion is handled by tokens/motion.css collapsing --dur-* to
+   0.01ms under prefers-reduced-motion -- not duplicated here. Any animation
+   or transition that uses the duration tokens (as every component in this
+   app must) already respects it. */
+
+/* ---------------------------------------------------------------- R4 states
+ * Global, unscoped classes -- not each component's own <style> block --
+ * because these four states exist in two incompatible runtimes: an .astro
+ * template (build time, no hydration) and a React island (client time,
+ * DataBoundary.tsx). Astro cannot hydrate an .astro file and React cannot
+ * import one, so there is no single component both can share. What they
+ * share instead is this stylesheet: identical classnames, identical rules,
+ * so a build-time Empty and a client-time Empty are pixel-identical even
+ * though they come from two different template languages.
+ */
+.state-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
+
+.state-spinner {
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--track);
+  border-inline-start-color: var(--accent);
+  /* --dur-slow collapses to 0.01ms under prefers-reduced-motion
+     (tokens/motion.css) -- no separate reduced-motion rule needed. */
+  animation: state-spin calc(var(--dur-slow) * 6) var(--ease-linear) infinite;
+}
+
+@keyframes state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.state-error {
+  display: grid;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--warn);
+  border-radius: var(--r-md);
+  background: var(--note-bg);
+}
+
+.state-error-title {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.state-error-retry {
+  justify-self: start;
+  padding: 6px 14px;
+  border: var(--hairline);
+  border-radius: var(--r-pill);
+  color: var(--act);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.state-error-retry:hover {
+  border-color: var(--act);
+}
+
+.state-empty {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 24px;
+  border: var(--hairline);
+  border-radius: var(--r-md);
+  color: var(--muted);
+}

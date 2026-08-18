@@ -1,0 +1,233 @@
+---
+// THE LEARN SURFACE — the scale axis (D50), ported from design/fe-0/lab/
+// scale.html + scale.css + scale.js.
+//
+// WHY THIS REPLACED A CARD STACK: the shipped FE-8 page was a vertical stack
+// of five identical tool panels. That is precisely the shape FE-0 rejected
+// ("the default output shape of a language model asked to present a list",
+// lab-concepts-spec.md) and it was doing no intellectual work: it presented a
+// stereocentre and a landfill as equal siblings. D50 settled the replacement
+// — scale is the organising structure, you arrive at the zoom, and each tool
+// sits at the length scale its subject actually exists at. The page teaches
+// the multi-scale nature of the discipline before a word is read, and it is
+// a structure that makes sense for nothing except polymers.
+//
+// Both locale routes render this one component; only `locale` differs, the
+// same split every other paired route in this app uses. Everything here is
+// build-time Astro + CSS except one small scroll listener (below) and the
+// five islands — restructuring the page must not turn it into a client-side
+// app (performance budget), and it does not: no island was touched.
+//
+// D51 (graph is a tool inside Learn) and D53 (notebook is the template for
+// educational content) are NOT built here — no graph tool exists yet, and
+// there is no article to typeset. D52 (map) WAS deferred here on
+// 2026-08-03 ("it is a per-material view and wants more than two materials
+// to be worth its space" — there were 2 materials then) and has since
+// shipped as its own route, `/{locale}/learn/map`
+// (components/learn/LearnMap.astro) — that reason lapsed once the catalog
+// grew to 17 materials, and the owner has since asked for all four L1-L4
+// parts explicitly. `<LearnConceptNav>` below is the seam between this
+// page and that one (and the seam GRAPH/NOTEBOOK will use next). The
+// station model still leaves room for graph and notebook: a graph is a
+// tool that would sit across scales, and notebook prose drops into
+// `.station-text` unchanged.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import ScaleStation from './ScaleStation.astro';
+import LearnConceptNav from './LearnConceptNav.astro';
+import { SCALE_STATIONS, railFraction } from './scale-stations';
+
+import StateSimulatorIsland from '../../islands/StateSimulatorIsland';
+import DPCalculatorIsland from '../../islands/DPCalculatorIsland';
+import BranchingSimulatorIsland from '../../islands/BranchingSimulatorIsland';
+import TacticitySimulatorIsland from '../../islands/TacticitySimulatorIsland';
+import HansenSpaceIsland from '../../islands/HansenSpaceIsland';
+import ChainCoilIsland from '../../islands/ChainCoilIsland';
+import CrystallinityDensityIsland from '../../islands/CrystallinityDensityIsland';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const byKey = (key: string) => {
+  const station = SCALE_STATIONS.find((s) => s.key === key);
+  if (!station) throw new Error(`Unknown scale station "${key}"`);
+  return station;
+};
+const first = SCALE_STATIONS[0];
+---
+
+<main class="learn-page">
+  <header class="learn-hero">
+    <LearnConceptNav locale={locale} current="scale" />
+    <p class="learn-kicker">{t(locale, 'learn.kicker')}</p>
+    <h1>{t(locale, 'learn.title')}</h1>
+    <p class="learn-hero-lead">{t(locale, 'learn.intro')}</p>
+  </header>
+
+  {
+    /* The readout. Sticky, so the current magnification is always on screen —
+       it is the page's answer to "where am I", replacing the breadcrumb a
+       card stack would have needed. Updated by the scroll listener below;
+       server-rendered with the first station so it is correct with JS off. */
+  }
+  <div class="scale-readout" data-scale-readout>
+    <p class="sr-label">{t(locale, 'learn.scale.readoutLabel')}</p>
+    <div class="sr-body">
+      <span class="sr-num num" dir="ltr" data-readout-exp>10<sup>{first.exp}</sup></span>
+      <span class="sr-name" data-readout-name>{t(locale, first.nameKey)}</span>
+    </div>
+  </div>
+
+  <div class="scale-doc">
+    {
+      /* The ruler. Tick spacing is proportional to log-distance (see
+         railFraction) — that is the part that teaches: the gap drawn between
+         "spherulite" and "part" is three times the gap between "chain" and
+         "lamella", because it is three decades instead of one. A <nav> of
+         buttons, not links: they scroll, they do not navigate, and buttons
+         are what a screen reader should be told they are. */
+    }
+    <nav class="scale-rail" aria-label={t(locale, 'learn.scale.railLabel')}>
+      <p class="sr-only">{t(locale, 'learn.scale.jumpHint')}</p>
+      <div class="rail-track">
+        {
+          SCALE_STATIONS.map((s) => (
+            <button
+              type="button"
+              class="rail-tick"
+              data-rail-tick={s.key}
+              style={`inset-block-start:${(railFraction(s.exp) * 100).toFixed(2)}%`}
+            >
+              <span class="rail-dot" aria-hidden="true" />
+              <span class="rail-num num" dir="ltr" aria-hidden="true">
+                10<sup>{s.exp}</sup>
+              </span>
+              <span class="sr-only">{t(locale, s.nameKey)}</span>
+            </button>
+          ))
+        }
+      </div>
+    </nav>
+
+    <div class="stations">
+      <h2 class="sr-only">{t(locale, 'learn.scale.stationsHeading')}</h2>
+
+      <ScaleStation station={byKey('monomer')} locale={locale}>
+        <TacticitySimulatorIsland client:load locale={locale} />
+      </ScaleStation>
+
+      {
+        /* `id="hansen"` is carried by the station, not the island (which owns
+           `id="hansen-space"`): learn-bridge-map.ts has always linked the
+           academic group at `#hansen`, and landing on the station rather than
+           on the tool panel is the better arrival anyway — the reader gets the
+           scale sentence that explains why solubility is a chain question. */
+      }
+      <ScaleStation station={byKey('chain')} locale={locale}>
+        <div id="hansen" class="station-anchor"></div>
+        {
+          /* The FE-0 spec's required live element ("One live element
+             (required)", L1/SCALE): a DP slider redrawing a 2D
+             random-walk chain, first among this station's tools since it
+             is the one the spec calls non-optional. */
+        }
+        <ChainCoilIsland client:load locale={locale} />
+        <DPCalculatorIsland client:load locale={locale} />
+        <HansenSpaceIsland client:load locale={locale} />
+      </ScaleStation>
+
+      <ScaleStation station={byKey('lamella')} locale={locale}>
+        <BranchingSimulatorIsland client:load locale={locale} />
+      </ScaleStation>
+
+      <ScaleStation station={byKey('spherulite')} locale={locale}>
+        <CrystallinityDensityIsland client:load locale={locale} />
+      </ScaleStation>
+
+      <ScaleStation station={byKey('specimen')} locale={locale}>
+        <StateSimulatorIsland client:load locale={locale} />
+      </ScaleStation>
+
+      <ScaleStation station={byKey('lifecycle')} locale={locale} />
+    </div>
+  </div>
+</main>
+
+<script>
+  // The only page-level client JS on this surface, and it is deliberately
+  // this small: the structure is CSS, the tools are islands, and this does
+  // nothing but keep the readout and the rail in sync with the scroll
+  // position. If it never runs, the page is still complete and every tool
+  // still works — the readout just stays on the first station.
+  const readoutExp = document.querySelector<HTMLElement>('[data-readout-exp]');
+  const readoutName = document.querySelector<HTMLElement>('[data-readout-name]');
+  const ticks = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-rail-tick]'));
+  const stations = Array.from(document.querySelectorAll<HTMLElement>('[data-station]'));
+
+  if (readoutExp && readoutName && ticks.length && stations.length) {
+    const setActive = (key: string) => {
+      const station = stations.find((s) => s.dataset.station === key);
+      if (!station) return;
+      for (const tick of ticks) tick.classList.toggle('is-on', tick.dataset.railTick === key);
+      // Copied out of the already-translated DOM rather than re-derived from
+      // a JS-side table: R14 says user-visible strings live in the message
+      // catalogue, and the station heading is that string, already rendered.
+      const railNum = ticks.find((t) => t.dataset.railTick === key)?.querySelector('.rail-num');
+      const heading = station.querySelector('h2');
+      if (railNum) readoutExp.innerHTML = railNum.innerHTML;
+      if (heading) readoutName.textContent = heading.textContent;
+    };
+
+    // "The current scale" is whichever station crosses a line 45% down the
+    // viewport — the station the reader is actually looking at, not whichever
+    // one last touched the top edge.
+    //
+    // WHY NOT IntersectionObserver (which the FE-0 prototype used): a
+    // sliver-rootMargin observer is the idiomatic answer, but it reports
+    // *entering* a band, and every station here is taller than the band, so
+    // the readout only ever updates on a crossing and silently keeps a stale
+    // value after any programmatic scroll or restored scroll position. A
+    // direct measurement has no such state — it is correct from the first
+    // frame, at any scroll offset, however the reader got there. Cost is one
+    // passive listener whose body is six getBoundingClientRect calls,
+    // coalesced to at most one run per ~60ms.
+    //
+    // Coalesced on a timer rather than requestAnimationFrame — deliberately,
+    // and it is not the obvious choice. rAF is the right tool for anything
+    // that PAINTS, but frames stop being served whenever the page is not
+    // being painted (backgrounded tab, occluded window, and — as it happens —
+    // this project's own browser-automation pane, which is how the difference
+    // was found). A readout that silently stops tracking in those states, and
+    // is stale the moment the reader looks back, is worse than one that
+    // updates a frame late.
+    let pending = 0;
+    const sync = () => {
+      pending = 0;
+      const line = window.innerHeight * 0.45;
+      let current = stations[0];
+      for (const station of stations) {
+        const box = station.getBoundingClientRect();
+        if (box.top <= line) current = station;
+      }
+      if (current?.dataset.station) setActive(current.dataset.station);
+    };
+    const schedule = () => {
+      if (!pending) pending = window.setTimeout(sync, 60);
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    sync();
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    for (const tick of ticks) {
+      tick.addEventListener('click', () => {
+        const key = tick.dataset.railTick;
+        const target = stations.find((s) => s.dataset.station === key);
+        target?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth' });
+      });
+    }
+  }
+</script>

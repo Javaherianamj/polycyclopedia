@@ -133,7 +133,7 @@ The user approved a full project roadmap in the previous session (`~/.claude/pla
 
 | Item                                                  | Why deferred                                                                                                                   |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Fastify REST API                                      | No Node.js runtime available in this environment; would be unverifiable. Next unit.                                            |
+| Fastify REST API                                      | No Node.js runtime here (§2). Next unit.                                                                                       |
 | Frontend swap to API calls                            | Depends on the API unit.                                                                                                       |
 | Target-property search UI                             | Roadmap Phase 2.                                                                                                               |
 | N-way comparison rewrite                              | Roadmap Phase 2.                                                                                                               |

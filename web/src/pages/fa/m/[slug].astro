@@ -1,0 +1,134 @@
+---
+// FE-3: the datasheet. One long scrolling page, no tabs (D23). Build-time
+// static generation (R13) -- getStaticPaths enumerates every material from
+// the API right now, at build time, not from a hardcoded list.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionRail from '../../../components/datasheet/SectionRail.astro';
+import PropertySection from '../../../components/datasheet/PropertySection.astro';
+import CoverageBadge from '../../../components/datasheet/CoverageBadge.astro';
+import DraftBadge from '../../../components/datasheet/DraftBadge.astro';
+import GradeClassJumpLink from '../../../components/datasheet/GradeClassJumpLink.astro';
+import GradeClassBand from '../../../components/datasheet/GradeClassBand.astro';
+import BottomLinks from '../../../components/datasheet/BottomLinks.astro';
+import { getMaterial, getMaterials, getProperties } from '../../../lib/api/client';
+import { buildMaterialSections } from '../../../lib/pages/material-detail';
+import { gateMaterials } from '../../../lib/publish';
+import { t } from '../../../i18n/t';
+
+const locale = 'fa' as const;
+
+export async function getStaticPaths() {
+  const result = await getMaterials({ limit: 200 });
+  if (!result.ok) {
+    // A build-time listing failure fails the build (ErrorState.astro's
+    // comment explains why this is deliberate, not a missing try/catch):
+    // there is no partial-site outcome that is better than a loud failure.
+    throw new Error(`Failed to list materials for static paths: ${result.error.message}`);
+  }
+  return gateMaterials(result.data.data).map((material) => ({ params: { slug: material.slug } }));
+}
+
+const { slug } = Astro.params;
+const [materialResult, propertiesResult] = await Promise.all([getMaterial(slug), getProperties()]);
+
+if (!materialResult.ok) {
+  throw new Error(`Failed to fetch material '${slug}': ${materialResult.error.message}`);
+}
+if (!propertiesResult.ok) {
+  throw new Error(`Failed to fetch property registry: ${propertiesResult.error.message}`);
+}
+
+const material = materialResult.data;
+const registry = propertiesResult.data.data;
+const sections = buildMaterialSections(registry, material);
+
+const identityLabels: Record<string, string> = {
+  cas: t(locale, 'datasheet.identity.cas'),
+  resin_code: t(locale, 'datasheet.identity.resin_code'),
+};
+---
+
+<BaseLayout locale={locale} title={material.nameFa}>
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-main">
+        <div class="hero-text">
+          {
+            material.code && (
+              <div class="hero-code" dir="ltr">
+                {material.code}
+              </div>
+            )
+          }
+          <h1>{material.nameFa}</h1>
+          <p class="hero-en" dir="ltr">
+            {material.nameEn} · {material.family.nameEn}
+          </p>
+          {material.overviewFa && <p class="hero-overview">{material.overviewFa}</p>}
+        </div>
+        <aside class="hero-facts">
+          <dl>
+            {
+              Object.entries(material.identifiers).map(([type, value]) => (
+                <>
+                  <dt>{identityLabels[type] ?? type}</dt>
+                  <dd dir="ltr">{value}</dd>
+                </>
+              ))
+            }
+            <dt>{t(locale, 'datasheet.identity.family')}</dt>
+            <dd>{material.family.nameFa}</dd>
+            {
+              material.discoveryYear && (
+                <>
+                  <dt>{t(locale, 'datasheet.identity.discovered')}</dt>
+                  <dd dir="ltr">{material.discoveryYear}</dd>
+                </>
+              )
+            }
+          </dl>
+        </aside>
+      </div>
+      <DraftBadge status={material.status} locale={locale} />
+      <CoverageBadge coverage={material.coverage} locale={locale} />
+      <GradeClassJumpLink gradeClasses={material.gradeClasses} locale={locale} />
+    </div>
+  </div>
+
+  <div class="main wrap">
+    <SectionRail
+      items={sections.map((s) => ({ key: s.key, nameFa: s.nameFa, nameEn: s.nameEn }))}
+      locale={locale}
+    />
+    <div class="col">
+      {
+        sections.map((section) => (
+          <PropertySection
+            section={section}
+            slug={material.slug}
+            locale={locale}
+            processingTechniques={
+              section.key === 'processing' ? material.processingTechniques : undefined
+            }
+          />
+        ))
+      }
+      {
+        // R7/R4: 4 of 7 seeded materials have no grade classes at all --
+        // this renders nothing, not an empty band, when that's the case.
+        material.gradeClasses.length > 0 && (
+          <GradeClassBand gradeClasses={material.gradeClasses} locale={locale} />
+        )
+      }
+      <BottomLinks slug={material.slug} locale={locale} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .wrap {
+    max-inline-size: 1120px;
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+  }
+</style>

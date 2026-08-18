@@ -1,0 +1,38 @@
+---
+// S2: sticky vertical rail on desktop, horizontal chip bar on mobile (one
+// element, two presentations via datasheet.css's media query — same
+// approach as ValueAtom's popover sheet/anchor split). Markup ported from
+// design/fe-0/render.js's rail; scroll-spy is section-rail.ts.
+import type { Locale } from '../../i18n/config';
+
+interface RailItem {
+  key: string;
+  nameFa: string;
+  nameEn: string;
+}
+
+interface Props {
+  items: RailItem[];
+  locale: Locale;
+}
+
+const { items, locale } = Astro.props;
+---
+
+<nav class="rail" data-testid="datasheet-section-rail">
+  <ul>
+    {
+      items.map((item, i) => (
+        <li>
+          <a href={`#${item.key}`} class={i === 0 ? 'on' : undefined}>
+            {locale === 'fa' ? item.nameFa : item.nameEn}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  import './section-rail';
+</script>

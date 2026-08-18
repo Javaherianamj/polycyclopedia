@@ -1,0 +1,647 @@
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>مشخصات حرکت — Polypedia FE-0</title>
+
+    <!--
+      Colour/typography source: this page links lab/lab.css rather than
+      themes/e-press.css. Decision, not left implicit per the spec's
+      instruction to Agent B (same principle applies here): these tokens are
+      written "for the Learn surface" (see motion.css's header comment,
+      quoting the closeout spec's stated goal directly) so the demo should
+      live inside the palette its intended consumer will actually use.
+      lab.css is READ ONLY here — nothing in it is edited.
+    -->
+    <link rel="stylesheet" href="./lab/lab.css" />
+    <link rel="stylesheet" href="./tokens/motion.css" />
+
+    <style>
+      /* Page-local styles for this specimen only. No colour or type
+         decisions are made here beyond what lab.css already sets; this is
+         box/track/layout scaffolding for the demo elements themselves. */
+
+      main {
+        padding-block: 32px 64px;
+      }
+
+      section {
+        padding-block: 28px;
+        border-block-end: 1px solid var(--line);
+      }
+
+      section:last-of-type {
+        border-block-end: 0;
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-size: 1.7rem;
+        margin: 0 0 6px;
+      }
+
+      .lede {
+        color: var(--muted);
+        max-inline-size: 62ch;
+        margin: 0 0 8px;
+      }
+
+      h2 {
+        font-size: 1.05rem;
+        margin: 0 0 4px;
+      }
+
+      .sec-note {
+        color: var(--muted);
+        font-size: 0.85rem;
+        max-inline-size: 62ch;
+        margin: 0 0 18px;
+      }
+
+      code {
+        font-family: var(--font-num);
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 1px 6px;
+        font-size: 0.85em;
+      }
+
+      /* ---------------------------------------------------- duration race */
+
+      .lanes {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .lane {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .lane-label {
+        inline-size: 12ch;
+        flex: none;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .lane-label b {
+        display: block;
+        color: var(--ink-2);
+        font-family: var(--font-num);
+      }
+
+      .track {
+        position: relative;
+        flex: 1 1 240px;
+        min-inline-size: 160px;
+        block-size: 34px;
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+      }
+
+      .puck {
+        position: absolute;
+        inset-block-start: 3px;
+        inset-inline-start: 3px;
+        inline-size: 26px;
+        block-size: 26px;
+        border-radius: 50%;
+        background: var(--act);
+        /* Named properties only — R35. */
+        transition: transform var(--dur-base) var(--ease-out);
+      }
+
+      .track.at-end .puck {
+        /* translate, not left/right — keeps this compositor-friendly and
+           direction-agnostic under dir="rtl" (a positive X translate in an
+           RTL inline context still reads as "toward the line-end"). */
+        transform: translateX(calc(var(--track-w, 200px) - 32px));
+      }
+
+      /* one track per duration — same easing (--ease-out), duration swapped */
+      #lane-instant .puck {
+        transition-duration: var(--dur-instant);
+      }
+      #lane-fast .puck {
+        transition-duration: var(--dur-fast);
+      }
+      #lane-base .puck {
+        transition-duration: var(--dur-base);
+      }
+      #lane-slow .puck {
+        transition-duration: var(--dur-slow);
+      }
+      #lane-deliberate .puck {
+        transition-duration: var(--dur-deliberate);
+      }
+
+      /* ----------------------------------------------------- easing race */
+
+      #lane-ease-out .puck {
+        transition-timing-function: var(--ease-out);
+      }
+      #lane-ease-inout .puck {
+        transition-timing-function: var(--ease-in-out);
+      }
+      #lane-ease-spring .puck {
+        transition-timing-function: var(--ease-spring);
+      }
+      #lane-ease-linear .puck {
+        transition-timing-function: var(--ease-linear);
+      }
+      .easing-lanes .puck {
+        transition-duration: var(--dur-slow);
+        background: var(--ok);
+      }
+
+      /* ------------------------------------------------------ R19 pairing */
+
+      .pairing {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+      }
+
+      .pair-card {
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: 16px;
+        background: var(--panel);
+      }
+
+      .pair-card h3 {
+        font-size: 0.85rem;
+        margin: 0 0 4px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .pair-card p {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+
+      .chip-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        background: var(--panel-2);
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+
+      /* Datasheet card: only --dur-fast + --ease-out is legal per R19. */
+      #datasheet-demo .chip {
+        transition:
+          background-color var(--dur-fast) var(--ease-out),
+          border-color var(--dur-fast) var(--ease-out),
+          transform var(--dur-fast) var(--ease-out);
+      }
+      #datasheet-demo .chip:hover,
+      #datasheet-demo .chip.is-hit {
+        background: var(--act-bg);
+        border-color: var(--act-line);
+        color: var(--act);
+      }
+
+      /* Learn card: full set, on purpose, to contrast with the above. */
+      #learn-demo .chip {
+        transition:
+          background-color var(--dur-slow) var(--ease-spring),
+          border-color var(--dur-slow) var(--ease-spring),
+          transform var(--dur-slow) var(--ease-spring);
+      }
+      #learn-demo .chip:hover,
+      #learn-demo .chip.is-hit {
+        background: var(--ok-line);
+        border-color: var(--ok);
+        color: var(--ok);
+        transform: translateY(-3px) scale(1.04);
+      }
+
+      /* --------------------------------------------------- teaching case */
+
+      .teach-wrap {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .teach-rail {
+        position: relative;
+        flex: 1 1 320px;
+        min-inline-size: 220px;
+        block-size: 64px;
+        border-block-end: 2px solid var(--line-2);
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: var(--muted);
+        padding-inline: 4px;
+      }
+
+      .teach-mark {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        transform: translateY(11px);
+      }
+
+      .teach-mark::before {
+        content: '';
+        inline-size: 1px;
+        block-size: 8px;
+        background: var(--line-2);
+      }
+
+      .teach-puck {
+        position: absolute;
+        inset-block-end: -11px;
+        inset-inline-start: 0;
+        inline-size: 22px;
+        block-size: 22px;
+        margin-inline-start: -11px;
+        border-radius: 50%;
+        background: var(--ramp-melt);
+        border: 2px solid var(--panel);
+        box-shadow: 0 0 0 1px var(--line-2);
+        /* The one slow, deliberate transition on this page: temperature is
+           a continuous physical quantity moving through a phase change, and
+           the point of the animation is that a viewer follows it happening,
+           not that it "finishes." --dur-deliberate + --ease-in-out: slow
+           in, slow-ish settle, no linear robotic feel and no spring bounce
+           (a bounce here would misrepresent a physical transition as
+           springy, which it is not). */
+        transition: inset-inline-start var(--dur-deliberate) var(--ease-in-out);
+      }
+
+      .teach-rail[data-state='glass'] .teach-puck {
+        inset-inline-start: 4%;
+      }
+      .teach-rail[data-state='rubber'] .teach-puck {
+        inset-inline-start: 50%;
+      }
+      .teach-rail[data-state='melt'] .teach-puck {
+        inset-inline-start: 92%;
+      }
+
+      .teach-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: none;
+      }
+
+      .teach-btn {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        background: var(--panel);
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+
+      .teach-btn.is-current {
+        border-color: var(--act);
+        color: var(--act);
+        background: var(--act-bg);
+      }
+
+      .teach-caption {
+        font-size: 0.82rem;
+        color: var(--muted);
+        max-inline-size: 62ch;
+        margin-block-start: 14px;
+      }
+
+      .teach-caption .val {
+        color: var(--ink-2);
+        font-family: var(--font-num);
+      }
+
+      /* --------------------------------------------------- reduced motion */
+
+      .rm-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-block-end: 16px;
+      }
+
+      .rm-status {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .rm-status b {
+        color: var(--ink-2);
+      }
+
+      #rm-log {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-family: var(--font-num);
+        min-block-size: 1.6em;
+      }
+
+      .replay-btn {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        color: var(--muted);
+        background: none;
+        cursor: pointer;
+      }
+
+      .replay-btn:hover {
+        color: var(--act);
+        border-color: var(--act);
+      }
+
+      @media (max-width: 480px) {
+        .lane-label {
+          inline-size: auto;
+        }
+        .teach-controls {
+          flex-direction: row;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="labbar">
+      <div class="wrap">
+        <div class="labbrand">مشخصات حرکت <small>FE-0 · Agent C</small></div>
+        <div class="spacer"></div>
+        <a class="pill" href="./index.html">بازگشت</a>
+        <span id="theme-slot"></span>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <h1>یک نظام حرکتی، برای هر دو رویه</h1>
+      <p class="lede">
+        دیتاشیت رویه‌ای محدود دارد؛ رویه یادگیری رویه‌ای است که حرکت در آن معنا می‌سازد (R19). این
+        صفحه پنج مدت‌زمان و چهار منحنی شتاب را که در
+        <code dir="ltr">tokens/motion.css</code> تعریف شده‌اند کنار هم نشان می‌دهد، به‌همراه یک
+        نمونه واقعی از «انیمیشن آموزشی» و کلیدی برای شبیه‌سازی حالت کاهش حرکت.
+      </p>
+
+      <!-- ============================================================ -->
+      <section id="durations">
+        <h2>مدت‌زمان‌ها</h2>
+        <p class="sec-note">
+          یک منحنی ثابت (<code dir="ltr">--ease-out</code>) روی پنج مدت‌زمان متفاوت. دکمه را بزنید
+          و تفاوت سرعت را ببینید.
+        </p>
+        <div class="lanes">
+          <div class="lane" id="lane-instant">
+            <div class="lane-label"><b dir="ltr">80ms</b>--dur-instant</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-fast">
+            <div class="lane-label"><b dir="ltr">160ms</b>--dur-fast</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-base">
+            <div class="lane-label"><b dir="ltr">240ms</b>--dur-base</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-slow">
+            <div class="lane-label"><b dir="ltr">400ms</b>--dur-slow</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-deliberate">
+            <div class="lane-label"><b dir="ltr">700ms</b>--dur-deliberate</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+        </div>
+        <p style="margin-block-start: 16px">
+          <button class="teach-btn" id="play-durations" type="button">پخش هم‌زمان</button>
+        </p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="easings" class="easing-lanes">
+        <h2>منحنی‌های شتاب</h2>
+        <p class="sec-note">
+          یک مدت‌زمان ثابت (<code dir="ltr">--dur-slow</code>، ۴۰۰ میلی‌ثانیه)، چهار منحنی متفاوت.
+          <code dir="ltr">--ease-spring</code> تنها برای رویه یادگیری مجاز است، هرگز برای دیتاشیت.
+        </p>
+        <div class="lanes">
+          <div class="lane" id="lane-ease-out">
+            <div class="lane-label"><b dir="ltr">ease-out</b>ورود UI</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-ease-inout">
+            <div class="lane-label"><b dir="ltr">ease-in-out</b>تغییر حالت</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-ease-spring">
+            <div class="lane-label"><b dir="ltr">ease-spring</b>فقط Learn</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+          <div class="lane" id="lane-ease-linear">
+            <div class="lane-label"><b dir="ltr">linear</b>مقدار پیوسته</div>
+            <div class="track"><div class="puck"></div></div>
+          </div>
+        </div>
+        <p style="margin-block-start: 16px">
+          <button class="teach-btn" id="play-easings" type="button">پخش هم‌زمان</button>
+        </p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="r19">
+        <h2>محدود در برابر پویا — R19 در عمل</h2>
+        <p class="sec-note">
+          دو کارت، دو نظام حرکتی متفاوت. روی هر تراشه هاور کنید یا آن را لمس کنید.
+        </p>
+        <div class="pairing">
+          <div class="pair-card" id="datasheet-demo">
+            <h3>دیتاشیت</h3>
+            <p>فقط <code dir="ltr">--dur-fast</code> + <code dir="ltr">--ease-out</code>.</p>
+            <div class="chip-row">
+              <button class="chip" type="button">چگالی</button>
+              <button class="chip" type="button">MFI</button>
+              <button class="chip" type="button">Tg</button>
+            </div>
+          </div>
+          <div class="pair-card" id="learn-demo">
+            <h3>یادگیری</h3>
+            <p>مجموعه کامل — اینجا <code dir="ltr">--ease-spring</code> با <code dir="ltr"
+                >--dur-slow</code
+              >.</p>
+            <div class="chip-row">
+              <button class="chip" type="button">چگالی</button>
+              <button class="chip" type="button">MFI</button>
+              <button class="chip" type="button">Tg</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="teaching">
+        <h2>نمونه انیمیشن آموزشی</h2>
+        <p class="sec-note">
+          گذر فاز LDPE با تغییر دما — دقیقاً همان چیزی که «شبیه‌ساز حالت فیزیکی» رویه یادگیری قرار
+          است نشان دهد (<code dir="ltr">lab/scale.js</code>). مقادیر واقعی و «unsourced»‌اند، مثل
+          بقیه این پروژه؛ چیزی ساختگی نیست.
+        </p>
+        <div class="teach-wrap">
+          <div class="teach-controls">
+            <button class="teach-btn is-current" data-state="glass" type="button">شیشه‌ای</button>
+            <button class="teach-btn" data-state="rubber" type="button">لاستیکی</button>
+            <button class="teach-btn" data-state="melt" type="button">مذاب</button>
+          </div>
+          <div class="teach-rail" id="teach-rail" data-state="glass">
+            <div class="teach-mark">Tg <span dir="ltr" class="num">-110°C</span></div>
+            <div class="teach-mark">—</div>
+            <div class="teach-mark">Tm <span dir="ltr" class="num">105–115°C</span></div>
+            <div class="teach-puck"></div>
+          </div>
+        </div>
+        <p class="teach-caption">
+          مدت‌زمان این حرکت <span class="val" dir="ltr">700ms</span> است
+          (<code dir="ltr">--dur-deliberate</code>) — کندتر از هر تراشه یا دکمه دیگر روی این صفحه،
+          چون چیزی که نشان می‌دهد یک رویداد لحظه‌ای نیست: دمایی که پلیمر از حالت سخت و شکننده
+          (شیشه‌ای) به حالت انعطاف‌پذیر (لاستیکی) تغییر فاز می‌دهد. اگر این حرکت به‌سرعت
+          <code dir="ltr">--dur-fast</code> اجرا شود، چشم نمی‌تواند گذار را دنبال کند و فقط یک
+          جهش می‌بیند — دقیقاً چیزی که این توکن برایش ساخته نشده.
+        </p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section id="reduced-motion">
+        <h2>حالت کاهش حرکت</h2>
+        <p class="sec-note">
+          این کلید <code dir="ltr">prefers-reduced-motion</code> واقعیِ سیستم‌عامل را عوض نمی‌کند —
+          کلاس <code dir="ltr">.motion-reduced-sim</code> را (تعریف‌شده در
+          <code dir="ltr">tokens/motion.css</code>) روی صفحه اضافه/حذف می‌کند، که همه توکن‌های مدت‌زمان
+          را به <code dir="ltr">0.01ms</code> فشرده می‌کند — نه <code dir="ltr">0</code> و نه
+          <code dir="ltr">none</code>، چون یک انتقال با مدت صفر هرگز <code dir="ltr"
+            >transitionend</code
+          > را شلیک نمی‌کند و کدی که منتظر آن رویداد است برای کاربرانِ کاهش‌حرکت برای همیشه گیر
+          می‌کند.
+        </p>
+        <div class="rm-row">
+          <button class="teach-btn" id="rm-toggle" type="button">فعال‌سازی شبیه‌سازی</button>
+          <button class="replay-btn" id="rm-replay" type="button">پخش دوباره پاک (بالا)</button>
+          <span class="rm-status">وضعیت: <b id="rm-state">حرکت کامل</b></span>
+        </div>
+        <div id="rm-log">— هنوز رویدادی ثبت نشده —</div>
+      </section>
+    </main>
+
+    <footer class="labfoot wrap">
+      FE-0 · Agent C — motion.css / motion.html · نسخه بررسی داخلی، بدون کامیت
+    </footer>
+
+    <script type="module">
+      import { initTheme, themeButton } from './theme.js';
+
+      initTheme();
+      document.getElementById('theme-slot').replaceWith(themeButton());
+
+      // ---- size the lane tracks so the puck has somewhere to travel -----
+      function sizeTracks() {
+        document.querySelectorAll('.track').forEach((t) => {
+          t.style.setProperty('--track-w', t.clientWidth + 'px');
+        });
+      }
+      sizeTracks();
+      window.addEventListener('resize', sizeTracks);
+
+      // ---- duration / easing race: toggle .at-end on all tracks ---------
+      function playGroup(selector) {
+        const tracks = document.querySelectorAll(selector + ' .track');
+        tracks.forEach((t) => t.classList.remove('at-end'));
+        // force reflow so the removal above is committed before re-adding
+        // eslint-disable-next-line no-unused-expressions
+        void document.body.offsetHeight;
+        tracks.forEach((t) => t.classList.add('at-end'));
+      }
+
+      document.getElementById('play-durations').addEventListener('click', () => {
+        playGroup('#durations');
+      });
+      document.getElementById('play-easings').addEventListener('click', () => {
+        playGroup('#easings');
+      });
+
+      // click a chip to trigger its hover-equivalent state without a mouse
+      document.querySelectorAll('.chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          chip.classList.add('is-hit');
+          setTimeout(() => chip.classList.remove('is-hit'), 900);
+        });
+      });
+
+      // ---- teaching animation: three-state rail --------------------------
+      const rail = document.getElementById('teach-rail');
+      document.querySelectorAll('.teach-controls .teach-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document
+            .querySelectorAll('.teach-controls .teach-btn')
+            .forEach((b) => b.classList.remove('is-current'));
+          btn.classList.add('is-current');
+          rail.dataset.state = btn.dataset.state;
+        });
+      });
+
+      // ---- reduced-motion simulation toggle ------------------------------
+      const rmToggle = document.getElementById('rm-toggle');
+      const rmState = document.getElementById('rm-state');
+      const rmLog = document.getElementById('rm-log');
+      let rmOn = false;
+
+      rmToggle.addEventListener('click', () => {
+        rmOn = !rmOn;
+        document.documentElement.classList.toggle('motion-reduced-sim', rmOn);
+        rmToggle.textContent = rmOn ? 'خاموش کردن شبیه‌سازی' : 'فعال‌سازی شبیه‌سازی';
+        rmState.textContent = rmOn ? 'کاهش حرکت (شبیه‌سازی‌شده)' : 'حرکت کامل';
+      });
+
+      document.getElementById('rm-replay').addEventListener('click', () => {
+        playGroup('#durations');
+      });
+
+      // Proof that transitionend still fires under the 0.01ms collapse —
+      // listen on the slowest lane's puck, which is the one most likely to
+      // reveal a hang if this were done wrong (e.g. via `transition: none`).
+      const witness = document.querySelector('#lane-deliberate .puck');
+      witness.addEventListener('transitionend', (e) => {
+        if (e.propertyName !== 'transform') return;
+        const ms = Math.round(e.elapsedTime * 1000);
+        rmLog.textContent =
+          'transitionend شلیک شد — transform ، ' +
+          ms +
+          'ms طول کشید' +
+          (rmOn ? ' (کاهش‌یافته)' : '');
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+---
+// One card, two consumers: the homepage's browse preview and the catalog's
+// full grid. Reuses .coverage-bar's visual language from datasheet.css
+// (same bar, same --accent fill) rather than inventing a second coverage
+// indicator style — but not CoverageBadge.astro itself, whose full sentence
+// ("N of M values sourced") doesn't fit a card and whose prop shape
+// (totalValues/citedValues/coveragePct) isn't what the list endpoint
+// returns; the list only ever carries the single percentage.
+import type { Locale } from '../../i18n/config';
+import type { MaterialListItem } from '../../lib/api/types';
+
+interface Props {
+  material: MaterialListItem;
+  locale: Locale;
+}
+
+const { material, locale } = Astro.props;
+const name = locale === 'fa' ? material.nameFa : material.nameEn;
+const barWidth = Math.max(material.citationCoverage, 1.5);
+---
+
+<a
+  class="material-card"
+  href={`/${locale}/m/${material.slug}/`}
+  data-testid="material-card"
+  data-name-fa={material.nameFa}
+  data-name-en={material.nameEn}
+  data-code={material.code ?? ''}
+  data-family={material.family}
+>
+  <div class="material-card-head">
+    {
+      material.code && (
+        <span class="material-card-code" dir="ltr">
+          {material.code}
+        </span>
+      )
+    }
+    <span class="material-card-name">{name}</span>
+  </div>
+  <div class="coverage-bar material-card-bar"><i style={`inline-size:${barWidth}%`}></i></div>
+</a>

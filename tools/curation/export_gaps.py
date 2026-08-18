@@ -78,7 +78,12 @@ GAPS_QUERY = """
         pv.value_min,
         pv.value_max,
         pv.value_typical,
-        pv.value_text,
+        -- Resolved to one string for the read-only current_value column.
+        -- Prefers Persian, the language these sheets are curated in, and
+        -- falls back to English then to the deprecated single column
+        -- (db/migrations/0030), so rows written before and after the split
+        -- both render.
+        COALESCE(pv.value_text_fa, pv.value_text_en, pv.value_text) AS value_text,
         pv.value_enum,
         pv.value_bool
     FROM property_value pv
@@ -113,9 +118,15 @@ GAPS_MISSING_QUERY = """
         NULL::boolean          AS value_bool
     FROM material m
     JOIN field f ON f.id = m.field_id
+    JOIN family fam ON fam.id = m.family_id
     CROSS JOIN property_definition pd
     WHERE (%(material_slug)s::text IS NULL OR m.slug = %(material_slug)s)
+      -- Scoping is ANDed across both levels (db/seeds/0008_property_scoping.sql):
+      -- applies_to_fields is the coarse melt-vs-cure split, applies_to_families
+      -- the finer semi-crystalline-vs-amorphous one that field cannot express.
+      -- An empty array means "no restriction at that level".
       AND (pd.applies_to_fields = '{}' OR f.key = ANY(pd.applies_to_fields))
+      AND (pd.applies_to_families = '{}' OR fam.key = ANY(pd.applies_to_families))
       AND (%(preset_keys)s::text[] IS NULL OR pd.key = ANY(%(preset_keys)s))
       AND NOT EXISTS (
           SELECT 1 FROM property_value pv

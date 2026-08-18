@@ -5,7 +5,8 @@ it looks_. Answer after each `[Answer]:` tag.
 
 Sections A and B block FE-0 (visual identity). Section C blocks FE-1 (app shell)
 and is the most expensive group to answer late. Sections D–F block individual
-screens and can wait a little.
+screens and can wait a little. Wherever "X) Other" is offered, write your own
+answer as free text after the tag.
 
 ---
 
@@ -43,7 +44,7 @@ C) Polypedia is its own brand, independent of the association's identity
 
 D) There is no real brand yet — this is the moment to create one
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 C, we will use their logo for addvertisement on the site but i want a seperate brand
@@ -62,7 +63,7 @@ C) A commercial Persian typeface — most distinctive, costs money, needs a lice
 
 D) You choose; show me the same page set in three faces and I will pick
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: IRANSansX 'if not possible use estedad'
 
@@ -79,7 +80,7 @@ B) Latin numerals for all measured values and units; Persian numerals only in bo
 
 C) Latin numerals everywhere, including prose
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: C
 
@@ -95,7 +96,7 @@ B) Keep both, light as default — signals "reference work"
 
 C) Light only, at least for v1 — halves the design and QA cost of every screen
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: B
 
@@ -114,7 +115,7 @@ C) Richness — strong colour, illustration, 3D, generous imagery. Premium as in
 
 D) Mixed on purpose: A for the Datasheet surface, C for the Learn surface, and the contrast between them is itself the identity
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 A for datasheet, B for general and in between parts, C for learning. but mostly i meant B
@@ -136,7 +137,7 @@ C) A small warning-coloured marker, treating uncited data as a defect to be fixe
 
 D) No marker at all on uncited values; only _cited_ values get a marker, so the marker is a positive signal that grows over time
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 A, also say in progress or something like we are working on it in persian
@@ -156,7 +157,7 @@ C) Link to a public "how to contribute" page (a real open-contribution model, la
 
 D) Do nothing for readers, but when _you_ are logged in it becomes a direct link into the curation flow
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: C
 
@@ -174,7 +175,7 @@ B) One long page with a sticky section navigator down the side — better for sc
 
 C) One long page on desktop, tabs on mobile
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 aren't we using tabs for learing and datasheet to be seperated? if not introduce me to some examples on construction i can not decide which for now! two tabs, or one long tab with a button to learnin env, or you have other ideas... which i hope.
@@ -196,7 +197,7 @@ D) A single text box that parses what you type ("tg>100 tensile 40-80")
 
 E) A + D: sliders as the primary interface, with a text field for people who know what they want
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 E+C, E is the main searching env, but we have c at the end of each polymers entry, along side the quick comparison tool
@@ -212,7 +213,7 @@ B) The material plus the properties you filtered on, so you can see how each one
 
 C) A full comparison table of all results across the filtered properties — results _are_ a comparison
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 B with the button to see each by clickin on them or a full comparison between all of them using comparison tool
@@ -234,7 +235,7 @@ C) Move to **Next.js** — the heaviest option, real SSR, but it assumes a Node 
 
 D) You decide and justify it
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: D
 
@@ -259,7 +260,7 @@ C) A static host + CDN — Cloudflare Pages, which you are already on
 
 D) Still undecided — assume static-friendly and keep options open
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 i willl first use a free or static one, but later probably will move to a domestic provider(stay toned and keep the option), vps abroad is not on the table
@@ -275,7 +276,7 @@ B) `/ldpe` for Persian with `?lang=en` — simpler, worse for indexing
 
 C) Separate subdomains
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: A
 
@@ -294,7 +295,7 @@ C) Machine-translate on the fly and label it as machine-translated
 
 D) Do not offer English on a material until its English content exists
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 add english one to database
@@ -312,7 +313,7 @@ B) Tests for logic and the value atom only; screens are verified by eye
 
 C) No frontend tests; CI's existing gates are enough
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: A
 
@@ -331,7 +332,7 @@ B) You and me, with a target date (which is: ______)
 
 C) Others will join and need to be able to pick it up
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: A
 
@@ -349,7 +350,7 @@ B) Reasonable effort, no hard budget
 
 C) Not a concern — the audience is on decent connections
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 in that model, i was planing the same thing i want you to do, first thing is datasheet and must be as fast as possible, then they go to learning tools, when they decide to go there you should load heavy stuff! so we need those tools and they are a signature, but also they must be wanted not always out of the box

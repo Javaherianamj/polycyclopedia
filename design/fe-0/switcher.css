@@ -1,0 +1,63 @@
+/* Not part of any treatment — the harness that lets you flip between them.
+   Deliberately neutral so it does not contaminate the comparison. */
+
+.switcher {
+  position: fixed;
+  inset-block-end: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(20, 20, 22, 0.9);
+  box-shadow: 0 10px 34px -8px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.switcher a {
+  display: block;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: #b9b9be;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.switcher a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.switcher a[aria-current='page'] {
+  color: #14141d;
+  background: #fff;
+  font-weight: 600;
+}
+
+.switcher .sw-sep {
+  inline-size: 1px;
+  block-size: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  margin-inline: 3px;
+}
+
+@media (max-width: 560px) {
+  .switcher {
+    /* physical, to override the physical `left: 50%` above — mixing logical
+       and physical insets here is how this got misplaced the first time */
+    left: 10px;
+    right: 10px;
+    transform: none;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}

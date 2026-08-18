@@ -1,0 +1,102 @@
+---
+// R1: "every screen that shows a property value goes through this
+// component". `ValueAtom.astro` (FE-2) is that component for the
+// datasheet, but its markup is a whole label+value ROW (`.prop`) — right
+// for a property grid, wrong for a number sitting mid-sentence in an
+// article. This is the same value+mark+popover FRAGMENT `ValueAtom.astro`
+// renders internally, extracted so it can sit inline, reusing the exact
+// same CSS classes and native-Popover-API mechanics (value-atom.css) —
+// not a parallel implementation of provenance marking, just without the
+// row/label wrapper around it.
+//
+// Every number `LearnNotebook.astro` splices into the NOTEBOOK article's
+// prose (a `liveValue` segment, types.ts) goes through this component —
+// the article's content module never states a number itself (see
+// content/notebook/types.ts's `ProseSegment` header).
+import type { PropertyValue } from '../../lib/api/types';
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import { formatLocator, provenanceState } from '../value-atom/logic';
+
+interface Props {
+  value: PropertyValue | null;
+  locale: Locale;
+  /** Pre-formatted display override — used for the one derived (unit-
+   * converted) reading this article shows (°F from °C, `lib/notebook/
+   * units.ts`). When set, `value.display` is ignored for the visible
+   * text but `value.citations`/state still drive the mark, since the
+   * conversion carries the SAME provenance as the number it was derived
+   * from (never a second, independent fact). */
+  displayOverride?: string;
+}
+
+const { value, locale, displayOverride } = Astro.props;
+const state = provenanceState(value);
+const uid = crypto.randomUUID();
+const popId = `pop-nbv-${uid}`;
+const anchorName = `--nbv-anchor-${uid}`;
+---
+
+{
+  state === 'missing' ? (
+    <span class="nbv-missing" data-testid="inline-cited-value-missing">
+      {t(locale, 'value.missing')}
+    </span>
+  ) : (
+    <span class="nbv" data-testid="inline-cited-value">
+      <span class="num" dir="ltr">
+        {displayOverride ?? value!.display}
+      </span>
+      <button
+        type="button"
+        class={`mark mark-${state}`}
+        popovertarget={popId}
+        aria-label={state === 'cited' ? t(locale, 'value.sourced') : t(locale, 'value.uncited')}
+        style={`anchor-name: ${anchorName}`}
+        data-testid="inline-cited-value-mark"
+      >
+        {state === 'cited' ? '§' : '?'}
+      </button>
+      <div id={popId} class="pop" popover="auto" style={`position-anchor: ${anchorName}`}>
+        {state === 'cited' ? (
+          <>
+            <b>{t(locale, 'value.sourced')}</b>
+            <ul class="citation-list">
+              {value!.citations.map((citation) => (
+                <li class="citation-entry">
+                  <span>{citation.sourceTitle}</span>
+                  <span class="pop-meta" dir="ltr">
+                    {citation.sourceEdition && `${t(locale, 'value.citation.edition')} ${citation.sourceEdition} · `}
+                    {formatLocator(citation.locator, locale)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <b>{t(locale, 'value.uncited')}</b>
+            <span>{t(locale, 'value.uncitedLong')}</span>
+          </>
+        )}
+      </div>
+    </span>
+  )
+}
+
+<style>
+  /* Only the inline WRAPPER is new — .mark/.pop/.pop-meta/.citation-list/
+     .citation-entry all come from value-atom.css (imported once, globally,
+     in global.css) so this component stays visually identical to every
+     other provenance mark on the site. */
+  .nbv {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+
+  .nbv-missing {
+    color: var(--muted-2);
+    font-size: var(--fs-small);
+  }
+</style>

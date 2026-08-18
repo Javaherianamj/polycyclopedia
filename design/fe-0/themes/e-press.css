@@ -1,0 +1,324 @@
+/* E — PRESS   ← the merge you asked for, and the proposed house style
+ *
+ *   structure & row cards ....... Studio (B)
+ *   paper ground ................ Handbook (A) warmed toward Terra (D)
+ *   entry: code, title, legend .. Handbook (A) — the bordered fact rail, serif code
+ *   the Learn door .............. Atlas (C) — a dark plate, not a soft tint
+ *   colour ...................... none of them: every hue below has one job
+ *
+ * COLOUR IS SEMANTIC. That is the answer to "colours must have meanings, not
+ * just dropped". Five hues, five jobs, and a hue is never used decoratively
+ * where it carries a meaning elsewhere:
+ *
+ *   graphite  --ink        structure, navigation, the door out of the datasheet
+ *   teal      --accent     measurement. Numbers, and only numbers, are teal
+ *   sage      --ok         provenance satisfied. Cited values, coverage bar
+ *   grey      --track      provenance absent. Deliberately colourless — the
+ *                          absence of colour IS the meaning (D21)
+ *   clay      --act        something you can do. Contribute, explore, go
+ *   ochre     --warn       reserved: out-of-range, superseded. UNUSED on a
+ *                          healthy page, which is why you do not see it here
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-display-fa: 'Estedad Variable', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  /* one numeral voice across the whole product — the Handbook charm, carried
+     into the data column instead of stopping at the masthead */
+  --font-num: 'Newsreader', Georgia, serif;
+
+  --fs-body: 15.5px;
+  --lh-body: 1.9;
+  --fs-h1: 2.2rem;
+  --fw-h1: 650;
+  --fs-h2: 1.14rem;
+  --fw-h2: 650;
+  --fs-label: 0.93rem;
+  --fs-value: 1.2rem;
+  --fw-value: 500;
+  --num-tracking: 0.005em;
+
+  /* paper: warmer than Studio, calmer than Terra */
+  --bg: #f9f6ef;
+  --panel: #fffdf7;
+  --pop-bg: #fffdf7;
+  --bar-bg: rgba(249, 246, 239, 0.86);
+  --note-bg: #f2eee3;
+  --chip: #eee8da;
+  --track: #e3ddcd;
+
+  --ink: #22282a;
+  --ink-2: #4a5153;
+  --muted: #6e7272; /* was #7c8180 — darkened for 4.5:1 on --bg (contrast audit) */
+  --muted-2: #777064; /* was #a49e93 — darkened for 4.5:1 on --bg (contrast audit) */
+
+  /* the five jobs */
+  --accent: #2f5d62; /* measurement */
+  --accent-soft: #dde8e6;
+  --accent-soft-2: #a6c0bd;
+  --ok: #536e56; /* provenance satisfied — #5f7f63 → #5a785e (AA on --bg) → #536E56.
+                    The last step is for the sourced mark itself: `§` is 0.62rem
+                    sage on --ok-soft, so it needs the full 4.5:1, not 3:1.
+                    Now 4.53 on --ok-soft, 5.21 on --bg, 5.53 on --panel. */
+  --ok-soft: #e0e9df;
+  --act: #9f6246; /* something you can do — was #a8674a, darkened for 4.5:1 on --bg */
+  --act-soft: #f0e0d6;
+  --warn: #926a23; /* reserved, unused here — was #b1802a, darkened for 4.5:1 on --bg */
+
+  --accent-2: var(--act);
+
+  --hairline: 1px solid #e7e0d2;
+  --rule: 1px solid #ddd4c1;
+
+  --row-bg: #fffdf7;
+  --row-bg-hover: #fffefa;
+  --row-border: 1px solid #efe8da;
+  --row-border-hover: #d9d0bd;
+  --row-pad: 13px 18px;
+  --row-gap: 7px;
+  --sec-gap: 50px;
+  --sec-head-gap: 18px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(34, 40, 42, 0.04), 0 10px 26px -14px rgba(34, 40, 42, 0.16);
+  --shadow-2: 0 14px 36px -10px rgba(34, 40, 42, 0.22);
+
+  --t-fast: 0.19s cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-pop: opacity 0.16s ease, transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1), visibility 0.16s;
+
+  --measure-page: 1120px;
+  --pad-x: 28px;
+  --bar-h: 62px;
+
+  --bridge-bg: #22282a;
+  --bridge-border: 1px solid #22282a;
+}
+
+/* ---------------------------------------------- entry, taken from Handbook */
+
+.hero-code {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--act);
+  margin-block-end: 4px;
+}
+
+.hero h1 {
+  letter-spacing: -0.025em;
+}
+
+.hero-en {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+/* the legend: a rule, not a card. This is the Handbook detail you liked. */
+.hero-facts {
+  background: transparent;
+  border: 0;
+  border-inline-start: var(--rule);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 2px 22px 2px 0;
+  padding-inline: 22px 0;
+}
+
+.hero-facts dl {
+  gap: 11px 16px;
+}
+
+.hero-facts dt {
+  font-size: 0.8rem;
+}
+
+.hero-facts dd {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------------------- sections */
+
+.sec-head {
+  border-block-end: var(--rule);
+}
+
+.sec-head h2 {
+  position: relative;
+  padding-inline-start: 13px;
+}
+
+.sec-head h2::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 5px;
+  inline-size: 3px;
+  border-radius: 999px;
+  background: var(--accent-soft-2);
+}
+
+.prop:hover {
+  box-shadow: var(--shadow-1);
+}
+
+/* -------------------------------------------------------- colour with jobs */
+
+/* measurement is teal, and nothing else is */
+.value-num {
+  color: var(--accent);
+}
+
+/* provenance satisfied is sage */
+.mark-sourced {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+/* provenance absent is colourless on purpose */
+.mark-unsourced {
+  background: var(--track);
+  color: var(--muted-2);
+}
+
+.coverage-bar i {
+  background: var(--ok);
+}
+
+/* things you can do are clay */
+.value-cta,
+.bridge-go,
+.info:hover {
+  color: var(--act);
+}
+
+.info:hover {
+  border-color: var(--act);
+}
+
+.surface:not(.is-on) {
+  color: var(--act);
+  border-color: #e6dcd2;
+}
+
+.tail-card:hover {
+  color: var(--act);
+  border-color: var(--act);
+}
+
+/* ------------------------------------------ the Learn door, from Atlas (C) */
+
+.bridge {
+  color: #f2efe6;
+  padding: 16px 20px;
+}
+
+.bridge:hover {
+  background: #2c3336;
+}
+
+.bridge .bridge-hint {
+  color: #a8b2ae;
+}
+
+.bridge .bridge-go {
+  color: #d9a184;
+  font-size: 1.1rem;
+}
+
+.sec-note {
+  border-inline-start-color: var(--accent-soft-2);
+}
+
+/* ==========================================================================
+   DARK — "ember"
+   Not black. The paper is fired rather than switched off: a warm brown ground
+   with the same five jobs doing the same five things, lifted into a range that
+   works on a dark surface.
+
+   The Learn door goes DARKER than the page instead of lighter, so it still
+   reads as a door and not as a highlight.
+   ========================================================================== */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #241d17;
+  --panel: #2d251e;
+  --pop-bg: #322921;
+  --bar-bg: rgba(36, 29, 23, 0.86);
+  --note-bg: #2f271f;
+  --chip: #3a3128;
+  --track: #423830;
+
+  --ink: #f2e9dd;
+  --ink-2: #d8cbba;
+  --muted: #a6907c;
+  --muted-2: #9d8977; /* was #7f6c5b — lightened for 4.5:1 on --panel (contrast audit; see report re: rule 3 exception) */
+
+  /* the same five jobs, lifted for a dark ground */
+  --accent: #7ab8b2; /* measurement */
+  --accent-soft: #24413f;
+  --accent-soft-2: #4d7370;
+  --ok: #93bb96; /* provenance satisfied */
+  --ok-soft: #2c3c2e;
+  --act: #e5a37b; /* something you can do */
+  --act-soft: #3d2c22;
+  --warn: #d6a544; /* still reserved, still unused */
+  --accent-2: var(--act);
+
+  --hairline: 1px solid #3b3128;
+  --rule: 1px solid #4d4034;
+
+  --row-bg: #2a221b;
+  --row-bg-hover: #30281f;
+  --row-border: 1px solid #3b3128;
+  --row-border-hover: #574839;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 26px -14px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 14px 36px -10px rgba(0, 0, 0, 0.6);
+
+  --bridge-bg: #14100b;
+  --bridge-border: 1px solid #302619;
+}
+
+:root[data-theme='dark'] .bridge:hover {
+  background: #1e1811;
+}
+
+:root[data-theme='dark'] .surface:not(.is-on) {
+  border-color: #4a3b2e;
+}
+
+:root[data-theme='dark'] .topbar {
+  border-block-end-color: #372e26;
+}
+
+/* ------------------------------------------------------------ theme button */
+
+.theme {
+  font-size: 0.8rem;
+  color: var(--muted);
+  border: var(--hairline);
+  border-radius: 999px;
+  padding: 5px 13px;
+  margin-inline-end: 8px;
+  transition: var(--t-fast);
+}
+
+.theme:hover {
+  color: var(--act);
+  border-color: var(--act);
+}

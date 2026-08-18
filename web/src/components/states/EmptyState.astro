@@ -1,0 +1,19 @@
+---
+// One of R4's four states. Slot-based: this component owns only the layout
+// (styling lives in global.css's .state-empty). Callers (FE-3, FE-4, ...)
+// supply their own copy through the default slot, since "empty" means
+// something different on a material page (D11: an invitation to
+// contribute) than on a search result list.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div class="state-empty">
+  <slot>{t(locale, 'state.empty')}</slot>
+</div>

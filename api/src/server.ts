@@ -6,6 +6,10 @@ import { registerHealthRoute } from './routes/health.js';
 import { registerMaterialsRoutes } from './routes/materials.js';
 import { registerPropertiesRoute } from './routes/properties.js';
 import { registerCoverageRoute } from './routes/coverage.js';
+import { registerCompareRoute } from './routes/compare.js';
+import { registerSourcesRoutes } from './routes/sources.js';
+import { registerSolventsRoutes } from './routes/solvents.js';
+import { registerHspCorrelationsRoutes } from './routes/hsp-correlations.js';
 import { badRequestError, internalError, notFoundError } from './errors.js';
 
 export interface BuildAppOptions {
@@ -65,6 +69,10 @@ export function buildApp(options: BuildAppOptions = {}): BuiltApp {
   registerMaterialsRoutes(app, pool, config);
   registerPropertiesRoute(app, pool);
   registerCoverageRoute(app, pool);
+  registerCompareRoute(app, pool);
+  registerSourcesRoutes(app, pool);
+  registerSolventsRoutes(app, pool);
+  registerHspCorrelationsRoutes(app, pool);
 
   return { app, pool, config };
 }

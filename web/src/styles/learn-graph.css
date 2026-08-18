@@ -1,0 +1,658 @@
+/* L3 — «شبکه» / GRAPH (lab-concepts-spec.md). Ported from design/fe-0/lab/
+ * graph.css onto this app's real token vocabulary (--fs-*, --r-*, --dur-x/
+ * --ease-x instead of graph.css's own single --t), the same adaptation
+ * learn-map.css already did for MAP. Class names are new (`.gnode-*`/
+ * `.graph-*` rather than FE-0's bare `.node-*`/`.gr-*`) only where a name
+ * collision with learn-map.css's own `.mchip`-family classes was possible —
+ * everywhere else this keeps FE-0's naming so the two files stay easy to
+ * compare side by side.
+ *
+ * SHAPE CARRIES MEANING, same as the prototype: rect/track = a cause you can
+ * push on, circle = a read-only derived quantity, hexagon = a terminal
+ * outcome. Colour stays inside the jobs the status palette already has:
+ *   --act(-bg/-line)  = a cause you can drag, and "this pathway is suited"
+ *   --ok(-line)       = the underlying property IS sourced on the datasheet
+ *   dashed --muted-2  = unsourced, or no datasheet row at all
+ * R34: none of this is --ramp-* — that scale is reserved for MAP's
+ * temperature encoding. Nothing on this page encodes a number as hue.
+ *
+ * THE MEASURED/TREND SPLIT (causal-graph.ts's header has the full account):
+ * every derived node shows TWO numbers, never blended into one — a real
+ * MEASURED value (real units, real provenance mark, from the bound
+ * material's own datasheet row) and an illustrative TREND value (a unitless
+ * 0-100 position on this page's own schematic scale, responding to the
+ * three draggable inputs). `.gnode-measured`/`.gnode-trend` and their panel
+ * equivalents `.graph-row-measured`/`.graph-row-trend` are visually
+ * distinct on purpose — different weight, different colour role — so the
+ * two are never mistaken for each other at a glance.
+ */
+
+.graph-body {
+  padding-block: 4px 12px;
+  display: grid;
+  gap: 22px;
+}
+
+/* --------------------------------------------------------------- hero bits */
+
+.graph-drag-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  margin: 0;
+}
+
+.graph-drag-hint b {
+  color: var(--act);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ the diagram */
+
+.graph-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 22px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .graph-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.graph-figure {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 6px;
+  min-inline-size: 0;
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 14px 4px;
+  font-size: var(--fs-micro);
+  color: var(--muted);
+}
+
+.graph-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-legend i {
+  display: inline-block;
+  inline-size: 11px;
+  block-size: 11px;
+  flex: none;
+}
+
+.graph-legend .gsw-cause {
+  border-radius: 3px;
+  background: var(--act-bg);
+  border: 1.5px solid var(--act);
+}
+
+.graph-legend .gsw-derived {
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+}
+
+.graph-legend .gsw-outcome {
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+}
+
+/* The SVG and its HTML puck-button overlays share this frame so percentage
+ * positioning lines up exactly (GraphIsland.tsx computes both from the same
+ * VB_W/VB_H viewBox) — the same trick MapIsland's frame + marker-button use. */
+.graph-svg-frame {
+  position: relative;
+  inline-size: 100%;
+  aspect-ratio: 1040 / 640;
+  touch-action: none;
+}
+
+.graph-svg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------- SVG node parts */
+
+.gnode-cause-track {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.gnode-label {
+  font-family: var(--font-body, inherit);
+  font-size: 12.5px;
+  fill: var(--ink);
+  text-anchor: middle;
+}
+
+.gnode-sub {
+  font-family: var(--font-body, inherit);
+  font-size: 10px;
+  fill: var(--muted);
+  text-anchor: middle;
+}
+
+.gnode-trend-val {
+  font-family: var(--font-num, inherit);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+  direction: ltr;
+}
+
+.gnode-caption {
+  font-family: var(--font-body, inherit);
+  font-size: 8.4px;
+  fill: var(--muted-2);
+  text-anchor: middle;
+  font-style: italic;
+}
+
+.gnode-derived-circle {
+  fill: var(--panel-2);
+  stroke: var(--line-2);
+  stroke-width: 1.6;
+}
+
+.gnode-outcome-hex {
+  fill: var(--panel-2);
+  stroke: var(--line-2);
+  stroke-width: 1.6;
+  transition:
+    fill var(--dur-fast, 160ms) var(--ease-out),
+    stroke var(--dur-fast, 160ms) var(--ease-out);
+}
+
+.gnode-outcome-hex.is-suited {
+  fill: var(--act);
+  stroke: var(--act);
+}
+
+.gnode.is-suited .gnode-label,
+.gnode.is-suited .gnode-sub {
+  fill: var(--on-phase, #fff);
+}
+
+.gmark-badge {
+  font-family: var(--font-num, inherit);
+  font-size: 8.5px;
+}
+
+.gmark-badge.st-sourced circle {
+  fill: none;
+  stroke: var(--ok);
+}
+
+.gmark-badge.st-sourced text {
+  fill: var(--ok);
+}
+
+.gmark-badge.st-unsourced circle,
+.gmark-badge.st-nodata circle {
+  fill: none;
+  stroke: var(--muted-2);
+  stroke-dasharray: 2 1.6;
+}
+
+.gmark-badge.st-unsourced text,
+.gmark-badge.st-nodata text {
+  fill: var(--muted-2);
+}
+
+/* edges */
+.gedge-arrow-fill {
+  fill: var(--line-2);
+}
+
+.gedge-path {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 1.6;
+}
+
+.gedge-path.sign-neg {
+  stroke-dasharray: 5 3;
+}
+
+.gedge-sign {
+  font-family: var(--font-num, inherit);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.gedge-sign.sign-pos {
+  fill: var(--ok);
+}
+
+.gedge-sign.sign-neg {
+  fill: var(--act);
+}
+
+.gedge-pulse {
+  fill: var(--act);
+  opacity: 0;
+}
+
+/* --------------------------------------------------- draggable puck button
+ * A real HTML <button role="slider">, not an SVG shape — same reasoning as
+ * MapIsland's marker (see that file's header): a fixed 44px CSS pointer
+ * target is trivial to guarantee here and fragile on an SVG circle scaled
+ * by a responsive viewBox, and native keyboard focus/:focus-visible is
+ * simpler to get right on a <button>. The SVG draws the vertical track
+ * line only (non-interactive, `.gnode-cause-track` above); this button
+ * supplies the touch target, the visible puck (via ::before), and all
+ * keyboard/pointer handling, positioned over the SVG frame by percentage.
+ */
+.graph-puck-btn {
+  position: absolute;
+  inline-size: 44px;
+  block-size: 44px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  cursor: grab;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+
+.graph-puck-btn:active {
+  cursor: grabbing;
+}
+
+.graph-puck-btn::before {
+  content: '';
+  inline-size: 22px;
+  block-size: 22px;
+  border-radius: 50%;
+  background: var(--act-bg);
+  border: 2px solid var(--act);
+  transition: filter var(--dur-fast, 160ms) var(--ease-out);
+}
+
+.graph-puck-btn:active::before,
+.graph-puck-btn.is-dragging::before {
+  filter: brightness(0.94);
+}
+
+.graph-puck-btn:focus-visible {
+  outline: none;
+}
+
+.graph-puck-btn:focus-visible::before {
+  outline: 3px solid var(--act);
+  outline-offset: 3px;
+}
+
+/* -------------------------------------------------------------- reading panel */
+
+.graph-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 16px;
+  position: sticky;
+  inset-block-start: 76px;
+}
+
+.graph-panel h2 {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.graph-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 8px;
+  padding-block: 10px;
+  border-block-start: 1px solid var(--line);
+}
+
+.graph-row:first-of-type {
+  border-block-start: 0;
+}
+
+.graph-row-name {
+  font-size: var(--fs-small);
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  grid-column: 1 / -1;
+}
+
+.graph-row-name .sym {
+  font-family: var(--font-num, inherit);
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  direction: ltr;
+}
+
+.graph-row-vals {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-block-start: 2px;
+}
+
+.graph-row-cell {
+  min-inline-size: 0;
+}
+
+.graph-row-cell-label {
+  display: block;
+  font-size: var(--fs-micro);
+  color: var(--muted-2);
+  margin-block-end: 2px;
+}
+
+.graph-row-measured {
+  font-family: var(--font-num, inherit);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  direction: ltr;
+  color: var(--ink);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.graph-row-measured.is-empty {
+  font-weight: 400;
+  font-size: var(--fs-caption);
+  color: var(--muted-2);
+  font-style: italic;
+  white-space: normal;
+}
+
+.graph-row-trend {
+  font-family: var(--font-num, inherit);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  direction: ltr;
+  color: var(--act);
+}
+
+.graph-row-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 15px;
+  block-size: 15px;
+  border-radius: 50%;
+  font-size: var(--fs-micro);
+  font-family: var(--font-num, inherit);
+  border: 1px solid var(--line-2);
+  flex: none;
+}
+
+.graph-row-mark.st-sourced {
+  color: var(--ok);
+  border-color: var(--ok-line, var(--ok));
+}
+
+.graph-row-mark.st-unsourced,
+.graph-row-mark.st-nodata {
+  color: var(--muted-2);
+  border-style: dashed;
+}
+
+.graph-row-tag {
+  grid-column: 1 / -1;
+  font-size: var(--fs-micro);
+  color: var(--muted-2);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-start: 4px;
+  position: relative;
+}
+
+/* the ⓘ affordance, per house convention (ValueAtom's own info button) */
+.graph-info {
+  position: static;
+  inline-size: 15px;
+  block-size: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  font-size: var(--fs-micro);
+  color: var(--muted);
+  font-style: normal;
+  flex: none;
+}
+
+.graph-info:hover,
+.graph-info:focus-visible {
+  color: var(--act);
+  border-color: var(--act);
+}
+
+.graph-info .pop {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: calc(100% + 8px);
+  inline-size: auto;
+  padding: 10px 12px;
+  font-size: var(--fs-caption);
+  line-height: 1.7;
+  font-style: normal;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: 0 14px 30px -12px rgb(10 14 26 / 35%);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity var(--dur-fast, 160ms) var(--ease-out),
+    transform var(--dur-fast, 160ms) var(--ease-out),
+    visibility var(--dur-fast, 160ms) var(--ease-out);
+  z-index: 30;
+}
+
+.graph-info:hover .pop,
+.graph-info:focus-visible .pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.graph-panel-note {
+  margin-block-start: 12px;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--line);
+  font-size: var(--fs-caption);
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------- outcomes strip */
+
+.graph-outcomes {
+  padding-block: 4px 8px;
+}
+
+.graph-outcomes h2 {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.graph-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .graph-outcome-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.goc-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  background: var(--panel);
+  transition:
+    border-color var(--dur-fast, 160ms) var(--ease-out),
+    background-color var(--dur-fast, 160ms) var(--ease-out);
+}
+
+.goc-card.is-suited {
+  border-color: var(--act-line, var(--act));
+  background: var(--act-bg, var(--panel-2));
+}
+
+.goc-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-block-end: 6px;
+  gap: 8px;
+}
+
+.goc-flag {
+  font-size: var(--fs-micro);
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px dashed var(--line-2);
+  color: var(--muted-2);
+  white-space: nowrap;
+}
+
+.goc-card.is-suited .goc-flag {
+  border-style: solid;
+  border-color: var(--act);
+  color: var(--act);
+}
+
+.goc-card p {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* -------------------------------------------------------------- closing note */
+
+.graph-closing {
+  border-block-start: 1px solid var(--line);
+  padding-block: 18px 8px;
+}
+
+.graph-closing p {
+  max-inline-size: 68ch;
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: 1.9;
+  margin: 0;
+}
+
+/* ----------------------------------------------------- accessible relations
+ * R30: "the graph must be comprehensible to a screen reader — consider an
+ * accessible parallel representation (e.g. a described list of the causal
+ * relations) rather than an unlabelled SVG." A native <details>/<summary> —
+ * no ARIA needed, keyboard-operable by default, collapsed so it costs
+ * sighted readers nothing but is one activation away for anyone using a
+ * screen reader or keyboard who wants the same graph as a sentence list
+ * instead of a diagram.
+ */
+.graph-relations {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--panel);
+  padding: 4px 16px;
+}
+
+.graph-relations summary {
+  padding-block: 12px;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.graph-relations-intro {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.graph-relations-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.graph-relations-list li {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  padding-inline-start: 10px;
+  border-inline-start: 2px solid var(--line-2);
+}
+
+/* ------------------------------------------------------------------ mobile
+ * R27: no horizontal overflow at 320/375/768. The figure already scales
+ * fluidly (aspect-ratio + inline-size:100%); only the panel needs to drop
+ * out of its sticky 320px column and stack under the figure.
+ */
+@media (max-width: 640px) {
+  .graph-panel {
+    position: static;
+  }
+
+  .graph-figure {
+    padding: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph-puck-btn::before,
+  .goc-card,
+  .gnode-outcome-hex {
+    transition: none !important;
+  }
+}

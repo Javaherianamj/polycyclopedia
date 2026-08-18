@@ -1,0 +1,539 @@
+/* Datasheet surface (FE-3). Ported from design/fe-0/base.css's hero,
+ * coverage, surfaces, rail, sec, bridge and tail rules -- all already
+ * designed and, for .rail specifically, already gate-tested including the
+ * FE-0 build-and-test fix for the grid-item min-inline-size bug that made
+ * mobile section navigation silently unreachable (see aidlc-docs/
+ * construction/fe-0/build-and-test.md §3). Values renamed from FE-0's
+ * --t-fast/--t-pop to the equivalent tokens/motion.css names.
+ */
+
+.hero {
+  padding-block: 28px 8px;
+}
+
+.hero-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 40px;
+  align-items: start;
+}
+
+.hero-code {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-block-end: 10px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display-fa);
+  font-size: var(--fs-h1);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.hero-en {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hero-overview {
+  margin-block: 18px 0;
+  max-inline-size: 62ch;
+  color: var(--ink-2);
+  line-height: 1.95;
+}
+
+.hero-facts {
+  background: var(--panel);
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-1);
+}
+
+.hero-facts dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 14px;
+  font-size: 0.86rem;
+}
+
+.hero-facts dt {
+  color: var(--muted);
+}
+
+.hero-facts dd {
+  margin: 0;
+  text-align: start;
+}
+
+/* ---------------------------------------------------------------- coverage */
+
+.coverage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block-start: 26px;
+}
+
+.coverage-bar {
+  position: relative;
+  flex: 1;
+  max-inline-size: 260px;
+  block-size: 6px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.coverage-bar i {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: block;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.coverage-text {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------------- grade slot */
+
+.grade-slot {
+  margin-block-start: 26px;
+}
+
+.grade-jump {
+  display: inline-block;
+  padding: 9px 18px;
+  border-radius: var(--r-pill);
+  border: var(--hairline);
+  font-size: 0.9rem;
+  color: var(--act);
+  background: var(--panel);
+  text-decoration: none;
+}
+
+.grade-jump:hover,
+.grade-jump:focus-visible {
+  border-color: var(--act);
+}
+
+/* ------------------------------------------------------------- main layout */
+
+.main {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 40px;
+  padding-block: 34px 60px;
+  align-items: start;
+}
+
+.rail {
+  position: sticky;
+  inset-block-start: calc(var(--bar-h) + 22px);
+}
+
+.rail ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  border-inline-start: var(--hairline);
+}
+
+.rail a {
+  display: block;
+  padding: 8px 14px;
+  font-size: 0.87rem;
+  color: var(--muted);
+  border-inline-start: 2px solid transparent;
+  margin-inline-start: -1px;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.rail a:hover {
+  color: var(--ink);
+}
+
+.rail a.on {
+  color: var(--accent);
+  border-inline-start-color: var(--accent);
+  font-weight: 600;
+}
+
+.col {
+  display: grid;
+  /* min-inline-size:0 alone constrains .col's OWN box against its parent's
+     track; it does not stop .col's own implicit column from sizing to its
+     children's max-content. Same fix as .sec-body, one level up. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sec-gap);
+  min-inline-size: 0;
+}
+
+/* ---------------------------------------------------------------- sections */
+
+.sec {
+  scroll-margin-block-start: calc(var(--bar-h) + 20px);
+}
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-block-end: var(--sec-head-gap);
+  padding-block-end: 10px;
+  border-block-end: var(--rule);
+}
+
+.sec-head h2 {
+  margin: 0;
+  font-family: var(--font-display-fa);
+  font-size: var(--fs-h2);
+  letter-spacing: -0.01em;
+}
+
+.sec-en {
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.sec-body {
+  display: grid;
+  /* Without an explicit column track, an implicit grid column sizes to its
+     content's max-content width rather than the container's available
+     space -- the same class of bug as the FE-0 gate's .rail fix, one level
+     deeper. Each .prop row (and its own .prop-label flex child) could grow
+     past the viewport with no scrollbar to reveal it, since the root's
+     overflow-x:hidden hides overflow instead of showing it. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--row-gap);
+}
+
+.sec-empty {
+  padding: var(--row-pad);
+  color: var(--muted);
+  font-size: var(--fs-small);
+  border: var(--hairline);
+  border-radius: var(--r-md);
+}
+
+.processing-techniques {
+  margin-block-start: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.processing-techniques h3 {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.processing-techniques ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--row-gap);
+}
+
+.processing-techniques li {
+  padding: var(--row-pad);
+  background: var(--row-bg);
+  border: var(--row-border);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+}
+
+.processing-technique-note {
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.bridge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block-start: 16px;
+  padding: 14px 18px;
+  border-radius: var(--r-md);
+  background: var(--bridge-bg);
+  border: var(--bridge-border);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.bridge:hover {
+  transform: translateX(-3px);
+}
+
+[dir='ltr'] .bridge:hover {
+  transform: translateX(3px);
+}
+
+.bridge-label {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.bridge-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.bridge-go {
+  margin-inline-start: auto;
+  color: var(--accent);
+}
+
+/* -------------------------------------------------------------------- tail */
+
+.tail {
+  display: grid;
+  /* FE-7: a third card (sources) joined similar/compare. auto-fit keeps two
+     cards centred at 1fr 1fr like before while accommodating a third
+     without a second breakpoint-specific rule. */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-block-start: 8px;
+}
+
+.tail-card {
+  padding: 20px;
+  text-align: center;
+  font-size: 0.92rem;
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.tail-card:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ----------------------------------------------------------- grade band
+ * FE-3b. Studio's row-card language (D35), reused rather than invented:
+ * .grade-row borrows .sec-empty's border/radius/panel treatment and
+ * .grade-row-summary borrows .prop's row padding. Expansion is a plain
+ * <details>/<summary> -- no JS, no island, nothing here to blow FE-3's
+ * perf budget (R24).
+ */
+
+.grade-band {
+  margin-block-start: 12px;
+}
+
+.grade-band-hint {
+  margin: 0 0 var(--sec-head-gap);
+  max-inline-size: 62ch;
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: 1.8;
+}
+
+.grade-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--row-gap);
+}
+
+.grade-row {
+  border: var(--row-border);
+  border-radius: var(--r-md);
+  background: var(--row-bg);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.grade-row[open] {
+  border-color: var(--accent);
+}
+
+.grade-row-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  list-style: none;
+  padding: var(--row-pad);
+  cursor: pointer;
+}
+
+/* Default disclosure triangles vary by engine and sit on the wrong side in
+   an RTL layout -- a plain CSS-drawn chevron instead, rotated on [open],
+   with `transform` (not `transition: all`, R35) as the only animated
+   property. */
+.grade-row-summary::-webkit-details-marker {
+  display: none;
+}
+
+.grade-row-summary::marker {
+  content: '';
+}
+
+.grade-row-summary::after {
+  content: '';
+  flex: none;
+  inline-size: 8px;
+  block-size: 8px;
+  border-inline-end: 2px solid var(--muted-2);
+  border-block-end: 2px solid var(--muted-2);
+  transform: rotate(45deg);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.grade-row[open] > .grade-row-summary::after {
+  transform: rotate(-135deg);
+}
+
+.grade-row-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.grade-row-count {
+  margin-inline-end: auto;
+  color: var(--muted-2);
+  font-size: var(--fs-caption);
+  font-family: var(--font-num);
+}
+
+.grade-row-body {
+  padding: 0 var(--row-pad) var(--row-pad);
+  display: grid;
+  gap: 18px;
+}
+
+.grade-row-desc {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+  line-height: 1.85;
+}
+
+.grade-group {
+  display: grid;
+  gap: 10px;
+  min-inline-size: 0;
+}
+
+.grade-group-heading {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 900px) {
+  .grade-row-summary {
+    flex-wrap: wrap;
+  }
+
+  .hero-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .main {
+    /* Plain 1fr, not minmax(0, 1fr), still carries an automatic min-width:
+       auto -- the same overflow class as .sec-body/.col above, at the
+       layout's outermost level. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  /* Same fix as FE-0's gate found: a grid item's min-inline-size defaults
+     to auto (its max-content width), which made the rail wider than its
+     track, left the ul's overflow-x nothing to scroll against, and the
+     root's overflow-x:hidden silently clipped the later sections. */
+  .rail {
+    position: sticky;
+    inset-block-start: var(--bar-h);
+    z-index: 10;
+    min-inline-size: 0;
+    margin-inline: calc(var(--pad-x) * -1);
+    padding-inline: var(--pad-x);
+    background: var(--bar-bg);
+    border-block-end: var(--hairline);
+  }
+
+  .rail ul {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    border-inline-start: 0;
+    padding-block: 8px;
+    scrollbar-width: none;
+  }
+
+  .rail ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail a {
+    white-space: nowrap;
+    border: var(--hairline);
+    border-radius: var(--r-pill);
+    padding: 6px 13px;
+    margin: 0;
+  }
+
+  .rail a.on {
+    background: var(--accent-soft);
+    border-color: transparent;
+  }
+
+  .tail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Draft notice — see lib/publish.ts. Uses the caution hue, not the error
+   hue: a draft datasheet is incomplete, not broken. */
+.draft-badge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  margin-block-start: 20px;
+  padding: 10px 16px;
+  border-radius: var(--r-card);
+  border: var(--hairline);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  max-inline-size: 68ch;
+}
+
+.draft-badge strong {
+  color: var(--warn, var(--act));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+}

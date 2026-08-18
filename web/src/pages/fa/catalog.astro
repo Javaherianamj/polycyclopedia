@@ -1,0 +1,90 @@
+---
+// FE-4: family grouping + material cards + text search (D6, S14's
+// "browsing" half). Static at build time; the search/family filter is
+// client-side (catalog-filter.ts) over this already-rendered list — real
+// property-based search is FE-5/API-1, still outstanding.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MaterialCard from '../../components/catalog/MaterialCard.astro';
+import { getMaterials } from '../../lib/api/client';
+import { gateMaterials } from '../../lib/publish';
+import { t } from '../../i18n/t';
+import type { MaterialListItem } from '../../lib/api/types';
+
+const locale = 'fa' as const;
+
+const materialsResult = await getMaterials({ limit: 200 });
+if (!materialsResult.ok) {
+  throw new Error(`Failed to list materials: ${materialsResult.error.message}`);
+}
+const materials = gateMaterials(materialsResult.data.data);
+
+const families = new Map<string, { nameFa: string; nameEn: string }>();
+for (const m of materials)
+  families.set(m.family, { nameFa: m.familyNameFa, nameEn: m.familyNameEn });
+---
+
+<BaseLayout locale={locale} title={t(locale, 'catalog.title')}>
+  <main class="wrap">
+    <h1>{t(locale, 'catalog.title')}</h1>
+
+    <div class="catalog-controls">
+      <input
+        type="search"
+        class="catalog-search"
+        placeholder={t(locale, 'catalog.searchPlaceholder')}
+        data-testid="catalog-search-input"
+      />
+      <div class="catalog-chips">
+        <button
+          type="button"
+          class="catalog-chip is-active"
+          data-testid="catalog-family-chip"
+          data-family=""
+        >
+          {t(locale, 'catalog.allFamilies')}
+        </button>
+        {
+          [...families.entries()].map(([key, names]) => (
+            <button
+              type="button"
+              class="catalog-chip"
+              data-testid="catalog-family-chip"
+              data-family={key}
+            >
+              {names.nameFa}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="material-grid">
+      {
+        materials.map((material: MaterialListItem) => (
+          <MaterialCard material={material} locale={locale} />
+        ))
+      }
+    </div>
+    <p class="catalog-empty" data-testid="catalog-empty" hidden>
+      {t(locale, 'catalog.empty')}
+    </p>
+  </main>
+</BaseLayout>
+
+<style>
+  .wrap {
+    max-inline-size: 1120px;
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  h1 {
+    font-family: var(--font-display-fa);
+    font-size: var(--fs-h1);
+    margin-block-end: 24px;
+  }
+</style>
+
+<script>
+  import '../../components/catalog/catalog-filter';
+</script>

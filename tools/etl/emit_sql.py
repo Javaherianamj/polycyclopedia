@@ -106,6 +106,81 @@ REAGENT_EN_BY_FA = {
     "اشعه فرابنفش (UV)": "Ultraviolet (UV) Radiation",
 }
 
+# Text-typed property values are Persian-only in the legacy data (the
+# academic/processing string fields have no English sibling), so the problem
+# REAGENT_EN_BY_FA solves reappears on property_value. Before migration 0030
+# there was nowhere to put a translation and the legacy string went into the
+# single value_text column verbatim -- which is why values like
+# 'اتیلن (Ethylene)' carry both languages at once and render as mixed script
+# whichever locale the reader asked for.
+#
+# Keyed on the legacy string, valued as (value_text_fa, value_text_en). Two
+# kinds of entry:
+#   - Language-neutral values (formulae, repeat units) repeat the same string
+#     in both halves; a formula is already correct in either locale.
+#   - Persian values drop the trailing English gloss from the fa half, since
+#     the en half now carries it. Inline English *terms* inside prose (e.g.
+#     "(Chain Transfer)") stay put -- those are terminology aids a Persian
+#     reader expects, not a translation of the sentence.
+#
+# Keep this in step with the backfill table in
+# db/migrations/0030_property_value_text_locale.sql, which carries the same
+# pairs for rows already in a live database. Like the reagent glosses these
+# are translations of existing content, not fabricated data: every row still
+# emits status='unsourced' and no citation.
+VALUE_TEXT_BILINGUAL: dict[str, tuple[str, str]] = {
+    # -- language-neutral -------------------------------------------------
+    "C2H4": ("C2H4", "C2H4"),
+    "[CH2 - CH2]n": ("[CH2 - CH2]n", "[CH2 - CH2]n"),
+    # -- labels ------------------------------------------------------------
+    "اتیلن (Ethylene)": ("اتیلن", "Ethylene"),
+    "نیمه‌شفاف (Translucent)": ("نیمه‌شفاف", "Translucent"),
+    "کدر / کدر متمایل به سفید (Opaque)": ("کدر / کدر متمایل به سفید", "Opaque / off-white opaque"),
+    "2:1 تا 4:1": ("2:1 تا 4:1", "2:1 to 4:1"),
+    "2:1 تا 6:1": ("2:1 تا 6:1", "2:1 to 6:1"),
+    "7.4, 4.93, 2.55 Å (Orthorhombic)": (
+        "7.4، 4.93، 2.55 آنگستروم (اورتورومبیک)",
+        "7.4, 4.93, 2.55 Å (Orthorhombic)",
+    ),
+    "7.42, 4.95, 2.55 Å (Orthorhombic)": (
+        "7.42، 4.95، 2.55 آنگستروم (اورتورومبیک)",
+        "7.42, 4.95, 2.55 Å (Orthorhombic)",
+    ),
+    # -- prose -------------------------------------------------------------
+    "رادیکال آزاد (فشار بالا 1000-3000 بار و دمای 200-300 °C با آغازگر پراکسید آلی)": (
+        "رادیکال آزاد (فشار بالا 1000-3000 بار و دمای 200-300 °C با آغازگر پراکسید آلی)",
+        "Free radical (high pressure, 1000-3000 bar and 200-300 °C, with an organic peroxide initiator)",
+    ),
+    "کاتالیزوری (فشار 1-50 بار و دمای 70-120 °C با کاتالیزور زیگلر-ناتا، کروم فیلیپس یا متالوسن)": (
+        "کاتالیزوری (فشار 1-50 بار و دمای 70-120 °C با کاتالیزور زیگلر-ناتا، کروم فیلیپس یا متالوسن)",
+        "Catalytic (1-50 bar and 70-120 °C, with a Ziegler-Natta, Phillips chromium or metallocene catalyst)",
+    ),
+    "وقوع مکرر واکنش‌های انتقال زنجیر (Chain Transfer) و Backbiting عامل اصلی ایجاد شاخه‌های کوتاه و بلند در زنجیر است.": (
+        "وقوع مکرر واکنش‌های انتقال زنجیر (Chain Transfer) و Backbiting عامل اصلی ایجاد شاخه‌های کوتاه و بلند در زنجیر است.",
+        "Frequent chain transfer and backbiting reactions are the main cause of the short- and long-chain branches along the chain.",
+    ),
+    "کاهش شدید واکنش‌های انتقال زنجیر، منجر به تولید زنجیرهای کاملاً خطی با تراکم شاخه کمتر از 5 در هر 1000 کربن می‌شود.": (
+        "کاهش شدید واکنش‌های انتقال زنجیر، منجر به تولید زنجیرهای کاملاً خطی با تراکم شاخه کمتر از 5 در هر 1000 کربن می‌شود.",
+        "Sharply reduced chain transfer yields fully linear chains with a branch density below 5 per 1000 carbons.",
+    ),
+    "رفتار ویسکوزیته مذاب از نوع شبه‌پلاستیک (Shear-Thinning) با استحکام مذاب (Melt Strength) بالا به دلیل گره‌خوردگی شاخه‌های بلند است.": (
+        "رفتار ویسکوزیته مذاب از نوع شبه‌پلاستیک (Shear-Thinning) با استحکام مذاب (Melt Strength) بالا به دلیل گره‌خوردگی شاخه‌های بلند است.",
+        "Melt viscosity is pseudoplastic (shear-thinning), with high melt strength owing to long-chain-branch entanglement.",
+    ),
+    "رفتار ویسکوزیته مذاب شبه‌پلاستیک است. زمان خنک‌سازی آن در قالب به علت بلورینگی سریع، کوتاه است.": (
+        "رفتار ویسکوزیته مذاب شبه‌پلاستیک است. زمان خنک‌سازی آن در قالب به علت بلورینگی سریع، کوتاه است.",
+        "Melt viscosity is pseudoplastic. In-mould cooling time is short because crystallisation is rapid.",
+    ),
+    "مقدار آنتالپی ذوب تجربی برای LDPE کاملاً بلوری (100% فرضی) برابر با 293 J/g می‌باشد که مبنای محاسبات تجربی بلورینگی است.": (
+        "مقدار آنتالپی ذوب تجربی برای LDPE کاملاً بلوری (100% فرضی) برابر با 293 J/g می‌باشد که مبنای محاسبات تجربی بلورینگی است.",
+        "The experimental enthalpy of fusion for fully crystalline LDPE (a hypothetical 100%) is 293 J/g, the basis for empirical crystallinity calculations.",
+    ),
+    "به دلیل درصد بلورینگی بالاتر نسبت به LDPE، میزان کسر حجم آزاد کمتر است و نفوذپذیری گازها کاهش می‌یابد.": (
+        "به دلیل درصد بلورینگی بالاتر نسبت به LDPE، میزان کسر حجم آزاد کمتر است و نفوذپذیری گازها کاهش می‌یابد.",
+        "Because crystallinity is higher than in LDPE, the free volume fraction is lower and gas permeability decreases.",
+    ),
+}
+
 
 # ---------------------------------------------------------------------------
 # SQL literal helpers
@@ -189,21 +264,34 @@ def _property_value_sql(material_id: str, pr: PropertyResult) -> str:
     subject_id_expr = f"(SELECT id FROM material WHERE slug = {sql_str(material_id)})"
     property_id_expr = f"(SELECT id FROM property_definition WHERE key = {sql_str(pr.key)})"
     if p.kind == "numeric":
-        value_min, value_max, value_typical, value_text = sql_num(p.value_min), sql_num(p.value_max), sql_num(p.value_typical), "NULL"
+        value_min, value_max, value_typical = sql_num(p.value_min), sql_num(p.value_max), sql_num(p.value_typical)
+        value_text_fa = value_text_en = "NULL"
     else:
-        value_min, value_max, value_typical, value_text = "NULL", "NULL", "NULL", sql_str(p.value_text)
+        value_min, value_max, value_typical = "NULL", "NULL", "NULL"
+        # Fail loudly rather than emit a half-bilingual row, the same way a
+        # missing reagent gloss stops the run below. Silence here is what put
+        # 'اتیلن (Ethylene)' on an English page in the first place.
+        pair = VALUE_TEXT_BILINGUAL.get(p.value_text or "")
+        if pair is None:
+            raise SystemExit(
+                f"emit_sql: no fa/en pair for text value {p.value_text!r} "
+                f"(material {material_id}, property {pr.key}) -- add it to VALUE_TEXT_BILINGUAL"
+            )
+        value_text_fa, value_text_en = sql_str(pair[0]), sql_str(pair[1])
     qualifier = sql_str(p.qualifier)
     unit_display = sql_str(p.unit_display)
     note_fa = sql_str(pr.note_fa)
     note_en = sql_str(pr.note_en)
+    # value_text (singular) is deliberately not written: migration 0030
+    # deprecated it in favour of the value_text_fa/value_text_en pair.
     return (
         "INSERT INTO property_value "
-        "(subject_type, subject_id, property_id, value_min, value_max, value_typical, value_text, "
-        "unit_display, qualifier, note_fa, note_en, status)\n"
+        "(subject_type, subject_id, property_id, value_min, value_max, value_typical, "
+        "value_text_fa, value_text_en, unit_display, qualifier, note_fa, note_en, status)\n"
         f"SELECT 'material', {subject_id_expr}, {property_id_expr}, {value_min}, {value_max}, {value_typical}, "
-        f"{value_text}, {unit_display}, {qualifier}, {note_fa}, {note_en}, 'unsourced'\n"
+        f"{value_text_fa}, {value_text_en}, {unit_display}, {qualifier}, {note_fa}, {note_en}, 'unsourced'\n"
         "ON CONFLICT (subject_type, subject_id, property_id, conditions) "
-        "WHERE superseded_by IS NULL AND status <> 'superseded' DO NOTHING;"
+        "WHERE value_role = 'editorial' AND superseded_by IS NULL AND status <> 'superseded' DO NOTHING;"
     )
 
 
@@ -242,10 +330,15 @@ def emit_material_sql(material: ParsedMaterial, applications: list[str], process
         "ON CONFLICT (material_id, type, value) DO NOTHING;"
     )
 
-    # material_structure
+    # material_structure -- atoms only. unit_cell was dropped from this table
+    # in migration 0013 (DATA-GAPS G8): the same fact was enterable both here
+    # and as the registry property with key = 'unit_cell', and the registry
+    # one wins because it carries citation tracking. The value still reaches
+    # the database, via the property_value loop below -- parse_polymers.py
+    # maps academic.unitCell to that property key like any other.
     lines.append(
-        "INSERT INTO material_structure (material_id, atoms, unit_cell)\n"
-        f"SELECT (SELECT id FROM material WHERE slug = {sql_str(slug)}), {sql_jsonb(material.atoms3d)}, {sql_str(material.unit_cell)}\n"
+        "INSERT INTO material_structure (material_id, atoms)\n"
+        f"SELECT (SELECT id FROM material WHERE slug = {sql_str(slug)}), {sql_jsonb(material.atoms3d)}\n"
         "ON CONFLICT (material_id) DO NOTHING;"
     )
 

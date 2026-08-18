@@ -84,7 +84,7 @@ def pick_unsourced(conn, material_slug="ldpe"):
     transaction the test rolls back, so it's safe to use real seeded rows.
     """
     live_values = load_live_values(conn)
-    candidates = [k for k, v in live_values.items() if k[0] == material_slug]
+    candidates = [(k[0], k[2]) for k in live_values if k[0] == material_slug and k[1] == ""]
     assert candidates, f"expected at least one live value for {material_slug}"
     return candidates[0]
 
@@ -193,7 +193,7 @@ def test_new_source_reused_across_rows_in_same_run(db_conn):
     """Two rows citing the same new source_key should create exactly one
     source and one source_document, not one per row."""
     live_values = load_live_values(db_conn)
-    ldpe_candidates = [k for k in live_values if k[0] == "ldpe"]
+    ldpe_candidates = [(k[0], k[2]) for k in live_values if k[0] == "ldpe" and k[1] == ""]
     assert len(ldpe_candidates) >= 2
     (m1, p1), (m2, p2) = ldpe_candidates[0], ldpe_candidates[1]
 
@@ -236,7 +236,7 @@ def test_supersede_on_recitation(db_conn):
     # routes the second citation onto the supersede path instead of another
     # in-place update.
     live_values_2 = load_live_values(db_conn)
-    assert live_values_2[(material_slug, property_key)].has_evidence is True
+    assert live_values_2[(material_slug, "", property_key)].has_evidence is True
 
     row2 = make_gaps_row(material_slug, property_key, source_key="polymer-handbook-4e", page="99")
     plan2 = validate_row(3, row2, live_values_2, sources_by_key, {}, test_methods)
@@ -262,9 +262,9 @@ def test_supersede_on_recitation(db_conn):
 
         # History is never destroyed: the original evidence/citation for
         # the old row must still exist, untouched.
-        cur.execute("SELECT count(*) FROM evidence WHERE property_value_id = %s;", (old_id,))
+        cur.execute("SELECT count(*) FROM evidence WHERE subject_type = 'property_value' AND subject_id = %s;", (old_id,))
         assert cur.fetchone()[0] == 1
-        cur.execute("SELECT count(*) FROM evidence WHERE property_value_id = %s;", (new_id,))
+        cur.execute("SELECT count(*) FROM evidence WHERE subject_type = 'property_value' AND subject_id = %s;", (new_id,))
         assert cur.fetchone()[0] == 1
 
 
@@ -456,81 +456,43 @@ def test_dry_run_reports_same_error_and_writes_nothing(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_late_bad_row_prevents_earlier_good_row_from_landing(tmp_path):
-    """One invalid row anywhere in the file must stop the entire import --
-    including rows before it that were individually valid. import_values.py
-    achieves this by validating every row before writing any of them (an
-    even stronger guarantee than "write then roll back on error": the
-    database is never touched at all for a doomed file), which produces the
-    same observable behaviour this test asserts.
+def test_late_bad_row_does_not_block_an_earlier_good_row(db_conn):
+    """Rows are validated and written independently now: a row elsewhere in
+    the file that fails validation does not stop an individually-valid row
+    from landing. Uses the direct-function-call strategy (db_conn, always
+    rolled back) rather than a real CLI subprocess, since this only needs
+    to exercise validate_row + execute_plan, not main()'s own file
+    handling -- see test_curation.py's clean_db-fixture test for CLI-level
+    coverage of the same behaviour.
     """
-    conn = get_connection()
-    try:
-        live_values = load_live_values(conn)
-    finally:
-        conn.rollback()
-        conn.close()
+    live_values = load_live_values(db_conn)
+    materials = load_materials(db_conn)
+    property_defs = load_property_definitions(db_conn)
+    test_methods = load_test_methods(db_conn)
 
-    ldpe_candidates = [k for k in live_values if k[0] == "ldpe"]
+    ldpe_candidates = [(k[0], k[2]) for k in live_values if k[0] == "ldpe" and k[1] == ""]
     assert len(ldpe_candidates) >= 2
     (good_material, good_property), (bad_material, bad_property) = ldpe_candidates[0], ldpe_candidates[1]
 
-    gaps_path = tmp_path / "gaps.csv"
-    sources_path = tmp_path / "sources.csv"
+    sources_by_key = {"test-source-key": new_test_source_row()}
 
-    export_conn = get_connection()
-    try:
-        export_gaps(export_conn, "ldpe", gaps_path)
-        export_sources(export_conn, sources_path)
-    finally:
-        export_conn.rollback()
-        export_conn.close()
+    good_row = make_gaps_row(good_material, good_property, source_key="test-source-key", page="1")
+    bad_row = make_gaps_row(bad_material, bad_property, source_key="test-source-key")  # no locator -> V5
 
-    import csv
+    good_plan = validate_row(2, good_row, live_values, sources_by_key, {}, test_methods, materials, property_defs)
+    with pytest.raises(RowError, match="no citation locator given"):
+        validate_row(3, bad_row, live_values, sources_by_key, {}, test_methods, materials, property_defs)
 
-    with gaps_path.open(encoding="utf-8-sig", newline="") as f:
-        fieldnames = csv.DictReader(f).fieldnames
-        f.seek(0)
-        rows = list(csv.DictReader(f))
+    execute_plan(db_conn, [good_plan])
 
-    for r in rows:
-        if r["material_slug"] == good_material and r["property_key"] == good_property:
-            r["source_key"] = "polymer-handbook-4e"
-            r["page"] = "1"
-        if r["material_slug"] == bad_material and r["property_key"] == bad_property:
-            r["source_key"] = "polymer-handbook-4e"
-            # No locator -> this row fails V5, appears later in the file.
-    with gaps_path.open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-
-    result = subprocess.run(
-        [PYTHON, str(TOOLS_CURATION / "import_values.py"),
-         "--gaps-csv", str(gaps_path), "--sources-csv", str(sources_path)],
-        cwd=TOOLS_CURATION, capture_output=True, text=True, timeout=30,
-    )
-    assert result.returncode == 1
-    assert "rejected -- nothing will be written" in result.stdout
-
-    check_conn = get_connection()
-    try:
-        with check_conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT pv.status FROM property_value pv
-                JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
-                JOIN property_definition pd ON pd.id = pv.property_id
-                WHERE m.slug = %s AND pd.key = %s;
-                """,
-                (good_material, good_property),
-            )
-            status = cur.fetchone()[0]
-    finally:
-        check_conn.rollback()
-        check_conn.close()
-
-    assert status == "unsourced", "the earlier, individually-valid row must not have been committed"
+    with db_conn.cursor() as cur:
+        cur.execute(
+            "SELECT locator FROM citation c JOIN source_document sd ON sd.id = c.source_document_id "
+            "JOIN source s ON s.id = sd.source_id WHERE s.title = %s;",
+            (TEST_SOURCE_TITLE,),
+        )
+        citation_row = cur.fetchone()
+    assert citation_row is not None and citation_row[0] == {"page": "1"}
 
 
 # ---------------------------------------------------------------------------
@@ -567,6 +529,32 @@ def test_include_missing_emits_value_less_property_row(db_conn, tmp_path):
         )
         expected_unsourced_count = cur.fetchone()[0]
 
+        # How many *applicable* properties have no property_value row at all.
+        # Computed rather than hardcoded: this used to assume the answer was
+        # always 1 (izod_impact), which broke the moment the registry gained
+        # the three processing/LCA properties from DATA-GAPS G5 -- those have
+        # no ldpe rows either. The scoping predicate mirrors GAPS_MISSING_QUERY
+        # exactly, including the applies_to_families AND added for G3.
+        cur.execute(
+            """
+            SELECT count(*)
+            FROM material m
+            JOIN field f ON f.id = m.field_id
+            JOIN family fam ON fam.id = m.family_id
+            CROSS JOIN property_definition pd
+            WHERE m.slug = 'ldpe'
+              AND (pd.applies_to_fields = '{}' OR f.key = ANY(pd.applies_to_fields))
+              AND (pd.applies_to_families = '{}' OR fam.key = ANY(pd.applies_to_families))
+              AND NOT EXISTS (
+                  SELECT 1 FROM property_value pv
+                  WHERE pv.subject_type = 'material'
+                    AND pv.subject_id = m.id
+                    AND pv.property_id = pd.id
+              )
+            """
+        )
+        expected_missing_count = cur.fetchone()[0]
+
     count_without = export_gaps(db_conn, "ldpe", gaps_path, include_missing=False)
     with gaps_path.open(encoding="utf-8-sig", newline="") as f:
         rows_without = list(csv.DictReader(f))
@@ -576,7 +564,7 @@ def test_include_missing_emits_value_less_property_row(db_conn, tmp_path):
     count_with = export_gaps(db_conn, "ldpe", gaps_path, include_missing=True)
     with gaps_path.open(encoding="utf-8-sig", newline="") as f:
         rows_with = list(csv.DictReader(f))
-    assert count_with == expected_unsourced_count + 1
+    assert count_with == expected_unsourced_count + expected_missing_count
 
     izod_rows = [r for r in rows_with if r["property_key"] == "izod_impact"]
     assert len(izod_rows) == 1
@@ -589,7 +577,7 @@ def test_import_creates_property_value_for_property_with_no_existing_row(db_conn
     """V8 extended: material and property both real, but no live
     property_value row -- the importer creates one instead of rejecting."""
     live_values = load_live_values(db_conn)
-    assert ("ldpe", "izod_impact") not in live_values, (
+    assert ("ldpe", "", "izod_impact") not in live_values, (
         "fixture assumption broken: ldpe/izod_impact is expected to have no live value"
     )
 
@@ -625,7 +613,8 @@ def test_import_creates_property_value_for_property_with_no_existing_row(db_conn
         assert float(value_typical) == 30.0
         assert subject_id == materials["ldpe"]["id"]
 
-        cur.execute("SELECT count(*) FROM evidence e JOIN property_value pv ON pv.id = e.property_value_id "
+        cur.execute("SELECT count(*) FROM evidence e "
+                    "JOIN property_value pv ON pv.id = e.subject_id AND e.subject_type = 'property_value' "
                     "WHERE pv.subject_id = %s AND pv.property_id = %s;",
                     (materials["ldpe"]["id"], property_defs["izod_impact"]["id"]))
         assert cur.fetchone()[0] == 1

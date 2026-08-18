@@ -1,0 +1,29 @@
+---
+// One of R4's four states. A genuine fetch failure -- distinct in tone from
+// R22's "uncited, in progress" (grey, never red): this one is warn-adjacent
+// and offers a retry, because something actually broke rather than being
+// merely incomplete.
+//
+// This component has no click handler. An .astro component renders to
+// static HTML at build time and is never hydrated, so a function prop
+// could never be wired to the button here — that only works for the
+// client-side island version (DataBoundary.tsx), which owns the retry
+// logic itself. At build time there is nothing to retry: a failed
+// build-time fetch fails the build (see web/README.md), it does not
+// render this component.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div class="state-error" role="alert">
+  <p class="state-error-title">{t(locale, 'state.error.title')}</p>
+  <button type="button" class="state-error-retry" data-testid="error-state-retry-button" disabled>
+    {t(locale, 'state.error.retry')}
+  </button>
+</div>

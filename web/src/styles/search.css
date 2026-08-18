@@ -1,0 +1,649 @@
+/* FE-5: property-first search. Imported once into global.css, same
+ * reasoning as catalog.css/value-atom.css/datasheet.css: this surface's
+ * components repeat and share tokens with the rest of the house style
+ * rather than inventing new colour or shape values (R33/D36 -- --accent is
+ * "measurement", already the sliders' natural colour).
+ */
+
+.search-app {
+  display: grid;
+  gap: 28px;
+}
+
+.search-lead {
+  max-inline-size: 62ch;
+  color: var(--ink-2);
+  margin-block-end: 28px;
+}
+
+/* ------------------------------------------------------------- query box */
+
+.search-query-box {
+  display: grid;
+  gap: 8px;
+}
+
+.search-query-label {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+.search-query-input {
+  padding: 11px 16px;
+  border: var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: var(--font-num);
+  font-size: var(--fs-body);
+  max-inline-size: 480px;
+  inline-size: 100%;
+}
+
+.search-query-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-unrecognized-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-unrecognized-hint {
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--note-bg);
+  color: var(--warn);
+  font-size: var(--fs-caption);
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.search-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .search-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.search-panel-heading {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3, 1.15rem);
+  color: var(--ink);
+}
+
+/* Heading + "clear all" sit on one row so the escape hatch is right next to
+ * the thing it clears, never a separate floating control. */
+.search-panel-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 16px;
+}
+
+.search-panel-heading-row .search-panel-heading {
+  margin-block-end: 0;
+}
+
+.search-results-count {
+  font-family: var(--font-num);
+  font-size: var(--fs-small);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* "Clear all filters" -- a plain text-style button, deliberately quiet
+ * (this is an escape hatch, not a primary action) but still a real
+ * ≥44px pointer target (R30) via padding rather than visual bulk, same
+ * technique as .search-slider-reset / .rail-tick (learn-scale.css). */
+.search-clear-all {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  padding-inline: 10px;
+  margin-inline: -10px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-caption);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.search-clear-all:hover,
+.search-clear-all:focus-visible {
+  color: var(--accent);
+}
+
+.search-clear-all:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------- active filter chips */
+
+/* The visible summary of what's actually constraining the result set (fix
+ * item 2) -- every entry here is one key of `sliderFilters`, so this list
+ * and "what search() is filtering on" can never drift apart the way a
+ * hand-maintained summary could.
+ */
+.search-active-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.search-chip {
+  /* R30: the whole chip is the pointer target (removes the filter, wherever
+   * on the chip you tap), not just the × glyph -- so the chip itself, not a
+   * sub-element, is what needs to clear 44px. */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 44px;
+  padding-inline: 12px 8px;
+  border: var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: var(--fs-caption);
+  font-family: var(--font-num);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.search-chip:hover,
+.search-chip:focus-visible {
+  border-color: var(--accent);
+}
+
+.search-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-chip-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 18px;
+  block-size: 18px;
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------- sliders */
+
+.search-slider-panel {
+  display: grid;
+  gap: 22px;
+  padding: var(--row-pad);
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  position: sticky;
+  inset-block-start: 20px;
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 860px) {
+  .search-slider-panel {
+    position: static;
+  }
+}
+
+.search-slider-list {
+  display: grid;
+  gap: 20px;
+  max-block-size: 70vh;
+  overflow-y: auto;
+  padding-inline-end: 4px;
+  /* Defect 2 ("filters shift right and left"): this list overflows and gets
+   * a scrollbar as soon as its content is tall enough -- and content height
+   * isn't fixed, it depends on whether each slider's head wraps to a second
+   * line, which in turn depends on how wide the current value label is
+   * (0.02 through 1e18 vary hugely, see format.ts). Without this property,
+   * the scrollbar's own width phases in and out of the layout as that
+   * happens, shrinking/growing every card's available inline-size and
+   * shifting them sideways mid-drag. `scrollbar-gutter: stable` reserves
+   * the gutter permanently so the presence of a scrollbar never changes the
+   * content box width. Kept as defence-in-depth alongside the head-layout
+   * fix below (search-slider-head/-label/-value), which removes the height
+   * change that triggers this in the first place.
+   */
+  scrollbar-gutter: stable;
+}
+
+.search-slider {
+  display: grid;
+  gap: 8px;
+  min-inline-size: 0;
+}
+
+.search-slider-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  /* Was `flex-wrap: wrap`. Root cause of the "loose" horizontal shift the
+   * owner reported: the value label's width varies enormously across this
+   * domain's values (0.02 up to 1000000000000000000), so as it changes
+   * during a drag the head would sometimes wrap to a second line and
+   * sometimes not -- changing this slider's block-size, which changes the
+   * whole list's scroll content height, which toggles the list's scrollbar
+   * (see .search-slider-list), which shrinks/grows every card's
+   * inline-size out from under the pointer. Forcing a single line and
+   * letting the label (not the layout) absorb the width change removes the
+   * height fluctuation at its source; scrollbar-gutter:stable above is the
+   * second line of defence. Logical properties throughout so this holds in
+   * the RTL (fa) locale too.
+   */
+  flex-wrap: nowrap;
+  min-inline-size: 0;
+}
+
+.search-slider-label {
+  font-size: var(--fs-small);
+  color: var(--ink);
+  /* Shrinks and truncates instead of wrapping/reflowing when the value
+   * label next to it grows -- see .search-slider-head comment. */
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-slider-symbol {
+  color: var(--muted);
+  font-family: var(--font-num);
+}
+
+.search-slider-value {
+  font-family: var(--font-num);
+  font-size: var(--fs-caption);
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+  /* Never shrinks (the label gives way instead, see above) and uses
+   * tabular figures so a value going from "40" to "1000000000000000000"
+   * doesn't jitter width digit-by-digit while dragging. */
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.search-slider-track {
+  position: relative;
+  /* 44px matches the thumb hit target below (WCAG 2.5.5 / R30) so the whole
+   * track height is actually draggable, not just a 28px sliver around a
+   * visually-centred but hard-to-hit thumb. */
+  block-size: 44px;
+  --low: 0%;
+  --high: 100%;
+}
+
+.search-slider-track::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  inset-block-start: 50%;
+  block-size: 4px;
+  transform: translateY(-50%);
+  border-radius: var(--r-pill);
+  background: var(--track);
+}
+
+.search-slider-track::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: var(--low);
+  inset-inline-end: calc(100% - var(--high));
+  inset-block-start: 50%;
+  block-size: 4px;
+  transform: translateY(-50%);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+}
+
+.search-slider-input {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  inset-block-start: 0;
+  inline-size: 100%;
+  block-size: 44px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  pointer-events: none;
+  /* Defect 1, part of it: on a coarse pointer the browser's default
+   * touch-action lets a drag-start on the thumb get eaten by page-scroll
+   * gesture recognition, which reads as "the slider won't move". The track
+   * only moves horizontally, so panning is never meaningful here. */
+  touch-action: none;
+}
+
+/* Defect 1: "hard to squeeze" traced to the thumb's actual hit target
+ * being 16x16 CSS px -- well under the 44x44 WCAG 2.5.5 / R30 minimum, and
+ * the first thing that makes narrowing a range between two close handles a
+ * fine-motor challenge. Kept the *visual* size the same (a small dot) so
+ * the track doesn't look bulkier, but drew it with a radial-gradient onto a
+ * 44x44 hit box instead of sizing the thumb itself to 16px -- the gradient
+ * stops reproduce the old flat-fill + panel-coloured ring exactly, just on
+ * a bigger clickable/tappable circle. z-index comes from the inline style
+ * set in PropertySlider.tsx (activeHandle / position heuristic) so the
+ * near-coincident-handles case in the class comment there resolves.
+ */
+.search-slider-input::-webkit-slider-thumb {
+  appearance: none;
+  pointer-events: auto;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--accent) 0 8px,
+    var(--panel) 8px 10px,
+    transparent 10px
+  );
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+}
+
+.search-slider-input::-moz-range-thumb {
+  pointer-events: auto;
+  inline-size: 44px;
+  block-size: 44px;
+  border: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--accent) 0 8px,
+    var(--panel) 8px 10px,
+    transparent 10px
+  );
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+}
+
+.search-slider-input::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.search-slider-input::-moz-range-track {
+  background: transparent;
+}
+
+/* Visible focus ring for keyboard users (R30) -- arrow keys/Home/End work
+ * on a native <input type=range> for free, but there was no focus styling
+ * at all before this, so a keyboard user had no way to tell which handle
+ * (if either) was focused. */
+.search-slider-input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-slider-input:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-slider-bounds {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-num);
+  font-size: var(--fs-caption);
+  color: var(--muted-2);
+}
+
+/* Per-slider reset (fix item 2) -- only rendered at all once the slider is
+ * actually active (PropertySlider's `isActive`), so the common case (an
+ * untouched slider, most of the 55+ in this registry) never carries a
+ * decorative disabled control. Its own row below the bounds, not crammed
+ * into `.search-slider-head`, so it can carry a real 44px target (R30)
+ * without touching the head's tightly-tuned nowrap/ellipsis layout (see
+ * that class's own comment -- that fix is for a *different* bug and this
+ * must not reopen it).
+ */
+.search-slider-reset {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding-inline: 14px;
+  margin-block-start: 2px;
+  border: var(--hairline);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--accent);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.search-slider-reset:hover {
+  background: var(--accent-soft);
+}
+
+.search-slider-reset:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- results */
+
+.search-main {
+  display: grid;
+  gap: 24px;
+  min-inline-size: 0;
+}
+
+.search-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 14px;
+}
+
+.search-result-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-1);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.search-result-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-2);
+}
+
+.search-result-values {
+  display: grid;
+  gap: 6px;
+}
+
+.search-result-value {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-size: var(--fs-small);
+}
+
+.search-result-value-label {
+  color: var(--muted);
+}
+
+.search-result-value-amount {
+  font-family: var(--font-num);
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.search-result-name {
+  font-size: var(--fs-small);
+  color: var(--ink);
+  padding-block-start: 6px;
+  border-block-start: var(--hairline);
+}
+
+.search-result-lockup-material {
+  color: var(--muted);
+}
+
+.search-result-lockup-grade {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------- cold-load prompt */
+
+/* Distinct from .state-empty (BR11's true "zero matches" case) -- this is
+ * "nothing asked yet", not "nothing found". Same quiet card language, a
+ * clay/--act accent instead of --muted so it reads as an invitation, not a
+ * dead end (D36: clay = "something you can do"). */
+.search-start-prompt {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 24px;
+  border: var(--hairline);
+  border-radius: var(--r-md);
+  color: var(--act);
+  background: var(--act-soft);
+}
+
+/* --------------------------------------------------------- near misses */
+
+.search-near-misses {
+  padding-block-start: 20px;
+  border-block-start: var(--rule);
+}
+
+.search-near-heading {
+  color: var(--muted);
+}
+
+.search-result-card-near {
+  opacity: 0.86;
+}
+
+.search-result-grid-near .search-result-value-amount {
+  color: var(--act);
+}
+
+.search-result-near-reason {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--act);
+}
+
+/* --------------------------------------------------------- missing data */
+
+/* Fix item 4: makes the "no value never matches" exclusion (BR2+BR5)
+ * legible instead of a silent drop. Native <details>/<summary> -- keyboard-
+ * operable and announced correctly by a screen reader for free, no JS
+ * needed, matching the near-miss section's own "quiet secondary set below
+ * the primary list" placement rather than inventing a new visual language.
+ * `--warn`/`--note-bg` reused from `.search-unrecognized-hint` above: same
+ * "here is something you should know about, not an error" register.
+ */
+.search-missing-data {
+  padding-block-start: 20px;
+  border-block-start: var(--rule);
+}
+
+.search-missing-data-summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--note-bg);
+  color: var(--warn);
+  font-size: var(--fs-caption);
+  /* Native <summary> disclosure triangles vary a lot across browsers and
+   * some render very small -- min-block-size keeps the whole clickable row
+   * at a real R30 pointer target regardless. */
+  min-block-size: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.search-missing-data-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-missing-data-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-missing-data-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  background: var(--panel);
+  border: var(--hairline);
+  font-size: var(--fs-small);
+}
+
+.search-missing-data-name {
+  color: var(--ink);
+}
+
+.search-missing-data-reason {
+  color: var(--muted);
+  font-size: var(--fs-caption);
+}
+
+/* --------------------------------------------------------------- compare */
+
+.search-compare-button {
+  justify-self: start;
+  display: inline-block;
+}
+
+.search-compare-button[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+}

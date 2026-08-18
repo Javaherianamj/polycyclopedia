@@ -1,0 +1,376 @@
+/* THE LEARN SURFACE — page-level structure (D50, the scale axis).
+ *
+ * Ported from design/fe-0/lab/scale.css. That file was written against the
+ * FE-0 prototype's own copy of the lab palette; here the same rules run on
+ * tokens/colour.css's `[data-surface="lab"]` block, which IS that palette
+ * (same hex values, same contrast audit) — so this is a port of the layout,
+ * not a re-derivation of the colour. No raw hex appears below.
+ *
+ * learn.css (tool-internal styling) is untouched by this file: it styles
+ * what is INSIDE a `.learn-tool`, this styles where a `.learn-tool` sits.
+ * The split is deliberate — the whole failure being corrected here was a
+ * page whose structure was invented at the same moment as its tools.
+ *
+ * R27: every grid track that can hold a tool is `minmax(0, 1fr)`, never
+ * `1fr`. A grid item's default `min-inline-size: auto` refuses to shrink
+ * below its content, and the Hansen scene and the branching/tacticity SVGs
+ * are all wider than 320px — that combination is what has produced
+ * horizontal page overflow on this project repeatedly.
+ */
+
+:root[data-surface='lab'] {
+  --rail-w: 132px;
+}
+
+/* --------------------------------------------------------------- readout */
+
+/* The current magnification, pinned. The site header is not sticky, so this
+ * sits at inset-block-start: 0 rather than under a bar the way the FE-0
+ * prototype's did. */
+.scale-readout {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  max-inline-size: var(--measure-page, 1120px);
+  margin-inline: auto;
+  padding: 10px var(--pad-x);
+  background: var(--bar-bg);
+  backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--line);
+}
+
+.sr-label {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+.sr-body {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-inline-size: 0;
+}
+
+.sr-num {
+  font-family: var(--font-display, serif);
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.sr-num sup {
+  font-size: 0.5em;
+}
+
+.sr-name {
+  font-weight: 700;
+  color: var(--ink);
+  min-inline-size: 0;
+}
+
+/* ------------------------------------------------------------------- doc */
+
+.scale-doc {
+  position: relative;
+  max-inline-size: var(--measure-page, 1120px);
+  margin-inline: auto;
+  /* Darkest at the atomic end, lightest at the bulk end — ONE gradient down
+     the whole document rather than a box per section, exactly as the FE-0
+     spec asks ("subtle"). --bg-2 is the darker of the two ground tokens in
+     both themes, so this reuses the surface palette instead of inventing a
+     shade, and it works unchanged in light and dark. */
+  background: linear-gradient(to bottom, var(--bg-2), var(--bg) 85%);
+}
+
+.stations {
+  /* Reserve the rail's column. The rail is fixed, so nothing else keeps
+     content out from under it. */
+  padding-inline-start: var(--rail-w);
+}
+
+/* ------------------------------------------------------------------ rail */
+
+/* The ruler. `inset-inline-start` puts it on the leading edge in both
+   directions with no per-locale rule: right in Persian, left in English. */
+.scale-rail {
+  position: fixed;
+  inset-block: 25vh 0;
+  inset-inline-start: 0;
+  inline-size: var(--rail-w);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.rail-track {
+  position: relative;
+  block-size: 55vh;
+  margin-inline-start: 18px;
+  border-inline-start: 1px solid var(--line-2);
+}
+
+.rail-tick {
+  position: absolute;
+  inset-inline-start: -6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateY(-50%);
+  /* R30: 44px pointer target. The tick's visible mark is a 9px dot; the
+     button is padded out to a real touch size around it rather than the
+     dot being enlarged, so the ruler still reads as a ruler. */
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding-inline: 0 8px;
+  font: inherit;
+  color: var(--muted-2);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.rail-dot {
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  flex: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.rail-num {
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.rail-tick:hover {
+  color: var(--act);
+}
+
+.rail-tick:hover .rail-dot {
+  border-color: var(--act);
+}
+
+.rail-tick:focus-visible {
+  outline: 2px solid var(--act);
+  outline-offset: 2px;
+}
+
+.rail-tick.is-on {
+  color: var(--ink);
+}
+
+.rail-tick.is-on .rail-dot {
+  background: var(--act);
+  border-color: var(--act);
+  transform: scale(1.3);
+}
+
+/* -------------------------------------------------------------- station */
+
+.station {
+  position: relative;
+  /* Not 100vh: with a real tool inside, a full-viewport minimum adds dead
+     space above every panel and makes the page a scroll marathon. 62vh is
+     enough that a tool-less station still reads as a place you arrive at. */
+  min-block-size: 62vh;
+  display: flex;
+  align-items: center;
+  padding-block: 56px;
+  padding-inline: var(--pad-x);
+  border-block-end: 1px dashed var(--line);
+  /* Clips the oversized ghost numeral. Combined with the minmax(0,...)
+     tracks below this is the page's overflow guarantee. */
+  overflow: hidden;
+}
+
+.station:last-child {
+  border-block-end: 0;
+}
+
+/* The magnification, huge and almost invisible. */
+.station-ghost {
+  position: absolute;
+  inset-inline-end: -0.05em;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-display, serif);
+  font-size: min(30vw, 18rem);
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+}
+
+.station-in {
+  position: relative;
+  inline-size: 100%;
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.station-obj {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 18px);
+  background: var(--panel);
+  aspect-ratio: 1.1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 0;
+}
+
+.station-icon {
+  inline-size: 78%;
+  block-size: 78%;
+  stroke: var(--act);
+  fill: none;
+  stroke-width: 3;
+}
+
+.station-icon circle {
+  stroke-width: 2.4;
+}
+
+.station-text {
+  min-inline-size: 0;
+}
+
+.station-exp {
+  font-family: var(--font-display, serif);
+  font-size: var(--fs-h3);
+  color: var(--act);
+  margin: 0 0 6px;
+}
+
+.station-text h2 {
+  font-family: var(--font-display, serif);
+  font-size: var(--fs-h1);
+  line-height: var(--lh-display);
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.station-sentence {
+  max-inline-size: 58ch;
+  color: var(--ink-2);
+  margin: 0 0 24px;
+}
+
+/* A tool with no data does not render as if it worked (R7). Dashed outline
+   and muted-2 ink is D21's "absent" grammar, the same one the datasheet uses
+   for a value nobody has measured — because "we have not built this" and
+   "nobody has measured this" are the same kind of admission. */
+.station-gap {
+  max-inline-size: 58ch;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md, 12px);
+  padding: 14px 16px;
+}
+
+.station-gap-label {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--muted-2);
+  margin: 0 0 6px;
+}
+
+.station-gap-label::before {
+  content: '⊘ ';
+}
+
+.station-gap-reason {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-small);
+  color: var(--muted);
+  margin: 0;
+}
+
+.station-tools {
+  display: grid;
+  gap: 28px;
+  min-inline-size: 0;
+}
+
+.station-tools:empty {
+  display: none;
+}
+
+/* Deep-link target for learn-bridge-map's `#hansen`. Zero-size and inert;
+   scroll-margin so the sticky readout does not cover the arrival point. */
+.station-anchor {
+  scroll-margin-block-start: 96px;
+}
+
+/* Same reason, for the rail's jump targets and every `#tool-id` bridge. */
+.station,
+.learn-tool {
+  scroll-margin-block-start: 84px;
+}
+
+/* ----------------------------------------------------------------- mobile
+ * R27 gate: 320 / 375 / 768. The rail keeps its dots and loses its numerals
+ * rather than disappearing — it is the page's structural argument, and a
+ * narrow screen is not a reason to stop making it.
+ */
+@media (max-width: 900px) {
+  :root[data-surface='lab'] {
+    /* 44px, not 40: the rail column has to be at least one pointer target
+       wide (R30) once the numerals are gone and the dot is all that is left. */
+    --rail-w: 44px;
+  }
+
+  .rail-num {
+    display: none;
+  }
+
+  .rail-track {
+    margin-inline-start: 12px;
+  }
+
+  .station-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .station-obj {
+    max-inline-size: 132px;
+  }
+}
+
+@media (max-width: 640px) {
+  .station {
+    padding-inline: 16px;
+    padding-block: 40px;
+  }
+
+  .station-ghost {
+    font-size: min(40vw, 9rem);
+  }
+
+  .scale-readout {
+    padding-inline: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-dot,
+  .rail-tick {
+    transition: none;
+  }
+}

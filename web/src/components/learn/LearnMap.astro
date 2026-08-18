@@ -1,0 +1,59 @@
+---
+// L2 — «نقشه» / MAP (lab-concepts-spec.md). Ported from design/fe-0/lab/
+// map.html + map.css + map.js — the FE-0 prototype's exact concept, faithful
+// structure: hero, plot, readout, tray, off-curve section. What changed
+// going from the static prototype to this app: the prototype hardcoded LDPE
+// (the only material it had); this reads whatever material the reader picks
+// or arrives bound to, live from the API, and refuses to draw a curve at
+// all when that material has no Tg on record (MapIsland.tsx's header has
+// the full data-honesty account).
+//
+// ROUTE DECISION (build brief: "decide and state how MAP relates to
+// SCALE"): a SEPARATE route, `/{locale}/learn/map`, sibling to `/{locale}/
+// learn` (SCALE) the same way `m/[slug]/sources.astro` already sits beside
+// `m/[slug].astro` in this codebase — one Astro page per file, nested
+// directory coexisting with the top-level file, no new routing pattern
+// invented. MAP is NOT a station inside SCALE's zoom: SCALE's whole
+// organising idea is length scale (D50), and MAP's organising idea is
+// temperature — forcing MAP's plot into one of SCALE's six fixed-height
+// stations would compress the SVG into a box sized for a molecule diagram,
+// and "the map is 1/6th the height of a scroll-station" is not the shape
+// the spec is describing. A full route gives it the SVG's own room, exactly
+// like SCALE has its own room.
+//
+// THE SEAM for GRAPH/NOTEBOOK (next two agents): follow this same pattern —
+// `/{locale}/learn/graph` and `/{locale}/learn/notebook`, each with its own
+// `Learn{Concept}.astro` + island(s), each opening with `<LearnConceptNav
+// current="...">` exactly as this file and LearnScale.astro do. Do not
+// invent a third integration pattern; there are only meant to be these two
+// (a route + a concept-nav entry), and GRAPH/NOTEBOOK are the third and
+// fourth instances of it, not a new one.
+//
+// Structure/layout is Astro + CSS (learn-map.css); the interactive plot,
+// readout, tray and off-curve section are ONE island (MapIsland.tsx) — they
+// share too much live state (the marker's temperature drives all of them
+// simultaneously) to split into several islands without prop-drilling that
+// state back out to a page-level `<script>`, which is exactly the kind of
+// non-Astro page logic FE-8's islands architecture exists to avoid.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import LearnConceptNav from './LearnConceptNav.astro';
+import MapIsland from '../../islands/MapIsland';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<main class="learn-page">
+  <header class="learn-hero">
+    <LearnConceptNav locale={locale} current="map" />
+    <p class="learn-kicker">{t(locale, 'learn.map.kicker')}</p>
+    <h1>{t(locale, 'learn.map.title')}</h1>
+    <p class="learn-hero-lead">{t(locale, 'learn.map.intro')}</p>
+  </header>
+
+  <MapIsland client:load locale={locale} />
+</main>

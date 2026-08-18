@@ -1,0 +1,15 @@
+---
+// L2 — «نقشه» / MAP, English route. See fa/learn/map.astro for the note on
+// why this is a separate route from /learn (SCALE) — identical here, just
+// the locale. Same three-line pairing every other locale-paired route in
+// this app uses (fa/learn.astro <-> en/learn.astro is the precedent).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LearnMap from '../../../components/learn/LearnMap.astro';
+import { t } from '../../../i18n/t';
+
+const locale = 'en' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.map.pageTitle')} surface="lab">
+  <LearnMap locale={locale} />
+</BaseLayout>

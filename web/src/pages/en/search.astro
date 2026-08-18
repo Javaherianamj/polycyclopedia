@@ -1,0 +1,44 @@
+---
+// FE-5: property-first search (D24/D25, R13). Sliders + text box need JS
+// immediately, so the whole interactive surface is one island hydrated
+// client:load -- the page itself only supplies the locale and BR13's
+// `?from` pre-fill source, read here (server-side/build-time) so the
+// island never has to parse the URL for that one param
+// (frontend-components.md's SearchIsland Props note).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SearchIsland from '../../islands/SearchIsland';
+import { t } from '../../i18n/t';
+
+const locale = 'en' as const;
+// [own call] `Astro.url.searchParams` carries no query string here --
+// verified against the running dev server: this project's static output
+// (R23, no adapter) means every route is prerendered, so there is no
+// per-request URL to read a query param from, in `astro dev` or in a real
+// build. The prop is still threaded through (harmless, forward-compatible
+// with an adapter), but SearchIsland's own fallback via `getPrefillSlug`
+// (read client-side from `location.search`) is what actually makes BR13
+// fire today -- see the comment on SearchIsland's `prefillSlug` prop.
+const prefillSlug = Astro.url.searchParams.get('from') ?? undefined;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'home.searchCta')}>
+  <main class="wrap search-wrap">
+    <h1>{t(locale, 'home.searchCta')}</h1>
+    <p class="search-lead">{t(locale, 'search.pageLead')}</p>
+    <SearchIsland client:load locale={locale} prefillSlug={prefillSlug} />
+  </main>
+</BaseLayout>
+
+<style>
+  .search-wrap {
+    max-inline-size: 1120px;
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h1);
+    margin-block-end: 10px;
+  }
+</style>

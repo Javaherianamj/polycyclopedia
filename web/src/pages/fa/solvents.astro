@@ -1,0 +1,40 @@
+---
+// FE-8 step 4 — solvent datasheet, Persian route. See en/solvents.astro for
+// the full comment on scope and the datasheet-vs-lab surface choice --
+// identical here, just the locale.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SolventsIsland from '../../islands/SolventsIsland';
+import { t } from '../../i18n/t';
+
+const locale = 'fa' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'solvents.pageTitle')}>
+  <main class="wrap sv-page">
+    <h1>{t(locale, 'solvents.pageTitle')}</h1>
+    <p class="sv-lead">{t(locale, 'solvents.pageLead')}</p>
+
+    <SolventsIsland client:load locale={locale} />
+  </main>
+</BaseLayout>
+
+<style>
+  .sv-page {
+    max-inline-size: var(--measure-page, 1120px);
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  h1 {
+    font-family: var(--font-display-fa);
+    font-size: var(--fs-h1);
+    margin-block: 0 8px;
+  }
+
+  .sv-lead {
+    max-inline-size: 68ch;
+    color: var(--ink-2);
+    line-height: 1.9;
+    margin-block-end: 20px;
+  }
+</style>

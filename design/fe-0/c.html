@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas — Polypedia FE-0</title>
+    <link rel="stylesheet" href="base.css" />
+    <link rel="stylesheet" href="themes/c-atlas.css" />
+    <link rel="stylesheet" href="switcher.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <nav class="switcher" dir="ltr" aria-label="design treatments">
+      <a href="index.html">Compare</a>
+      <span class="sw-sep"></span>
+      <a href="a.html">Handbook</a><a href="b.html">Studio</a
+      ><a href="c.html" aria-current="page">Atlas</a><a href="d.html">Terra</a>
+    </nav>
+
+    <script type="module">
+      import { render } from './render.js';
+      render(document.getElementById('app'), { emoji: '🜂' });
+    </script>
+  </body>
+</html>

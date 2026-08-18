@@ -1,0 +1,65 @@
+---
+// FE-7 — site-wide bibliography, Persian route. See en/sources.astro for
+// the full comment on the coverage-stat computation and why the
+// bibliography table itself is a client island -- identical here, just the
+// locale.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SourcesIsland from '../../islands/SourcesIsland';
+import { getCoverage } from '../../lib/api/client';
+import { t } from '../../i18n/t';
+
+const locale = 'fa' as const;
+
+const coverageResult = await getCoverage();
+if (!coverageResult.ok) {
+  throw new Error(`Failed to fetch coverage: ${coverageResult.error.message}`);
+}
+const rows = coverageResult.data.data;
+const totalValues = rows.reduce((sum, r) => sum + r.totalValues, 0);
+const citedValues = rows.reduce((sum, r) => sum + r.citedValues, 0);
+const pct = totalValues > 0 ? Math.round((citedValues / totalValues) * 1000) / 10 : 0;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'sources.pageTitle')}>
+  <main class="wrap src-page">
+    <h1>{t(locale, 'sources.pageTitle')}</h1>
+    <p class="src-lead">{t(locale, 'sources.pageLead')}</p>
+    <p class="src-coverage-stat" data-testid="sources-sitewide-coverage">
+      {
+        t(locale, 'sources.coverageStat')
+          .replace('{cited}', String(citedValues))
+          .replace('{total}', String(totalValues))
+          .replace('{pct}', String(pct))
+      }
+    </p>
+
+    <SourcesIsland client:load locale={locale} />
+  </main>
+</BaseLayout>
+
+<style>
+  .src-page {
+    max-inline-size: var(--measure-page, 1120px);
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  h1 {
+    font-family: var(--font-display-fa);
+    font-size: var(--fs-h1);
+    margin-block: 0 8px;
+  }
+
+  .src-lead {
+    max-inline-size: 62ch;
+    color: var(--ink-2);
+    line-height: 1.9;
+    margin-block-end: 10px;
+  }
+
+  .src-coverage-stat {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    margin-block-end: 24px;
+  }
+</style>

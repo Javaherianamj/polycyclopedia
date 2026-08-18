@@ -1,0 +1,86 @@
+---
+// FE-1b — the site wordmark, per aidlc-docs/construction/fe-0/wordmark-animation-spec.md
+// (D55). CSS + SVG only (R24: no animation library in header chrome, which
+// ships on every route). `poly`/`pedia` crack apart on a hairline seam,
+// `cyclo` is revealed between them in an accent hue, then the halves drive
+// back in and squeeze it out — never a fade (spec §3).
+//
+// Positioning trick (both locales): all three groups share one x position,
+// `--wm-seam`. `poly`/its Persian equivalent is text-anchor="end" at the
+// seam, `pedia`'s equivalent is text-anchor="start" at the seam — for RTL
+// text this anchor pair still resolves correctly (SVG text-anchor is
+// direction-relative: "end" is the RTL run's own visual left edge, "start"
+// its right edge), so the same two anchor values place پلی to the right of
+// the seam and پدیا to the left without any bidi special-casing. Only the
+// *sign* of the translateX in the animation flips between locales, via
+// `--wm-dir` (see chrome.css).
+//
+// No `dir` attribute on the <text> elements: SVG 2 dropped it in favour of
+// the CSS `direction` property, and Astro's SVGAttributes types reject it.
+// It is not needed anyway -- <html dir> already sets `direction` and SVG
+// text inherits it, so the Persian lockup lays out RTL for free.
+//
+// Two open items from the spec, resolved here with a documented default
+// (flagged for owner review in the FE-1b build-and-test report, not decided
+// quietly):
+//   1. Accent hue for `cyclo` — a sixth, brand-only hue (`--wm-cyclo`,
+//      defined in chrome.css), not one of D36's five semantic hues.
+//   2. Whether the Persian lockup animates — yes, it does, matching the
+//      owner's brief for this task ("the ANIMATED wordmark ... on every
+//      page, both locales"). The RTL mirroring above is what makes that
+//      possible without a second animation.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+
+const words: Record<Locale, { poly: string; cyclo: string; pedia: string }> = {
+  en: { poly: 'poly', cyclo: 'cyclo', pedia: 'pedia' },
+  fa: { poly: 'پلی', cyclo: 'سیکلو', pedia: 'پدیا' },
+};
+
+const w = words[locale];
+const accessibleName = t(locale, 'site.name');
+---
+
+<svg
+  class:list={['wordmark', className]}
+  data-wordmark
+  role="img"
+  aria-label={accessibleName}
+  viewBox="0 0 200 40"
+  width="164"
+  height="33"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <text
+    id="wm-poly"
+    class="wm-part"
+    x="100"
+    y="28"
+    text-anchor="end"
+    lang={locale}>{w.poly}</text
+  >
+  <text
+    id="wm-cyclo"
+    class="wm-part wm-cyclo"
+    x="100"
+    y="28"
+    text-anchor="middle"
+    aria-hidden="true"
+    lang={locale}>{w.cyclo}</text
+  >
+  <text
+    id="wm-pedia"
+    class="wm-part"
+    x="100"
+    y="28"
+    text-anchor="start"
+    lang={locale}>{w.pedia}</text
+  >
+</svg>

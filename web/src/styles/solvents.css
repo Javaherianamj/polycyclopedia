@@ -1,0 +1,134 @@
+/* FE-8 step 4 — the solvent datasheet. Imported once into global.css,
+ * right after sources.css (same table/sticky-header/provenance-mark
+ * conventions reused wholesale — .src-mark-cited/-uncited from sources.css
+ * is used directly in SolventsIsland.tsx rather than duplicated here).
+ *
+ * The one thing this file adds that sources.css doesn't need:
+ * `.sv-table-scroll` scrolls in BOTH directions and has a fixed
+ * block-size, because SolventsIsland virtualises ~700 rows inside it
+ * (R27 extended from "no page-level horizontal overflow" to "no page-level
+ * vertical growth to 700 rows tall" either).
+ */
+
+.sv-app {
+  display: grid;
+  gap: 14px;
+}
+
+.sv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 20px;
+}
+
+.sv-search {
+  padding: 10px 14px;
+  border: var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--fs-body);
+  max-inline-size: 420px;
+  flex: 1 1 260px;
+}
+
+.sv-search:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.sv-row-count {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sv-table-scroll {
+  overflow: auto;
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-1);
+}
+
+.sv-table {
+  border-collapse: collapse;
+  inline-size: 100%;
+  min-inline-size: 780px;
+}
+
+.sv-table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background: var(--panel);
+  border-block-end: var(--rule);
+  padding: 0;
+  text-align: start;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sv-sort-btn {
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--muted);
+  padding: 10px 14px;
+  inline-size: 100%;
+  text-align: start;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.sv-sort-btn:hover,
+.sv-sort-btn[aria-pressed='true'] {
+  color: var(--ink);
+}
+
+.sv-table tbody tr:not([aria-hidden]) {
+  border-block-end: var(--row-border);
+}
+
+.sv-table tbody tr:not([aria-hidden]):hover {
+  background: var(--row-bg-hover);
+}
+
+.sv-table td,
+.sv-table th[scope='row'] {
+  padding: 8px 14px;
+  text-align: start;
+  vertical-align: middle;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-inline-size: 220px;
+}
+
+.sv-cell-name {
+  font-weight: 600;
+  color: var(--ink);
+  max-inline-size: 240px;
+}
+
+.sv-cell-num {
+  font-family: var(--font-num);
+  color: var(--ink);
+  max-inline-size: 90px;
+}
+
+.sv-cell-systematic,
+.sv-cell-cas {
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .sv-table-scroll {
+    max-block-size: 70vh !important;
+  }
+}

@@ -1,0 +1,33 @@
+---
+// FE-6: compare, Persian route. See en/compare.astro for the full comment
+// on `?add=`'s R23 static-build caveat -- identical here, just the locale.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CompareIsland from '../../islands/CompareIsland';
+import { t } from '../../i18n/t';
+
+const locale = 'fa' as const;
+const addParam = Astro.url.searchParams.get('add') ?? undefined;
+const addSlugs = addParam ? addParam.split(',').filter((s) => s !== '') : [];
+---
+
+<BaseLayout locale={locale} title={t(locale, 'datasheet.quickCompare')}>
+  <main class="wrap cmp-wrap">
+    <h1>{t(locale, 'datasheet.quickCompare')}</h1>
+    <p class="cmp-lead">{t(locale, 'compare.pageLead')}</p>
+    <CompareIsland client:load locale={locale} addSlugs={addSlugs} />
+  </main>
+</BaseLayout>
+
+<style>
+  .cmp-wrap {
+    max-inline-size: var(--measure-page, 1120px);
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h1);
+    margin-block-end: 10px;
+  }
+</style>

@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Polypedia FE-0 — visual identity, four treatments</title>
+    <link rel="stylesheet" href="switcher.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1b1c1f;
+        --muted: #6b6d73;
+        --line: #e4e3df;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px 28px 120px;
+        font:
+          15px/1.65 ui-sans-serif,
+          system-ui,
+          sans-serif;
+        color: var(--ink);
+        background: #f4f3ef;
+      }
+      .page {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 1.7rem;
+        letter-spacing: -0.02em;
+      }
+      .sub {
+        margin: 0 0 8px;
+        color: var(--muted);
+        max-width: 68ch;
+      }
+      .how {
+        margin: 22px 0 34px;
+        padding: 16px 18px;
+        background: #fffefb;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        max-width: 78ch;
+      }
+      .how h2 {
+        margin: 0 0 8px;
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .how ol {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .how li {
+        margin-bottom: 5px;
+      }
+      .how code {
+        background: #f1f0ec;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.86em;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+        gap: 26px;
+      }
+      .card {
+        background: #fffefb;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .card header {
+        padding: 16px 18px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .card h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: baseline;
+        gap: 9px;
+      }
+      .card h3 b {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        color: #fff;
+        background: var(--ink);
+        border-radius: 5px;
+        padding: 3px 7px;
+      }
+      .card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .swatches {
+        display: flex;
+        gap: 5px;
+        margin-top: 12px;
+      }
+      .swatches i {
+        width: 26px;
+        height: 15px;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .frames {
+        display: flex;
+        gap: 0;
+        background: #eceae5;
+        flex: 1;
+      }
+      .frames iframe {
+        border: 0;
+        background: #fff;
+        display: block;
+      }
+      .f-desk {
+        flex: 1;
+        height: 620px;
+      }
+      .f-mob {
+        width: 375px;
+        height: 620px;
+        border-left: 1px solid var(--line) !important;
+        flex: none;
+      }
+      .card footer {
+        padding: 11px 18px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        gap: 14px;
+        font-size: 0.85rem;
+      }
+      .card footer a {
+        color: #2f5d62;
+      }
+      @media (max-width: 1100px) {
+        .f-mob {
+          display: none;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .legend {
+        margin-top: 40px;
+        padding: 20px 22px;
+        background: #fffefb;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        max-width: 78ch;
+      }
+      .legend h2 {
+        margin: 0 0 12px;
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .legend dl {
+        margin: 0;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 9px 16px;
+        font-size: 0.9rem;
+      }
+      .legend dt {
+        font-weight: 600;
+      }
+      .legend dd {
+        margin: 0;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>FE-0 — visual identity, four treatments</h1>
+      <p class="sub">
+        The same real LDPE datasheet, four times. Same content, same markup, same components — only
+        the design system differs. You are comparing pages, not swatches.
+      </p>
+
+      <div class="how">
+        <h2>How to give feedback</h2>
+        <ol>
+          <li>
+            Open each full-screen and scroll it. The switcher at the bottom moves between them.
+          </li>
+          <li>
+            Hover the small mark after a value (<code>?</code> or <code>§</code>) — that is
+            provenance. Hover the <code>i</code> beside a property name — that is the explanation.
+            They are deliberately different targets.
+          </li>
+          <li>
+            Look at <b>ضریب انبساط حرارتی</b> and <b>مقاومت ضربه ایزود</b> — those are the
+            empty-value invitations.
+          </li>
+          <li>
+            Narrow the window below 900px. The mobile layout is a different layout, not a squeezed
+            one.
+          </li>
+          <li>
+            Tell me which one, and what you would take from the others. Mixing is expected — these
+            are directions, not finished products.
+          </li>
+        </ol>
+      </div>
+
+      <section class="card" style="margin-bottom: 30px; border-color: #22282a">
+        <header style="background: #22282a; color: #f2efe6; border-bottom: 0">
+          <h3 style="color: #f2efe6">
+            <b style="background: #d9a184; color: #22282a">E</b> Press · the merge
+          </h3>
+          <p style="color: #a8b2ae">
+            Studio's structure · Handbook's entry and fact rail · a warmer paper ground · Atlas's
+            dark plate for the Learn door · and a colour system where every hue has one job. Plus
+            the Learn surface, which is the same system inverted.
+          </p>
+          <div class="swatches">
+            <i style="background: #f9f6ef" title="paper"></i>
+            <i style="background: #2f5d62" title="teal — measurement"></i>
+            <i style="background: #5f7f63" title="sage — sourced"></i>
+            <i style="background: #e3ddcd" title="grey — unsourced"></i>
+            <i style="background: #a8674a" title="clay — action"></i>
+            <i
+              style="background: #b1802a; opacity: 0.45"
+              title="ochre — reserved for warnings, unused"
+            ></i>
+          </div>
+        </header>
+        <div class="frames">
+          <iframe class="f-desk" src="e.html" title="Press datasheet"></iframe>
+          <iframe class="f-mob" src="learn.html" title="Learn surface"></iframe>
+        </div>
+        <footer>
+          <a href="e.html" target="_blank">Datasheet, full screen ↗</a>
+          <a href="learn.html" target="_blank">Learn surface, full screen ↗</a>
+        </footer>
+      </section>
+
+      <h2 style="margin: 34px 0 6px; font-size: 1.05rem">The four it came from</h2>
+      <p class="sub" style="margin-bottom: 20px">
+        Kept for reference. Each is a whole direction, not a variant.
+      </p>
+
+      <div class="grid">
+        <section class="card">
+          <header>
+            <h3><b>A</b> Handbook · کاغذی و کم‌حرف</h3>
+            <p>
+              Premium as restraint. Warm paper, hairline rules instead of cards, a serif face for
+              everything that is not a measurement. The "good scientific journal" register.
+            </p>
+            <div class="swatches">
+              <i style="background: #faf7f0"></i><i style="background: #efe9db"></i>
+              <i style="background: #8a6f4e"></i><i style="background: #2b2620"></i>
+            </div>
+          </header>
+          <div class="frames">
+            <iframe class="f-desk" src="a.html" title="Handbook desktop"></iframe>
+            <iframe class="f-mob" src="a.html" title="Handbook mobile"></iframe>
+          </div>
+          <footer><a href="a.html" target="_blank">Open full screen ↗</a></footer>
+        </section>
+
+        <section class="card">
+          <header>
+            <h3><b>B</b> Studio · کاردست و آرام</h3>
+            <p>
+              Premium as craft — the candidate house style. Dust-neutral canvas, softly rounded
+              rows, muted sage with clay as the second voice. Vintage by desaturation.
+            </p>
+            <div class="swatches">
+              <i style="background: #f6f5f1"></i><i style="background: #e2eae1"></i>
+              <i style="background: #6d8a72"></i><i style="background: #b08968"></i>
+            </div>
+          </header>
+          <div class="frames">
+            <iframe class="f-desk" src="b.html" title="Studio desktop"></iframe>
+            <iframe class="f-mob" src="b.html" title="Studio mobile"></iframe>
+          </div>
+          <footer><a href="b.html" target="_blank">Open full screen ↗</a></footer>
+        </section>
+
+        <section class="card">
+          <header>
+            <h3><b>C</b> Atlas · نشریه‌ای و قاطع</h3>
+            <p>
+              Premium as editorial authority. Ink-teal on limestone, rust as the second voice, a
+              high-contrast display face. The Nature-Communications register.
+            </p>
+            <div class="swatches">
+              <i style="background: #f3f1ea"></i><i style="background: #2f5d62"></i>
+              <i style="background: #a65e3b"></i><i style="background: #1c2b2d"></i>
+            </div>
+          </header>
+          <div class="frames">
+            <iframe class="f-desk" src="c.html" title="Atlas desktop"></iframe>
+            <iframe class="f-mob" src="c.html" title="Atlas mobile"></iframe>
+          </div>
+          <footer><a href="c.html" target="_blank">Open full screen ↗</a></footer>
+        </section>
+
+        <section class="card">
+          <header>
+            <h3><b>D</b> Terra · گرم و بازیگوش</h3>
+            <p>
+              Premium as warmth — the vintage palette taken furthest. Ochre, dusty rose and olive on
+              cream, large soft radii. Shown as a datasheet so you can judge how far the warm end
+              can go before authority is lost. This is closer to what <b>Learn</b> should be.
+            </p>
+            <div class="swatches">
+              <i style="background: #fbf6ed"></i><i style="background: #c07d31"></i>
+              <i style="background: #a8686a"></i><i style="background: #7a8450"></i>
+            </div>
+          </header>
+          <div class="frames">
+            <iframe class="f-desk" src="d.html" title="Terra desktop"></iframe>
+            <iframe class="f-mob" src="d.html" title="Terra mobile"></iframe>
+          </div>
+          <footer><a href="d.html" target="_blank">Open full screen ↗</a></footer>
+        </section>
+      </div>
+
+      <div class="legend">
+        <h2>What is identical in all four, on purpose</h2>
+        <dl>
+          <dt>Content</dt>
+          <dd>Real LDPE values from the seeded database. Nothing invented.</dd>
+          <dt>The one "cited" value</dt>
+          <dd>
+            Vicat is marked as sourced and its popover says <b>DESIGN SAMPLE</b>. No real citation
+            exists yet — all 109 seeded values are unsourced, and inventing a page number even in a
+            mock is the failure this project exists to prevent (R5).
+          </dd>
+          <dt>Two affordances</dt>
+          <dd>ⓘ on the property name = what is this. Mark on the value = who says so (D4).</dd>
+          <dt>Colour</dt>
+          <dd>
+            In <b>E</b> every hue has exactly one job — teal is measurement, sage is a satisfied
+            citation, grey is a missing one, clay is something you can do, ochre is reserved for
+            warnings and therefore absent from a healthy page. On <b>Learn</b> a second, separate
+            ramp encodes temperature; it never borrows the status palette.
+          </dd>
+          <dt>Numerals</dt>
+          <dd>Latin everywhere, tabular, in LTR islands inside RTL prose (D18, R6).</dd>
+          <dt>Type</dt>
+          <dd>Estedad for Persian in all four (D17). Latin display faces differ by treatment.</dd>
+          <dt>Structure</dt>
+          <dd>
+            One scrolling datasheet with a sticky section rail; Learn is a separate route reached by
+            one button; each section ends with a bridge to its tool (D23, R28).
+          </dd>
+          <dt>Empty values</dt>
+          <dd>Rendered as an invitation, never hidden and never a bare dash (D11, D22).</dd>
+        </dl>
+      </div>
+    </div>
+  </body>
+</html>

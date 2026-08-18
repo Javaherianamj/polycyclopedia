@@ -12,7 +12,9 @@ import pytest
 
 from import_values import DEFAULT_CONFIDENCE, LiveValue, RowError, validate_row
 
-CONTEXT = ("ldpe", "density")
+# (material_slug, grade_class, property_key) -- grade_class is "" for
+# material-level values, which is what every test in this file exercises.
+CONTEXT = ("ldpe", "", "density")
 
 
 def make_live(
@@ -24,6 +26,8 @@ def make_live(
     value_max=0.925,
     value_typical=None,
     value_text=None,
+    value_text_fa=None,
+    value_text_en=None,
     value_enum=None,
     value_bool=None,
     has_evidence=False,
@@ -40,6 +44,8 @@ def make_live(
         value_max=value_max,
         value_typical=value_typical,
         value_text=value_text,
+        value_text_fa=value_text_fa,
+        value_text_en=value_text_en,
         value_enum=value_enum,
         value_bool=value_bool,
         unit_display=canonical_unit,

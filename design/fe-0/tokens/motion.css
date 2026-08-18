@@ -1,0 +1,93 @@
+/* MOTION TOKENS — defined once so FE-8 does not improvise per tool.
+ *
+ * R19: the datasheet is the restrained surface, Learn is the animated one.
+ * That split is expressed here as a RULE, not just a list of numbers:
+ *
+ *   DATASHEET  may use only --dur-fast with --ease-out. Nothing else.
+ *              A hover, a focus ring, a coverage-bar fill — quick and done.
+ *   LEARN      may use the full set below: every duration, every easing,
+ *              including --ease-spring and --dur-deliberate. This is where
+ *              a causal pulse travels an edge or a state slowly settles so
+ *              the eye can follow it (see lab/graph.js's `pulse()`, which
+ *              already hand-rolls a ~480ms rAF tween for exactly this job —
+ *              --dur-slow (400ms) or --dur-deliberate (700ms) is the token
+ *              equivalent, depending how much is being shown).
+ *
+ * This file defines tokens only. It does not style anything itself, and
+ * nothing here is a `transition: all` — R35 is a per-usage rule (every
+ * consumer of these tokens must still name its properties), but the reason
+ * R35 exists lives here: see theme.js's toggleTheme(), which switches the
+ * whole page instantly rather than animating specifically because a
+ * transition that starts in a throttled/backgrounded tab may never fire its
+ * end event. The reduced-motion handling below exists for the same class of
+ * bug — see the comment on that block.
+ */
+
+:root {
+  /* Durations. Named by role, not by feeling: instant/fast are UI feedback,
+     base/slow are content changing, deliberate is "watch this happen." */
+  --dur-instant: 80ms; /* micro-feedback: a value flipping, a checkbox */
+  --dur-fast: 160ms; /* hover, focus, pressed state — the datasheet's ceiling */
+  --dur-base: 240ms; /* a panel opening, a tooltip appearing */
+  --dur-slow: 400ms; /* a multi-element change, e.g. several nodes updating */
+  --dur-deliberate: 700ms; /* a teaching animation that must be watched, not glanced at */
+
+  /* Easings.
+   *
+   * --ease-out reuses the lab's existing --t curve (lab/lab.css:
+   * `cubic-bezier(0.2, 0.7, 0.3, 1)`) rather than a fresh value, on purpose —
+   * the two systems will be consolidated by Opus after all three FE-0 agents
+   * land, and having the datasheet's one permitted easing already match the
+   * Learn surface's default costs nothing and saves a reconciliation step.
+   *
+   * --ease-in-out and --ease-spring below are NOT sourced from anything in
+   * this repo — I picked commonly-used curves because the spec names the
+   * roles but not the numbers. Flagged in the handoff report; treat both as
+   * provisional until a designer signs off.
+   */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1); /* = lab.css's --t curve. UI entering/settling. */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* symmetric, standard "material" curve. State change. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* overshoot-and-settle. Learn only, never the datasheet. */
+  --ease-linear: linear; /* no easing at all — for anything that encodes a continuous physical value (a drag, a scrub, a live readout) where acceleration would misrepresent the number */
+}
+
+/* --------------------------------------------------------- reduced motion
+ *
+ * THE TRAP: setting `transition-duration: 0s` (or `transition: none`) means
+ * the transition never starts, which means it never fires `transitionend`.
+ * Any JS that awaits that event — e.g. graph.js's pulse() step loop, or
+ * anything using a transition's end as a "the UI settled, now do X" signal —
+ * would hang forever for a reduced-motion user specifically, which is a
+ * worse outcome than the motion it was trying to avoid.
+ *
+ * The fix used everywhere below: collapse duration to 0.01ms, not 0 and not
+ * `none`. The transition still runs, still completes, still fires its end
+ * event — it is just visually instantaneous. Same trick lab.css's own
+ * reduced-motion block (lab.css:268) does NOT use (it sets
+ * `transition: none !important`, which is fine for that file because
+ * nothing there gates JS on transitionend today — but any Learn tool built
+ * on THESE tokens, including tools that reuse lab.css's transitions, should
+ * prefer collapsing duration via these custom properties over disabling
+ * transitions outright, precisely to avoid re-introducing this trap).
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0.01ms;
+    --dur-fast: 0.01ms;
+    --dur-base: 0.01ms;
+    --dur-slow: 0.01ms;
+    --dur-deliberate: 0.01ms;
+  }
+}
+
+/* Manual equivalent of the media query above, for UIs that want to offer an
+ * in-app "reduce motion" toggle without requiring the user to change an OS
+ * setting (motion.html's demo toggle uses exactly this). Apply the class to
+ * <html> or any ancestor; same 0.01ms trick, same reasoning. */
+.motion-reduced-sim {
+  --dur-instant: 0.01ms;
+  --dur-fast: 0.01ms;
+  --dur-base: 0.01ms;
+  --dur-slow: 0.01ms;
+  --dur-deliberate: 0.01ms;
+}

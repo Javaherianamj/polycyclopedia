@@ -1,0 +1,122 @@
+---
+// FE-7 — per-material sources surface. A DEDICATED ROUTE, not a section
+// appended to the datasheet ([slug].astro) — decided against folding it in
+// for three reasons, recorded here rather than only in the gate record:
+//
+//   1. D23 (FE-3) already committed the datasheet to "one long scrolling
+//      page, no tabs"; this table is a different SHAPE of the same data
+//      (rows keyed by citation, not by property atom) and would either
+//      duplicate ValueAtom's content a second time on the same page or
+//      require its own tab -- both worse than a linked-out page.
+//   2. R13 wants a real, linkable, shareable address per state. A page-
+//      section anchor is linkable too, but a real route reads as "the
+//      bibliography for this material" rather than "part 9 of the
+//      datasheet" -- closer to what D4 actually asked for ("a sources list
+//      per material", parallel to "a sources list site-wide").
+//   3. BottomLinks.astro already established the pattern of leaving the
+//      datasheet for a related, single-purpose view (similar/compare) --
+//      this is a third card of the same kind, not a new pattern.
+//
+// Static at build time (R13), same shape as [slug].astro: getStaticPaths
+// enumerates every material from the API, not a hardcoded list.
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import CoverageBadge from '../../../../components/datasheet/CoverageBadge.astro';
+import SourcesTable from '../../../../components/sources/SourcesTable.astro';
+import { getMaterial, getMaterials, getProperties } from '../../../../lib/api/client';
+import { buildMaterialSourceData } from '../../../../components/sources/material-sources';
+import { t } from '../../../../i18n/t';
+import { gateMaterials } from '../../../../lib/publish';
+
+const locale = 'en' as const;
+
+export async function getStaticPaths() {
+  const result = await getMaterials({ limit: 200 });
+  if (!result.ok) {
+    throw new Error(`Failed to list materials for static paths: ${result.error.message}`);
+  }
+  return gateMaterials(result.data.data).map((material) => ({ params: { slug: material.slug } }));
+}
+
+const { slug } = Astro.params;
+const [materialResult, propertiesResult] = await Promise.all([getMaterial(slug), getProperties()]);
+
+if (!materialResult.ok) {
+  throw new Error(`Failed to fetch material '${slug}': ${materialResult.error.message}`);
+}
+if (!propertiesResult.ok) {
+  throw new Error(`Failed to fetch property registry: ${propertiesResult.error.message}`);
+}
+
+const material = materialResult.data;
+const registry = propertiesResult.data.data;
+const sourceData = buildMaterialSourceData(registry, material);
+// R7: render nothing (well, a minimal shell with no table markup at all)
+// when there is nothing to show — a material page with zero candidate
+// properties AND zero grade-class rows shouldn't happen for real seeded
+// data, but this guard keeps the promise structural rather than
+// accidental.
+const hasAnything = sourceData.totalRowCount > 0;
+---
+
+<BaseLayout locale={locale} title={`${t(locale, 'sources.pageTitle')} — ${material.nameEn}`}>
+  <main class="wrap src-wrap">
+    <a class="src-back" href={`/${locale}/m/${material.slug}`} data-testid="sources-back-link">
+      &larr; {material.nameEn}
+    </a>
+    <h1>{t(locale, 'sources.pageTitle')}</h1>
+    <p class="src-lead">{t(locale, 'sources.materialPageLead')}</p>
+    <CoverageBadge coverage={material.coverage} locale={locale} />
+
+    {
+      hasAnything ? (
+        <SourcesTable
+          materialGroups={sourceData.materialGroups}
+          gradeClasses={sourceData.gradeClasses}
+          locale={locale}
+        />
+      ) : (
+        <p class="sec-empty">{t(locale, 'sources.materialEmpty')}</p>
+      )
+    }
+
+    <a class="src-sitewide-link" href={`/${locale}/sources`} data-testid="sources-sitewide-link">
+      {t(locale, 'sources.siteWideLink')}
+    </a>
+  </main>
+</BaseLayout>
+
+<style>
+  .src-wrap {
+    max-inline-size: var(--measure-page, 1120px);
+    margin-inline: auto;
+    padding: var(--sec-gap) var(--pad-x) 60px;
+  }
+
+  .src-back {
+    display: inline-block;
+    font-size: var(--fs-small);
+    color: var(--muted);
+    margin-block-end: 14px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h1);
+    margin-block: 0 8px;
+  }
+
+  .src-lead {
+    max-inline-size: 62ch;
+    color: var(--ink-2);
+    line-height: 1.9;
+    margin-block-end: 18px;
+  }
+
+  .src-sitewide-link {
+    display: inline-block;
+    margin-block-start: 30px;
+    font-size: var(--fs-small);
+    color: var(--accent);
+    border-block-end: 1px dashed currentColor;
+  }
+</style>

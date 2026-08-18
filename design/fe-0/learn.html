@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn — Polypedia FE-0</title>
+    <link rel="stylesheet" href="themes/learn.css" />
+    <link rel="stylesheet" href="switcher.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <nav class="switcher" dir="ltr" aria-label="design treatments">
+      <a href="index.html">Compare</a>
+      <span class="sw-sep"></span>
+      <a href="e.html">Press</a>
+      <a href="learn.html" aria-current="page">Learn</a>
+      <span class="sw-sep"></span>
+      <a href="a.html">A</a><a href="b.html">B</a><a href="c.html">C</a><a href="d.html">D</a>
+    </nav>
+
+    <script type="module">
+      import { renderLearn } from './learn.js';
+      renderLearn(document.getElementById('app'));
+    </script>
+  </body>
+</html>

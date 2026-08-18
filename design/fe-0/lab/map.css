@@ -1,0 +1,344 @@
+/* L2 — MAP. Per-concept styling on top of lab.css's foundation (tokens only).
+   The navigation IS the modulus–temperature curve: a draggable marker swaps
+   the tool tray beneath it by physical regime. */
+
+.pill[dir='ltr'] {
+  font-family: var(--font-num);
+  letter-spacing: 0.02em;
+}
+
+.labbar .wrap {
+  flex-wrap: nowrap;
+}
+
+/* .theme now lives in lab.css — the duplicate here was removed. */
+
+@media (max-width: 560px) {
+  .concept-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .labbrand small {
+    display: none;
+  }
+
+  .back-pill-text {
+    display: none;
+  }
+}
+
+/* -------------------------------------------------------------------- hero */
+
+.map-hero {
+  padding-block: 34px 8px;
+}
+
+.map-hero h1 {
+  margin: 6px 0 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.map-hero p {
+  margin: 10px 0 0;
+  max-inline-size: 60ch;
+  color: var(--ink-2);
+}
+
+.map-body {
+  padding-block: 22px 60px;
+  display: grid;
+  gap: 26px;
+}
+
+/* --------------------------------------------------------------------- plot */
+
+.plot-wrap {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 18px 10px 6px;
+}
+
+.modulus-plot {
+  inline-size: 100%;
+  block-size: auto;
+  display: block;
+  overflow: visible;
+}
+
+.gridline {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.axis-line {
+  stroke: var(--line-2);
+  stroke-width: 1.4;
+}
+
+.axis-y,
+.axis-x {
+  fill: var(--muted);
+  font-size: 15px;
+  font-family: var(--font-num);
+}
+
+.axis-title {
+  fill: var(--muted-2);
+  font-size: 14px;
+  font-family: var(--font-body);
+}
+
+.refline {
+  stroke: var(--line-2);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.ref-label {
+  fill: var(--muted);
+  font-size: 13px;
+  font-family: var(--font-num);
+}
+
+.plateau-label {
+  fill: var(--ink-2);
+  font-size: 14px;
+  font-family: var(--font-body);
+}
+
+.curve-solid {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.curve-dashed {
+  stroke: var(--muted-2);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 2 7;
+}
+
+.anchor-dot {
+  fill: var(--on-phase);
+  stroke: var(--act);
+  stroke-width: 2.5;
+}
+
+.marker {
+  cursor: grab;
+  touch-action: none;
+}
+
+.marker:active {
+  cursor: grabbing;
+}
+
+.marker-line {
+  stroke: var(--region-c, var(--act));
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+  transition: stroke var(--t);
+}
+
+.marker-dot {
+  fill: var(--region-c, var(--act));
+  stroke: var(--on-phase);
+  stroke-width: 2.5;
+  transition: fill var(--t);
+}
+
+.marker:focus-visible .marker-dot {
+  outline: 3px solid var(--act);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ readout */
+
+.readout {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+}
+
+.readout-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ro-temp {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.ro-unit {
+  color: var(--muted);
+}
+
+.ro-state {
+  margin-inline-start: auto;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--on-phase);
+}
+
+.readout-sub {
+  margin-block-start: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.readout-sub b {
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.ro-sentence {
+  margin: 14px 0 0;
+  color: var(--ink-2);
+  max-inline-size: 68ch;
+}
+
+.ro-caption {
+  margin: 14px 0 0;
+  padding-block-start: 14px;
+  border-block-start: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}
+
+/* --------------------------------------------------------------------- tray */
+
+.tray-title {
+  font-size: 0.98rem;
+  margin: 0 0 12px;
+  color: var(--ink-2);
+}
+
+.tray-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.mchip {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--panel);
+  padding: 12px 14px;
+  opacity: 1;
+  transition:
+    opacity var(--t),
+    border-color var(--t),
+    background-color var(--t);
+}
+
+.mchip-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.mchip-note,
+.mchip-reason {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.mchip.is-active {
+  border-color: var(--act-line);
+  background: var(--act-bg);
+}
+
+.mchip.is-dim {
+  opacity: 0.4;
+}
+
+.mchip.is-locked {
+  border-style: dashed;
+  background: transparent;
+}
+
+.mchip.is-locked .mchip-label {
+  color: var(--muted-2);
+}
+
+.mchip.is-locked .mchip-label::before {
+  content: '⊘ ';
+}
+
+.mchip.is-locked .mchip-reason {
+  color: var(--muted-2);
+  border-inline-start: 2px solid var(--muted-2);
+  padding-inline-start: 8px;
+}
+
+.mchip.is-locked.is-active {
+  border-color: var(--muted-2);
+  background: transparent;
+}
+
+.mchip.off {
+  background: var(--panel);
+}
+
+.offcurve {
+  padding-block-start: 6px;
+}
+
+@media (max-width: 780px) {
+  .map-hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .ro-temp {
+    font-size: 1.9rem;
+  }
+
+  .readout-main {
+    gap: 8px;
+  }
+
+  .ro-state {
+    margin-inline-start: 0;
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .axis-y,
+  .axis-x,
+  .ref-label {
+    font-size: 18px;
+  }
+
+  .plateau-label {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .plot-wrap {
+    padding: 12px 4px 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker-dot,
+  .marker-line {
+    transition: none;
+  }
+}

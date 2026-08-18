@@ -41,13 +41,13 @@ BEGIN;
 -- 6.1 property_group
 -- ---------------------------------------------------------------------------
 
-INSERT INTO property_group (key, name_fa, name_en, ui_tab, sort_order) VALUES
-    ('processing',  'فرآیندپذیری', 'Processing',  'ind', 10),
-    ('thermal',     'خواص حرارتی', 'Thermal',     'eng', 20),
-    ('mechanical',  'خواص مکانیکی','Mechanical',  'eng', 30),
-    ('physical',    'خواص فیزیکی', 'Physical',    'eng', 40),
-    ('electrical',  'خواص الکتریکی','Electrical', 'eng', 50),
-    ('academic',    'اطلاعات علمی و مولکولی', 'Academic', 'aca', 60)
+INSERT INTO property_group (key, name_fa, name_en, sort_order) VALUES
+    ('processing',  'فرآیندپذیری', 'Processing', 10),
+    ('thermal',     'خواص حرارتی', 'Thermal', 20),
+    ('mechanical',  'خواص مکانیکی','Mechanical', 30),
+    ('physical',    'خواص فیزیکی', 'Physical', 40),
+    ('electrical',  'خواص الکتریکی','Electrical', 50),
+    ('academic',    'اطلاعات علمی و مولکولی', 'Academic', 60)
 ON CONFLICT (key) DO NOTHING;
 
 -- ---------------------------------------------------------------------------

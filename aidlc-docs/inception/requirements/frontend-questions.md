@@ -2,7 +2,8 @@
 
 Answer after each `[Answer]:` tag. Free text is fine; option letters are just
 shortcuts. Anything left blank will be resolved with the default noted in
-brackets and recorded as an assumption.
+brackets and recorded as an assumption. Wherever "X) Other" is offered, write
+your own answer as free text after the tag.
 
 ---
 
@@ -20,7 +21,7 @@ D) Researchers who need the citation itself, not the number (provenance is the p
 
 E) All four equally — the site must not favour one
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 E- and each must have their way to achive their need. as it is we have datasheet in one topic of each entry, learning tools in other! so they can choose wehre to go. also we will add a searching tool to site like the comparison one--> that is the engine everything is held on!
@@ -41,7 +42,7 @@ C) Datasheet is the product; simulators become secondary, collapsed by default
 
 D) Lab is the product; the datasheet becomes a reference panel inside it
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: B
 
@@ -60,7 +61,7 @@ C) Show everything, but put a prominent per-material coverage indicator ("12% so
 
 D) Show sourced values normally and hide unsourced ones inside a "show uncited data" toggle, off by default
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 C and D. we show sources on hover, for the ones without source it should say source not added or...
@@ -78,7 +79,7 @@ C) A per-section status strip (e.g. "Thermal: 8/9 values sourced") plus per-valu
 
 D) A dedicated "Sources" tab per material listing every value → source mapping
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 C and D. a sources list is on the home page, a sources list is also for every entry which is like a csv of data with their source. also no demand they can hover and see the source in the datasheet page-->A, decide wether marker is better or hover.since we need one for sources and one for explaining what that propertie is and explaining it.
@@ -97,7 +98,7 @@ C) Metadata plus a scanned/cropped image of the cited table or line
 
 D) Undecided — design the popover so any of these can be switched on later
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: A
 
@@ -117,7 +118,7 @@ C) A separate page reachable from the nav; browsing stays the front door
 
 D) Later — browse and datasheet first, search after citation coverage is real
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: B
 
@@ -134,7 +135,7 @@ B) Mostly direct/word-of-mouth inside the association and universities — SEO i
 
 C) Unknown / not thought about yet
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 B-->ihave not thought about seo but it is in our vision, secondary(we had 1000 requests on claudeflare in 2 week when we published the prototype(this was the second prototype and the first one was aweful)
@@ -151,7 +152,7 @@ B) Desktop-first — this is a workbench tool used at a desk
 
 C) True dual — dense desktop layout and a genuinely different mobile layout, both designed
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 C- first impresion of most users is on mobile(telegram add) and as a searchable datasheet later serious uses might be on descktop so both matter a lot(and both are a bit worked on in prototype)
@@ -167,7 +168,7 @@ B) Refactor in place, screen by screen, behind the API — the site never stops 
 
 C) Keep it live as-is at a "classic" URL while the new one is built
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: A
 
@@ -185,7 +186,7 @@ C) Citation UI first — make the provenance visible even on a rough layout, bec
 
 D) Property search first — the differentiator, even if the rest still looks like the prototype
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 X- i won't publish this until done thoroghly, so do them in the correct and best order for execution
@@ -204,7 +205,7 @@ C) Show a group only if it has at least one value; hide empty groups entirely
 
 D) Show empty fields as a call to action ("no data yet — contribute a source")
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 D-also change database docs to have that in mind for further steps
@@ -222,7 +223,7 @@ C) Close to the current prototype's look, cleaned up and made consistent
 
 D) Academic/institutional — matching the Polymer Engineering Association's identity (do you have brand assets, colours, a logo spec?)
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 B-also Build a visual identity with me step by step,with some examples.the website must stand out(different parts need different visual-datasheet parts must be a little dryer and learning parts mus be interactive and fun to look at. also we need attraction for user and also premuim feel)
@@ -238,7 +239,7 @@ B) Persian only now, but build the i18n seam so English is a content task later,
 
 C) Bilingual from the start
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]:
 C-but the main language is persian and we decide based on it. also keep the room for other languages

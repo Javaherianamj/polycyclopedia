@@ -1,0 +1,39 @@
+---
+// Recommended processing techniques (material_process), a qualitative list
+// distinct from the numeric "processing" property group's values — rendered
+// inside that same section rather than as its own rail item, since the
+// frontend-plan's rail list never named it separately. R5: 0 real rows for
+// a given material renders as an explicit empty note, not a hidden block.
+import type { Locale } from '../../i18n/config';
+import type { ProcessingTechnique } from '../../lib/api/types';
+import { t } from '../../i18n/t';
+
+interface Props {
+  techniques: ProcessingTechnique[];
+  locale: Locale;
+}
+
+const { techniques, locale } = Astro.props;
+---
+
+<div class="processing-techniques" data-testid="datasheet-processing-techniques">
+  <h3>{t(locale, 'datasheet.processingTechniques')}</h3>
+  {
+    techniques.length > 0 ? (
+      <ul>
+        {techniques.map((technique) => (
+          <li>
+            <span>{locale === 'fa' ? technique.nameFa : technique.nameEn}</span>
+            {(locale === 'fa' ? technique.noteFa : technique.noteEn) && (
+              <span class="processing-technique-note">
+                {locale === 'fa' ? technique.noteFa : technique.noteEn}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="sec-empty">{t(locale, 'datasheet.sectionEmpty')}</p>
+    )
+  }
+</div>

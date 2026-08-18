@@ -1,0 +1,554 @@
+/* FE-6: compare. Imported once into global.css, same posture search.css
+ * documents for itself: shares tokens with the rest of the house style
+ * rather than inventing new ones EXCEPT where the feature genuinely needs a
+ * meaning none of D36's five hues carry — see the polarity tokens below,
+ * which is the one deliberate exception, named per R33 before use.
+ */
+
+/* --------------------------------------------------------- sr-only utility
+ * Standard visually-hidden pattern (not clip-path/width:0, which some
+ * screen readers skip) -- used for the table caption and the polarity
+ * mark's textual equivalent (CR2: colour is never the only channel).
+ */
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------- polarity tokens
+ * CR4/CR5/CR6. Deliberately NOT one of D36's five semantic hues (graphite/
+ * teal/sage/grey/clay) -- none of those five means "better for this use",
+ * and repurposing --ok (sage, "provenance satisfied") here would conflate
+ * two unrelated meanings under one colour, exactly what R33 exists to
+ * prevent. Two new named hues instead, used NOWHERE else on the site:
+ * --cmp-better (a blue distinct from --accent's teal) and --cmp-worse (a
+ * muted rose distinct from --act's clay and reserved --warn ochre). Both
+ * pass 4.5:1 against --panel in both themes (checked manually against the
+ * hex pairs below; not run through an automated contrast tool this
+ * session -- see build-and-test.md).
+ */
+:root {
+  --cmp-better: #2c5b8a;
+  --cmp-better-soft: #dfe8f2;
+  --cmp-worse: #8a3f3f;
+  --cmp-worse-soft: #f2e2df;
+}
+
+:root[data-theme='dark'] {
+  --cmp-better: #8fb8e6;
+  --cmp-better-soft: #253347;
+  --cmp-worse: #e0a3a3;
+  --cmp-worse-soft: #3a2726;
+}
+
+.cmp-lead {
+  max-inline-size: 62ch;
+  color: var(--ink-2);
+  margin-block-end: 28px;
+}
+
+.cmp-app {
+  display: grid;
+  gap: 24px;
+}
+
+.cmp-panel-heading {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3, 1.15rem);
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------- subjects */
+
+.cmp-subjects {
+  padding: var(--row-pad);
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+}
+
+.cmp-subject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.cmp-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 14px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+
+[dir='rtl'] .cmp-subject-chip {
+  padding: 6px 14px 6px 8px;
+}
+
+.cmp-subject-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 1rem;
+  line-height: 1;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.cmp-subject-remove:hover,
+.cmp-subject-remove:focus-visible {
+  background: var(--accent-soft-2);
+}
+
+.cmp-add-subject {
+  display: grid;
+  gap: 6px;
+  max-inline-size: 360px;
+}
+
+.cmp-add-subject-label {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+.cmp-add-subject-combo {
+  position: relative;
+}
+
+.cmp-add-subject-input {
+  inline-size: 100%;
+  padding: 10px 14px;
+  border: var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--fs-body);
+}
+
+.cmp-add-subject-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cmp-add-subject-list {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  inset-block-start: calc(100% + 6px);
+  z-index: 20;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  max-block-size: 280px;
+  overflow-y: auto;
+  border: var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--panel);
+  box-shadow: var(--shadow-2);
+}
+
+.cmp-add-subject-empty {
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
+
+.cmp-add-subject-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  inline-size: 100%;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  text-align: start;
+  font-size: var(--fs-small);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.cmp-add-subject-option:hover,
+.cmp-add-subject-option:focus-visible {
+  background: var(--note-bg);
+}
+
+.cmp-add-subject-option-meta {
+  color: var(--muted);
+  font-size: var(--fs-caption);
+}
+
+.cmp-clear-all {
+  margin-block-start: 12px;
+  color: var(--muted);
+  font-size: var(--fs-caption);
+  text-decoration: underline;
+}
+
+/* ----------------------------------------------------------- start prompt */
+
+.cmp-start-prompt {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 24px;
+  border: var(--hairline);
+  border-radius: var(--r-md);
+  color: var(--act);
+  background: var(--act-soft);
+}
+
+/* ---------------------------------------------------------------- controls */
+
+.cmp-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+  padding-block-end: 16px;
+  border-block-end: var(--rule);
+}
+
+.cmp-application {
+  display: grid;
+  gap: 4px;
+  max-inline-size: 320px;
+}
+
+.cmp-application-label {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+.cmp-application-select {
+  padding: 9px 14px;
+  border-radius: var(--r-pill);
+  border: var(--hairline);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+
+.cmp-application-hint {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--fs-caption);
+  max-inline-size: 42ch;
+  line-height: 1.7;
+}
+
+.cmp-sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.cmp-sort-label {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+.cmp-sort-buttons {
+  display: inline-flex;
+  border: var(--hairline);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.cmp-sort-btn {
+  padding: 7px 14px;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.cmp-sort-btn-on {
+  background: var(--accent);
+  color: var(--panel);
+}
+
+.cmp-hide-identical {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------------ table
+ * CR15: the ONLY sanctioned R27 exception. `.cmp-table-scroll` is the
+ * element that scrolls horizontally; the page body never does (verified in
+ * build-and-test.md via document.documentElement.scrollWidth). The
+ * property-name column (`.cmp-th-property`) is sticky to the scroll
+ * container's own inline-start, using logical properties so it sticks to
+ * the correct physical side under both `dir="ltr"` and `dir="rtl"`.
+ */
+
+.cmp-table-scroll {
+  overflow-x: auto;
+  border: var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-1);
+}
+
+.cmp-mobile-hint {
+  display: none;
+  margin: 0;
+  padding: 8px 14px;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  border-block-end: var(--hairline);
+}
+
+.cmp-table {
+  border-collapse: collapse;
+  inline-size: 100%;
+  min-inline-size: 640px;
+}
+
+.cmp-table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  background: var(--panel);
+  border-block-end: var(--rule);
+  padding: 12px 16px;
+  text-align: start;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cmp-th-property {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 6;
+  background: var(--panel);
+  border-inline-end: var(--rule);
+  min-inline-size: 220px;
+  max-inline-size: 320px;
+  white-space: normal;
+}
+
+thead .cmp-th-property {
+  z-index: 8;
+}
+
+.cmp-row-head {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  text-align: start;
+  font-weight: 400;
+  vertical-align: top;
+}
+
+.cmp-row-group-chip {
+  justify-self: start;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  background: var(--chip);
+  color: var(--muted-2);
+  font-size: var(--fs-caption);
+}
+
+.cmp-row-name {
+  color: var(--ink);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cmp-row-symbol,
+.cmp-row-conditions {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.cmp-row-delta {
+  font-family: var(--font-num);
+  font-size: var(--fs-caption);
+  color: var(--muted-2);
+}
+
+.cmp-row-overlap {
+  font-size: var(--fs-caption);
+  color: var(--muted);
+  font-style: italic;
+}
+
+.cmp-row-citation-flag {
+  font-size: var(--fs-caption);
+  color: var(--act);
+}
+
+.cmp-polarity-rationale {
+  font-size: var(--fs-caption);
+}
+
+.cmp-polarity-rationale summary {
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+}
+
+.cmp-polarity-rationale summary::-webkit-details-marker {
+  display: none;
+}
+
+.cmp-polarity-rationale p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+
+.cmp-table tbody tr {
+  border-block-end: var(--row-border);
+}
+
+.cmp-table tbody tr:hover {
+  background: var(--row-bg-hover);
+}
+
+.cmp-table tbody tr:hover .cmp-th-property {
+  background: var(--row-bg-hover);
+}
+
+.cmp-cell {
+  padding: 12px 16px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.cmp-cell-value {
+  font-family: var(--font-num);
+  color: var(--ink);
+  /* font-size/font-weight set inline per cell -- CR1/CR3's bounded
+     typographic ramp, computed from computeEmphasis(). Never a hue here. */
+}
+
+.cmp-cell-missing {
+  color: var(--muted-2);
+  font-style: italic;
+  font-size: var(--fs-small);
+}
+
+/* CR4/CR5/CR10 -- colour ONLY when an application is selected, the row has
+ * a real polarity judgement, and the row isn't overlapping/zero-span. The
+ * arrow glyph (`.cmp-cell-polarity-mark`) and the sr-only text label next to
+ * it are CR2's second channel -- colour is never the sole carrier. */
+.cmp-cell-better {
+  background: var(--cmp-better-soft);
+  box-shadow: inset 3px 0 0 var(--cmp-better);
+}
+
+[dir='rtl'] .cmp-cell-better {
+  box-shadow: inset -3px 0 0 var(--cmp-better);
+}
+
+.cmp-cell-worse {
+  background: var(--cmp-worse-soft);
+  box-shadow: inset 3px 0 0 var(--cmp-worse);
+}
+
+[dir='rtl'] .cmp-cell-worse {
+  box-shadow: inset -3px 0 0 var(--cmp-worse);
+}
+
+.cmp-cell-polarity-mark {
+  margin-inline-start: 6px;
+  font-size: 0.75em;
+}
+
+.cmp-cell-better .cmp-cell-polarity-mark {
+  color: var(--cmp-better);
+}
+
+.cmp-cell-worse .cmp-cell-polarity-mark {
+  color: var(--cmp-worse);
+}
+
+/* Citation mark -- D36's actual mapping (sage = provenance satisfied, grey =
+ * provenance absent), not `--accent`/teal (measurement's own job). See
+ * build-and-test.md for the note that ValueAtom's existing `.mark-cited`
+ * uses `--accent` instead, which this unit did not touch or "fix" (out of
+ * FE-6's scope) but flagged separately. */
+.cmp-cell-cited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 15px;
+  block-size: 15px;
+  margin-inline-start: 8px;
+  border-radius: 5px;
+  font-size: 0.7em;
+  vertical-align: middle;
+}
+
+.cmp-cell-cited-yes {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.cmp-cell-cited-no {
+  background: var(--track);
+  color: var(--muted-2);
+}
+
+/* ------------------------------------------------------------- CR7 motion
+ * View Transitions (feature-detected in CompareIsland.tsx) animate each row
+ * between its old and new position on a sort-mode toggle. R35: named
+ * properties only (the browser's default view-transition animates transform
+ * + opacity, never `all`), and a theme switch is unaffected -- this only
+ * ever fires from `changeSortMode`, never from `data-theme` changing.
+ */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ------------------------------------------------------------- breakpoints */
+
+@media (max-width: 900px) {
+  .cmp-controls {
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cmp-mobile-hint {
+    display: block;
+  }
+
+  .cmp-th-property {
+    min-inline-size: 168px;
+    max-inline-size: 200px;
+  }
+
+  .cmp-add-subject {
+    max-inline-size: 100%;
+  }
+}

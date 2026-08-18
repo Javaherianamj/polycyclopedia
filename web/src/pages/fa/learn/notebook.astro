@@ -1,0 +1,17 @@
+---
+// L4 — «دفترچه» / NOTEBOOK, Persian route (default locale). Fourth and
+// final sibling of `/{locale}/learn` (SCALE), `/{locale}/learn/map` (MAP)
+// and `/{locale}/learn/graph` (GRAPH) — see components/learn/LearnNotebook
+// .astro's header for the full routing/content rationale, which this file
+// does not repeat (same three-line pairing every locale-routed page in
+// this app already uses).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LearnNotebook from '../../../components/learn/LearnNotebook.astro';
+import { t } from '../../../i18n/t';
+
+const locale = 'fa' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.notebook.pageTitle')} surface="lab">
+  <LearnNotebook locale={locale} />
+</BaseLayout>

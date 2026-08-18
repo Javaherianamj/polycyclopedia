@@ -1,0 +1,130 @@
+/* B — STUDIO
+   Premium as craft. This is the candidate house style: a soft dust-neutral
+   canvas, rows as very softly rounded cards, one muted sage accent with clay as
+   the second voice, and shadows you notice only when they are removed.
+   Vintage by desaturation rather than by colour. */
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-display-fa: 'Estedad Variable', system-ui, sans-serif;
+  --font-display: 'Estedad Variable', system-ui, sans-serif;
+  --font-num: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  --fs-body: 15.5px;
+  --lh-body: 1.9;
+  --fs-h1: 2.15rem;
+  --fw-h1: 700;
+  --fs-h2: 1.1rem;
+  --fw-h2: 650;
+  --fs-label: 0.92rem;
+  --fs-value: 1.05rem;
+  --fw-value: 500;
+  --num-tracking: -0.02em;
+
+  --bg: #f6f5f1;
+  --panel: #fffefc;
+  --pop-bg: #fffefc;
+  --bar-bg: rgba(246, 245, 241, 0.82);
+  --note-bg: #f0efe9;
+  --chip: #eceae3;
+  --track: #e3e1d9;
+
+  --ink: #26282a;
+  --ink-2: #4b4e50;
+  --muted: #7c7f7a;
+  --muted-2: #a3a69f;
+
+  /* muted sage, with clay reserved for the Learn surface */
+  --accent: #6d8a72;
+  --accent-soft: #e2eae1;
+  --accent-soft-2: #b5c6b6;
+  --accent-2: #b08968;
+
+  --hairline: 1px solid #e6e4dc;
+  --rule: 1px solid #e6e4dc;
+
+  --row-bg: #fffefc;
+  --row-bg-hover: #fbfaf6;
+  --row-border: 1px solid #eceae2;
+  --row-border-hover: #d9ddd4;
+  --row-pad: 14px 18px;
+  --row-gap: 8px;
+  --sec-gap: 48px;
+  --sec-head-gap: 18px;
+
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(38, 40, 42, 0.04), 0 8px 24px -12px rgba(38, 40, 42, 0.1);
+  --shadow-2: 0 12px 34px -10px rgba(38, 40, 42, 0.18);
+
+  --t-fast: 0.19s cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-pop: opacity 0.17s ease, transform 0.17s cubic-bezier(0.2, 0.7, 0.3, 1), visibility 0.17s;
+
+  --measure-page: 1140px;
+  --pad-x: 28px;
+  --bar-h: 64px;
+
+  --bridge-bg: linear-gradient(200deg, #f2f0e9, #eef1ec);
+  --bridge-border: 1px solid #e2e5dd;
+}
+
+.hero {
+  padding-block-start: 34px;
+}
+
+.hero-code {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #4c6b52;
+  letter-spacing: 0.14em;
+}
+
+.sec-head h2 {
+  position: relative;
+  padding-inline-start: 14px;
+}
+
+.sec-head h2::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 4px 4px;
+  inline-size: 4px;
+  border-radius: 999px;
+  background: var(--accent-soft-2);
+}
+
+.prop {
+  box-shadow: 0 1px 1px rgba(38, 40, 42, 0.02);
+}
+
+.prop:hover {
+  box-shadow: var(--shadow-1);
+  transform: translateY(-1px);
+}
+
+/* clay is the Learn voice — the one place the palette warms up */
+.bridge {
+  border-color: #e6ddd2;
+  background: linear-gradient(200deg, #f6efe6, #f3f2ec);
+}
+
+.bridge-go {
+  color: var(--accent-2);
+}
+
+.surfaces .surface:not(.is-on) {
+  border-color: #e2ddd4;
+  color: var(--accent-2);
+}
+
+.coverage-bar i {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}

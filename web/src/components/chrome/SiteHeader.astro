@@ -1,0 +1,159 @@
+---
+// FE-1b — the global site header.
+//
+// Why this exists as a late unit: FE-1's app shell delivered tokens, routing,
+// the API client and the four states, but never a header. The site therefore
+// shipped five feature surfaces with no wordmark, no home link and no way to
+// reach Search, Compare or Sources except by typing a URL. The owner found
+// it immediately: "in each polymer page there is no site name, and i can not
+// go home either" / "the search engine is not reachable".
+//
+// Static Astro, no island: navigation must not depend on hydration (R24, and
+// FE-5/6/7's islands already carry the react-dom runtime cost on their own
+// routes — chrome must not add to it). The theme toggle's handler is the one
+// script here, and it degrades to a no-op rather than breaking navigation.
+import type { Locale } from '../../i18n/config';
+import { locales } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import Wordmark from './Wordmark.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+// Trailing slashes vary by route (Astro's default is directory-style URLs),
+// so normalise before comparing rather than matching raw strings.
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const home = `/${locale}`;
+
+const navItems = [
+  { href: `/${locale}/catalog`, key: 'nav.catalog' },
+  { href: `/${locale}/search`, key: 'nav.search' },
+  { href: `/${locale}/compare`, key: 'nav.compare' },
+  // FE-8 step 1: the Learn surface's only chrome-level entry point besides
+  // datasheet PropertySection bridge cards (which only cover 3 of 6
+  // property groups today, learn-bridge-map.ts). Without this link a reader
+  // who never scrolls into a bridged section has no way to find Learn at all.
+  { href: `/${locale}/learn`, key: 'nav.learn' },
+  // FE-8 step 4: the solvent reference table -- a datasheet-surface sibling
+  // to Catalog/Sources, not a Learn tool (the Hansen-space VISUALISATION of
+  // this same data lives on /learn instead; see solvents.astro's header).
+  { href: `/${locale}/solvents`, key: 'nav.solvents' },
+  { href: `/${locale}/sources`, key: 'nav.sources' },
+] as const;
+
+// A nav item is current when it is the path or an ancestor of it, so
+// /en/m/hdpe/sources does not light up "Sources" (a different surface) but
+// /en/catalog does light up "Catalog". Exact match only, deliberately.
+const isCurrent = (href: string) => path === href;
+
+// The language switcher must land on the SAME page in the other locale
+// (D28: both trees are prefixed, so every route has a counterpart), not dump
+// the reader on the homepage. Swap only the first segment.
+const otherLocale = locales.find((l) => l !== locale) as Locale;
+const swapped = path.replace(new RegExp(`^/${locale}(?=/|$)`), `/${otherLocale}`);
+const otherHref = swapped === path ? `/${otherLocale}` : swapped;
+---
+
+<a class="skip-link" href="#main">{t(locale, 'nav.skipToContent')}</a>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="wordmark-link" href={home} aria-label={t(locale, 'nav.wordmarkHome')}>
+      <Wordmark locale={locale} />
+    </a>
+
+    <nav class="site-nav" aria-label={t(locale, 'nav.home')}>
+      <ul class="site-nav-list">
+        {
+          navItems.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['site-nav-link', { 'is-current': isCurrent(item.href) }]}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                data-testid={`nav-${item.key.split('.')[1]}`}
+              >
+                {t(locale, item.key)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header-controls">
+      <a
+        class="lang-switch"
+        href={otherHref}
+        lang={otherLocale}
+        title={t(locale, 'lang.switcherLabel')}
+        data-testid="lang-switch"
+      >
+        {t(locale, 'lang.switchTo')}
+      </a>
+
+      <ThemeToggle locale={locale} />
+    </div>
+  </div>
+</header>
+
+<script>
+  // Theme toggle. The initial theme is already applied by BaseLayout's
+  // blocking inline script (same `polypedia-theme` key) -- this only
+  // handles subsequent user toggles, so there is no flash to avoid here.
+  //
+  // R35: switching a setting is not an animation. The `data-theme-changing`
+  // flag lets chrome.css suppress transitions for the duration of the swap,
+  // then releases it on the next frame.
+  const root = document.documentElement;
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    const sync = () => {
+      const isDark = root.dataset.theme === 'dark';
+      button.setAttribute(
+        'aria-label',
+        (isDark ? button.dataset.labelToLight : button.dataset.labelToDark) ?? '',
+      );
+      button.setAttribute('aria-pressed', String(isDark));
+    };
+
+    button.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.themeChanging = '';
+      root.dataset.theme = next;
+
+      // The celestial sweep (chrome.css). Restarting a CSS animation
+      // requires the element to leave and re-enter the matching state, so
+      // the attribute is cleared, layout is flushed, then re-set --
+      // otherwise a second toggle within one animation does nothing.
+      const sky = document.querySelector('[data-sky-sweep]');
+      if (sky instanceof HTMLElement && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        sky.removeAttribute('data-sweeping');
+        void sky.offsetWidth;
+        sky.dataset.sweeping = next;
+      }
+      try {
+        localStorage.setItem('polypedia-theme', next);
+      } catch {
+        // Private-mode or storage-disabled: the toggle still works for this
+        // page view, it just will not persist. Not worth failing over.
+      }
+      sync();
+
+      // Release the transition suppression once the restyle has been
+      // painted. rAF alone is NOT sufficient: in a backgrounded or
+      // non-compositing context it may not fire for a long time (or at
+      // all), which would leave `data-theme-changing` stuck and silently
+      // disable every transition on the site. The timeout is the
+      // guarantee; the rAF is the fast path.
+      const release = () => delete root.dataset.themeChanging;
+      requestAnimationFrame(release);
+      setTimeout(release, 50);
+    });
+
+    sync();
+  }
+</script>

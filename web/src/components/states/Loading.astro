@@ -1,0 +1,19 @@
+---
+// One of R4's four states. Styling lives in global.css under .state-loading
+// (see the comment there for why) -- only meaningful for client-side fetches
+// inside islands, since a build-time Astro page resolves directly to
+// Empty/Full/Error and never has a loading moment (web/README.md).
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div class="state-loading" role="status" aria-live="polite">
+  <span class="state-spinner" aria-hidden="true"></span>
+  <span>{t(locale, 'state.loading')}</span>
+</div>

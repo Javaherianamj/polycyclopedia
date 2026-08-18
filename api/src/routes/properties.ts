@@ -10,7 +10,6 @@ const PROPERTIES_SQL = `
     pgr.key AS group_key,
     pgr.name_fa AS group_name_fa,
     pgr.name_en AS group_name_en,
-    pgr.ui_tab AS group_ui_tab,
     pd.key AS property_key,
     pd.name_fa AS property_name_fa,
     pd.name_en AS property_name_en,
@@ -21,7 +20,9 @@ const PROPERTIES_SQL = `
     pd.canonical_unit AS property_canonical_unit,
     pd.allowed_units AS property_allowed_units,
     pd.is_searchable AS property_is_searchable,
-    pd.is_comparable AS property_is_comparable
+    pd.is_comparable AS property_is_comparable,
+    pd.applies_to_fields AS property_applies_to_fields,
+    pd.applies_to_families AS property_applies_to_families
   FROM property_definition pd
   JOIN property_group pgr ON pgr.id = pd.group_id
   ORDER BY pgr.sort_order, pd.sort_order, pd.key
@@ -39,6 +40,8 @@ interface PropertyDefinitionRow {
   propertyAllowedUnits: string[];
   propertyIsSearchable: boolean;
   propertyIsComparable: boolean;
+  propertyAppliesToFields: string[];
+  propertyAppliesToFamilies: string[];
 }
 
 export function registerPropertiesRoute(app: FastifyInstance, pool: pg.Pool): void {
@@ -51,14 +54,12 @@ export function registerPropertiesRoute(app: FastifyInstance, pool: pg.Pool): vo
         groupKey: string;
         groupNameFa: string;
         groupNameEn: string;
-        groupUiTab: string | null;
       }>(rows[0]!);
 
       return {
         key: first.groupKey,
         nameFa: first.groupNameFa,
         nameEn: first.groupNameEn,
-        uiTab: first.groupUiTab,
         properties: rows.map((r) => {
           const camel = toCamelCase<PropertyDefinitionRow>(r);
           return {
@@ -73,6 +74,13 @@ export function registerPropertiesRoute(app: FastifyInstance, pool: pg.Pool): vo
             allowedUnits: camel.propertyAllowedUnits,
             isSearchable: camel.propertyIsSearchable,
             isComparable: camel.propertyIsComparable,
+            // Scoping, so the frontend can tell "nobody has sourced this yet"
+            // (render the add-a-source call to action) apart from "this
+            // property does not apply to this material at all" (render
+            // nothing). Both arrays empty = applies everywhere; they are
+            // ANDed. See db/seeds/0008_property_scoping.sql.
+            appliesToFields: camel.propertyAppliesToFields,
+            appliesToFamilies: camel.propertyAppliesToFamilies,
           };
         }),
       };

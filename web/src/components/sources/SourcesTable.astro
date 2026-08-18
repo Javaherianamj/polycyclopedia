@@ -1,0 +1,221 @@
+---
+// FE-7 — the "CSV of data with their source" table (D4). One row per
+// (property, citation); a value with N citations gets N rows sharing one
+// rowspan'd property/value cell, so a reader can see every source backing
+// a single number without a nested popover the way ValueAtom's mark does.
+// A value with zero citations still gets exactly one row -- D3's "uncited
+// values say so explicitly, they are not hidden" made literal as a table
+// row rather than an omission.
+//
+// Colour: the source badge reuses D36's mapping directly -- var(--ok)/
+// var(--ok-soft) for cited (sage, "provenance satisfied"), var(--track)/
+// var(--muted-2) for uncited/missing (grey, "provenance absent"). Same
+// tokens value-atom.css's `.mark-cited`/`.mark-uncited` and compare.css's
+// `.cmp-cell-cited-yes`/`-no` use, so "sourced" reads identically here too
+// (see this unit's build-and-test.md §6 for the fix that made all three
+// agree in the first place).
+import type { Locale } from '../../i18n/config';
+import type { MaterialSourceGroup, MaterialSourceGradeClass } from './material-sources';
+import { formatLocator } from '../value-atom/logic';
+import { t } from '../../i18n/t';
+
+interface Props {
+  materialGroups: MaterialSourceGroup[];
+  gradeClasses: MaterialSourceGradeClass[];
+  locale: Locale;
+}
+
+const { materialGroups, gradeClasses, locale } = Astro.props;
+---
+
+{
+  materialGroups.length > 0 && (
+    <section class="src-section" data-testid="sources-table-material">
+      <h2 class="src-section-heading">{t(locale, 'sources.materialLevelHeading')}</h2>
+      {materialGroups.map((group) => (
+        <div class="src-group">
+          <h3 class="src-group-heading">{locale === 'fa' ? group.nameFa : group.nameEn}</h3>
+          <div class="src-table-scroll">
+            <table class="src-table" data-testid={`sources-table-${group.key}`}>
+              <caption class="sr-only">{locale === 'fa' ? group.nameFa : group.nameEn}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{t(locale, 'sources.columnProperty')}</th>
+                  <th scope="col">{t(locale, 'sources.columnValue')}</th>
+                  <th scope="col">{t(locale, 'sources.columnSource')}</th>
+                  <th scope="col">{t(locale, 'sources.columnLocator')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.rows.map((row) => {
+                  const citations = row.citations;
+                  const rowSpan = citations.length > 0 ? citations.length : 1;
+                  const name = locale === 'fa' ? row.nameFa : row.nameEn;
+                  return citations.length > 0 ? (
+                    citations.map((citation, i) => (
+                      <tr data-testid={`sources-row-${row.rowKey}`}>
+                        {i === 0 && (
+                          <>
+                            <th scope="row" rowspan={rowSpan} class="src-cell-property">
+                              {name}
+                              {row.symbol && (
+                                <span class="src-property-sym" dir="ltr">
+                                  {' '}
+                                  ({row.symbol})
+                                </span>
+                              )}
+                              {row.conditionLabel && (
+                                <span class="src-property-cond"> ({row.conditionLabel})</span>
+                              )}
+                            </th>
+                            <td rowspan={rowSpan} class="src-cell-value" dir="ltr">
+                              {row.display}
+                            </td>
+                          </>
+                        )}
+                        <td class="src-cell-source">
+                          <span class="src-mark src-mark-cited">{t(locale, 'value.sourced')}</span>{' '}
+                          {citation.sourceTitle}
+                          {citation.sourceEdition && (
+                            <span class="src-edition">
+                              {' '}
+                              ({t(locale, 'value.citation.edition')} {citation.sourceEdition})
+                            </span>
+                          )}
+                          {citation.role === 'conflicting' && (
+                            <span class="src-conflict-flag">
+                              {t(locale, 'value.citation.conflicting')}
+                            </span>
+                          )}
+                        </td>
+                        <td class="src-cell-locator" dir="ltr">
+                          {formatLocator(citation.locator, locale)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr data-testid={`sources-row-${row.rowKey}`}>
+                      <th scope="row" class="src-cell-property">
+                        {name}
+                        {row.symbol && (
+                          <span class="src-property-sym" dir="ltr">
+                            {' '}
+                            ({row.symbol})
+                          </span>
+                        )}
+                        {row.conditionLabel && (
+                          <span class="src-property-cond"> ({row.conditionLabel})</span>
+                        )}
+                      </th>
+                      <td class="src-cell-value" dir="ltr">
+                        {row.state === 'missing' ? t(locale, 'value.missing') : row.display}
+                      </td>
+                      <td class="src-cell-source">
+                        <span class="src-mark src-mark-uncited">
+                          {row.state === 'missing'
+                            ? t(locale, 'value.missing')
+                            : t(locale, 'value.uncited')}
+                        </span>
+                      </td>
+                      <td class="src-cell-locator" aria-hidden="true">
+                        —
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+{
+  gradeClasses.map((gc) => (
+    <section class="src-section" data-testid={`sources-table-grade-${gc.key}`}>
+      <h2 class="src-section-heading">
+        {t(locale, 'sources.gradeClassHeading').replace(
+          '{name}',
+          locale === 'fa' ? gc.nameFa : gc.nameEn,
+        )}
+      </h2>
+      {gc.groups.map((group) => (
+        <div class="src-group">
+          <h3 class="src-group-heading">{locale === 'fa' ? group.nameFa : group.nameEn}</h3>
+          <div class="src-table-scroll">
+            <table class="src-table">
+              <caption class="sr-only">{locale === 'fa' ? group.nameFa : group.nameEn}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{t(locale, 'sources.columnProperty')}</th>
+                  <th scope="col">{t(locale, 'sources.columnValue')}</th>
+                  <th scope="col">{t(locale, 'sources.columnSource')}</th>
+                  <th scope="col">{t(locale, 'sources.columnLocator')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.rows.map((row) => {
+                  const citations = row.citations;
+                  const rowSpan = citations.length > 0 ? citations.length : 1;
+                  const name = locale === 'fa' ? row.nameFa : row.nameEn;
+                  return citations.length > 0 ? (
+                    citations.map((citation, i) => (
+                      <tr data-testid={`sources-row-${gc.key}-${row.rowKey}`}>
+                        {i === 0 && (
+                          <>
+                            <th scope="row" rowspan={rowSpan} class="src-cell-property">
+                              {name}
+                              {row.conditionLabel && (
+                                <span class="src-property-cond"> ({row.conditionLabel})</span>
+                              )}
+                            </th>
+                            <td rowspan={rowSpan} class="src-cell-value" dir="ltr">
+                              {row.display}
+                            </td>
+                          </>
+                        )}
+                        <td class="src-cell-source">
+                          <span class="src-mark src-mark-cited">{t(locale, 'value.sourced')}</span>{' '}
+                          {citation.sourceTitle}
+                          {citation.sourceEdition && (
+                            <span class="src-edition">
+                              {' '}
+                              ({t(locale, 'value.citation.edition')} {citation.sourceEdition})
+                            </span>
+                          )}
+                        </td>
+                        <td class="src-cell-locator" dir="ltr">
+                          {formatLocator(citation.locator, locale)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr data-testid={`sources-row-${gc.key}-${row.rowKey}`}>
+                      <th scope="row" class="src-cell-property">
+                        {name}
+                        {row.conditionLabel && (
+                          <span class="src-property-cond"> ({row.conditionLabel})</span>
+                        )}
+                      </th>
+                      <td class="src-cell-value" dir="ltr">
+                        {row.display}
+                      </td>
+                      <td class="src-cell-source">
+                        <span class="src-mark src-mark-uncited">{t(locale, 'value.uncited')}</span>
+                      </td>
+                      <td class="src-cell-locator" aria-hidden="true">
+                        —
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </section>
+  ))
+}

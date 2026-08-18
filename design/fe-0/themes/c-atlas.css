@@ -1,0 +1,157 @@
+/* C — ATLAS
+   Premium as editorial authority. Deep ink-teal against warm limestone, rust as
+   the second voice, a high-contrast display face, and section headings that read
+   like chapter openers. The Nature-Communications register you named — a
+   publication rather than a news site. Strongest personality of the four. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-display-fa: 'Estedad Variable', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-num: 'Fraunces', Georgia, serif;
+
+  --fs-body: 16px;
+  --lh-body: 1.95;
+  --fs-h1: 2.5rem;
+  --fw-h1: 700;
+  --fs-h2: 1.28rem;
+  --fw-h2: 700;
+  --fs-label: 0.95rem;
+  --fs-value: 1.24rem;
+  --fw-value: 500;
+  --num-tracking: 0;
+
+  --bg: #f3f1ea;
+  --panel: #fbfaf6;
+  --pop-bg: #fbfaf6;
+  --bar-bg: rgba(243, 241, 234, 0.9);
+  --note-bg: #eceadf;
+  --chip: #e6e3d6;
+  --track: #ddd9ca;
+
+  --ink: #1c2b2d;
+  --ink-2: #3c4c4d;
+  --muted: #6d7a78;
+  --muted-2: #97a09b;
+
+  --accent: #2f5d62;
+  --accent-soft: #dde8e6;
+  --accent-soft-2: #9cb8b5;
+  --accent-2: #a65e3b;
+
+  --hairline: 1px solid #ddd9ca;
+  --rule: 2px solid #1c2b2d;
+
+  --row-bg: transparent;
+  --row-bg-hover: #ebe8dc;
+  --row-border: 0;
+  --row-border-hover: transparent;
+  --row-pad: 11px 10px;
+  --row-gap: 2px;
+  --sec-gap: 56px;
+  --sec-head-gap: 20px;
+
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-pill: 999px;
+
+  --shadow-1: none;
+  --shadow-2: 0 10px 30px -8px rgba(28, 43, 45, 0.22);
+
+  --t-fast: 0.17s ease;
+  --t-pop: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+
+  --measure-page: 1080px;
+  --pad-x: 30px;
+  --bar-h: 64px;
+
+  --bridge-bg: #1c2b2d;
+  --bridge-border: 1px solid #1c2b2d;
+}
+
+.topbar {
+  background: var(--ink);
+  border-block-end: 0;
+}
+
+.topbar .brand,
+.topbar .topnav a {
+  color: #ecebe3;
+}
+
+.topbar .topnav a:hover {
+  color: #fff;
+}
+
+.topbar .lang {
+  color: #b9c3c0;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.hero h1 {
+  letter-spacing: -0.03em;
+}
+
+.hero-code {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-2);
+}
+
+.hero-overview {
+  font-size: 1.02rem;
+}
+
+.hero-facts {
+  background: transparent;
+  border: 0;
+  border-block-start: 2px solid var(--ink);
+  border-radius: 0;
+  padding-inline: 0;
+}
+
+.sec-head {
+  align-items: baseline;
+}
+
+.sec-head h2 {
+  font-family: var(--font-display);
+}
+
+.sec-en {
+  margin-inline-start: auto;
+  color: var(--accent-2);
+}
+
+.sec-body .prop + .prop {
+  border-block-start: 1px solid #e3e0d2;
+}
+
+.value-num {
+  color: var(--accent);
+}
+
+/* the Learn bridge is a dark plate — an obvious door out of the datasheet */
+.bridge {
+  color: #ecebe3;
+}
+
+.bridge .bridge-hint {
+  color: #9cb8b5;
+}
+
+.bridge .bridge-go {
+  color: #e0a884;
+}
+
+.tail-card {
+  background: transparent;
+  border-color: var(--ink);
+  border-radius: 4px;
+}

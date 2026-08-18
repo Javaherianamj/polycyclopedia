@@ -1,0 +1,101 @@
+---
+import '../styles/global.css';
+import { direction, type Locale } from '../i18n/config';
+import { t } from '../i18n/t';
+import SiteHeader from '../components/chrome/SiteHeader.astro';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  /** D39/D37: the surface axis is warm-datasheet vs cool-lab, expressed as
+   * this attribute (tokens/colour.css). Defaults to 'datasheet' -- every
+   * screen before FE-8 was implicitly this surface; Learn is the first
+   * caller to pass 'lab'. */
+  surface?: 'datasheet' | 'lab';
+}
+
+const { locale, title, surface = 'datasheet' } = Astro.props;
+const pageTitle = title ? `${title} — ${t(locale, 'site.name')}` : t(locale, 'site.name');
+---
+
+<!doctype html>
+<html lang={locale} dir={direction[locale]} data-surface={surface}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <!--
+      Blocking, inline, before any stylesheet paints -- this is the one
+      place a script MUST run synchronously rather than as a module.
+      Ported from design/fe-0/theme.js's initTheme; same localStorage key,
+      same default. A deferred/module version would flash light-then-dark
+      on every reload for a reader who chose dark.
+    -->
+    <script is:inline>
+      document.documentElement.dataset.theme = localStorage.getItem('polypedia-theme') || 'light';
+    </script>
+  </head>
+  <body>
+    <!--
+      The celestial sweep. Owner brief: "when i change it a sun or moon
+      passes from the back of the screen". Inert and invisible until the
+      theme toggle sets data-sweeping; pointer-events:none always, so it can
+      never intercept a click. Rendered before #main so it sits behind the
+      content it passes behind.
+    -->
+    <div class="sky-sweep" data-sky-sweep aria-hidden="true">
+      <svg class="sky-body sky-body-sun" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="26"></circle>
+        <g class="sky-rays">
+          <line x1="50" y1="6" x2="50" y2="18"></line>
+          <line x1="50" y1="82" x2="50" y2="94"></line>
+          <line x1="6" y1="50" x2="18" y2="50"></line>
+          <line x1="82" y1="50" x2="94" y2="50"></line>
+          <line x1="19" y1="19" x2="27" y2="27"></line>
+          <line x1="73" y1="73" x2="81" y2="81"></line>
+          <line x1="19" y1="81" x2="27" y2="73"></line>
+          <line x1="73" y1="27" x2="81" y2="19"></line>
+        </g>
+      </svg>
+      <svg class="sky-body sky-body-moon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <mask id="sky-moon-cut">
+          <rect width="100" height="100" fill="#fff"></rect>
+          <circle cx="66" cy="40" r="28" fill="#000"></circle>
+        </mask>
+        <circle cx="50" cy="50" r="30" mask="url(#sky-moon-cut)"></circle>
+      </svg>
+    </div>
+
+    <SiteHeader locale={locale} />
+    <div id="main">
+      <slot />
+    </div>
+    <!--
+      D55/spec §5: the header wordmark plays ONCE per session, then rests
+      compressed, replaying only on hover or keyboard focus. A continuous
+      loop in persistent chrome would fail WCAG 2.2.2 (Pause, Stop, Hide)
+      on a site people read long technical pages on. sessionStorage, not
+      localStorage: "first load of a session" is exactly its semantics.
+    -->
+    <script is:inline>
+      try {
+        if (!sessionStorage.getItem('polypedia-wm-intro')) {
+          sessionStorage.setItem('polypedia-wm-intro', '1');
+          document.documentElement.dataset.wmIntro = '';
+        }
+      } catch {
+        /* storage disabled: skip the intro rather than replaying it forever */
+      }
+    </script>
+    <!--
+      Progressive enhancement for every ValueAtom on the page (FE-2) --
+      desktop hover-to-open. A module script, deferred by default, so it
+      runs after the slotted content exists regardless of its position here.
+      Not required for popovers to function at all (native popovertarget
+      handles click/tap/keyboard); see popover-hover.ts's own comment.
+    -->
+    <script>
+      import '../components/value-atom/popover-hover';
+    </script>
+  </body>
+</html>

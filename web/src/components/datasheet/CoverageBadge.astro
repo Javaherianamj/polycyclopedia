@@ -1,0 +1,32 @@
+---
+// D3/R12: every material page states its own coverage, above the fold.
+// coveragePct comes from the API as-is (R3) -- this component does not
+// compute a percentage, only formats the two counts into a sentence.
+import type { Locale } from '../../i18n/config';
+import type { MaterialCoverage } from '../../lib/api/types';
+import { t } from '../../i18n/t';
+
+interface Props {
+  coverage: MaterialCoverage;
+  locale: Locale;
+}
+
+const { coverage, locale } = Astro.props;
+// The bar's own minimum is a legibility floor ported from FE-0 (a 0%
+// material still shows a sliver, not an invisible bar), not a claim that
+// coverage is higher than it is -- the text beside it always states the
+// real number.
+const barWidth = Math.max(coverage.coveragePct, 1.5);
+---
+
+<div class="coverage" data-testid="datasheet-coverage">
+  <div class="coverage-bar"><i style={`inline-size:${barWidth}%`}></i></div>
+  <span class="coverage-text">
+    {
+      t(locale, 'datasheet.coverage')
+        .replace('{cited}', String(coverage.citedValues))
+        .replace('{total}', String(coverage.totalValues))
+        .replace('{pct}', String(coverage.coveragePct))
+    }
+  </span>
+</div>

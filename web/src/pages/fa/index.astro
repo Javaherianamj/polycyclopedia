@@ -1,0 +1,86 @@
+---
+// FE-4: the real homepage, replacing FE-1's "not a product screen" proof
+// page. D6: browsing and property-search are visual equals, not a primary
+// and a secondary. Numbers below are checked against the live API at build
+// time, not invented copy — see construction/plans/fe-4-code-generation-plan.md
+// §1. No heavy client islands: the homepage carries the tightest JS budget
+// of any route (§6, ≤60 kB gzip) and doesn't need one.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MaterialCard from '../../components/catalog/MaterialCard.astro';
+import { getMaterials, getProperties } from '../../lib/api/client';
+import { gateMaterials } from '../../lib/publish';
+import { t } from '../../i18n/t';
+
+const locale = 'fa' as const;
+
+const [materialsResult, propertiesResult] = await Promise.all([
+  getMaterials({ limit: 200 }),
+  getProperties(),
+]);
+if (!materialsResult.ok) {
+  throw new Error(`Failed to list materials: ${materialsResult.error.message}`);
+}
+if (!propertiesResult.ok) {
+  throw new Error(`Failed to fetch property registry: ${propertiesResult.error.message}`);
+}
+const materials = gateMaterials(materialsResult.data.data);
+const propertyCount = propertiesResult.data.total;
+const preview = materials.slice(0, 6);
+---
+
+<BaseLayout locale={locale}>
+  <main>
+    <section class="home-hero wrap">
+      <h1>{t(locale, 'site.name')}</h1>
+      <p>{t(locale, 'home.mission')}</p>
+      <div class="home-ctas">
+        <a
+          class="home-cta home-cta-primary"
+          href={`/${locale}/catalog`}
+          data-testid="home-browse-cta"
+        >
+          {t(locale, 'home.browseCta')}
+        </a>
+        <a
+          class="home-cta home-cta-secondary"
+          href={`/${locale}/search`}
+          data-testid="home-search-cta"
+        >
+          {t(locale, 'home.searchCta')}
+        </a>
+      </div>
+      <div class="home-stats">
+        <div class="home-stat">
+          <span class="home-stat-num" dir="ltr">{materials.length}</span>
+          <span class="home-stat-label">{t(locale, 'home.stats.materials')}</span>
+        </div>
+        <div class="home-stat">
+          <span class="home-stat-num" dir="ltr">{propertyCount}</span>
+          <span class="home-stat-label">{t(locale, 'home.stats.properties')}</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <div class="home-section-head">
+        <h2>{t(locale, 'home.browseHeading')}</h2>
+        <a href={`/${locale}/catalog`}>{t(locale, 'home.browseAll')}</a>
+      </div>
+      <div class="material-grid">
+        {preview.map((material) => <MaterialCard material={material} locale={locale} />)}
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .wrap {
+    max-inline-size: 1120px;
+    margin-inline: auto;
+    padding-inline: var(--pad-x);
+  }
+
+  main {
+    padding-block-end: 60px;
+  }
+</style>

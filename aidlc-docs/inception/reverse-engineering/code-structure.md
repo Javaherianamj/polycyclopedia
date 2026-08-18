@@ -73,7 +73,7 @@ index.html
 - `src/components/ProcessingWindowSimulator.tsx` (292 lines) - checks user-set melt temp / mold temp / pressure sliders against a hardcoded table of ISO/ASTM standard processing windows per polymer (includes `'abs'` branches unreachable in current data).
 - `src/components/ResinBadge.tsx` - renders the SPI/ASTM D7611 resin-identification-code triangle badge (1-7) from `resinCode`.
 - `src/components/ResourcesModal.tsx` - static, hand-written bibliography modal (handbooks, ISO/ASTM standards, petrochemical companies); no data binding to individual `sourceId` values anywhere.
-- `src/components/ScrollToTop.tsx` - **orphaned**: a complete scroll-to-top FAB component with its own scroll listener; not imported by `App.tsx` or any other file (`App.tsx` reimplements the same behavior inline instead, lines ~967-988). Dead code.
+- `src/components/ScrollToTop.tsx` - **orphaned**: a complete scroll-to-top FAB component, never imported (`App.tsx` reimplements the same behavior inline instead, lines ~967-988); full verification in `dependencies.md` "no inbound dependents" and `code-quality-assessment.md` item 9.
 - `src/components/SourcedValue.tsx` - the shared `{ value, unit, note }` -> formatted-JSX renderer (`inline`/`block` variants) recently extracted to replace 5 duplicated `formatVal` helpers; documented in its own comment as "the single place Phase 1's citation marker/popover will plug into."
 - `src/components/StateSimulator.tsx` - temperature slider showing which physical state (glassy/rubbery/molten/degraded) a polymer is in, bounds derived from `thermal.tgValue`/`tmValue`/`degradationValue`.
 - `src/components/StressStrainChart.tsx` - Chart.js line chart approximating a stress-strain curve; parses numeric bounds out of the `mechanical.*` `SourcedValue` strings via regex/`parseFloat`.
@@ -85,7 +85,7 @@ index.html
 
 - **Location**: `src/App.tsx` and every component that needs polymer data (`import { polymersData } from '../data/polymersData'` or receives it as a prop from `App.tsx`).
 - **Purpose**: Simplicity for a fully static site — no data-fetching, loading states, or error states are needed anywhere in the app.
-- **Implementation**: `polymersData` is a plain exported `const` array; lookups are linear `Array.find`/`Array.filter` calls (e.g. `polymersData.find((p) => p.id === selectedPolymerId)` in `App.tsx`). This is the seam that will need to become a real data-access layer if/when the planned backend (per `aidlc-docs/audit.md`) is introduced.
+- **Implementation**: Plain exported `const` array, linear `Array.find`/`Array.filter` lookups, no caching layer; full detail (code snippet, the per-component lookup list, the future-backend seam) in `api-documentation.md` "Internal Data-Access Pattern".
 
 ### Manual Hash-Based Routing
 
@@ -108,27 +108,27 @@ index.html
 ### Anti-pattern: Values-as-Display-Strings
 
 - **Location**: Almost every leaf field in `src/data/polymersData.ts` (via the `SourcedValue.value: number | string` union).
-- **Why it's a problem**: Most numeric properties are stored as already-formatted display strings rather than structured numbers, making the data unusable for sorting, filtering, or range queries. Verified examples: `physical.density.value = '0.910 - 0.925'`, `physical.refractiveIndex.value = '~ 1.51'`, `physical.waterAbsorption.value = '< 0.01'`, `electrical.volumeResistivity.value = '10¹⁶ - 10¹⁸'` (Unicode superscript digits embedded in the string), and a genuinely malformed split where the unit leaked into the value: `thermal.cte = { value: '150 - 200 µm/', unit: '°C' }` (LDPE record, `src/data/polymersData.ts` line 75).
-- **Existing workaround**: A parallel set of "shadow" plain-`number` fields exists specifically so sliders/simulators have real numbers to compute with: `thermal.tgValue`, `thermal.tmValue`, `thermal.degradationValue`, `physical.minDensity`/`maxDensity`, `academic.minCrystallinity`/`maxCrystallinity`, `academic.mnDefaultValue`. These are manually kept in sync with their sourced-string siblings by whoever edits the data file — nothing enforces agreement, so they can silently drift (e.g. nothing would catch `tgValue: -110` diverging from a future edit to `tg.value`).
+- **Why it's a problem, verified examples, and the shadow-numeric-field workaround (with its drift risk)**: see `code-quality-assessment.md` Technical Debt items 2 and 3 — full detail not repeated here.
 
 ### Anti-pattern: Presentation Leaking into Data
 
 - **Location**: `PolymerData.chemicalResistance[].colorClass` (`src/types/polymer.ts` line 61), populated with literal Tailwind utility class names like `'text-status-success'` / `'text-status-warning'` / `'text-status-error'` directly in `src/data/polymersData.ts`, then interpolated straight into `className` in `App.tsx` (line 656).
-- **Why it's a problem**: Couples the "database" to a specific CSS framework and a specific theme's class names; a rating-to-color mapping that should be a pure function of the rating value is instead baked into every one of the ~40+ chemical-resistance rows across the 6 records.
+- **Why it's a problem**: full rationale in `code-quality-assessment.md` Technical Debt item 4 (couples the data model to a specific CSS framework/theme across ~40+ rows).
 
 ### Anti-pattern: God Component
 
 - **Location**: `src/App.tsx` (991 lines).
-- **Why it's a problem**: Combines routing, layout, theming, modal/FAB orchestration, and the entire markup for all 3 detail-page tabs (Industrial/Engineering/Academic) in one file/one function component, rather than extracting `IndustrialTab`, `EngineeringTab`, `AcademicTab` (etc.) as separate components. Every property card in the Engineering and Academic tabs is hand-written JSX rather than generated from a declarative field list, so adding one new property requires touching `App.tsx`, `src/types/polymer.ts`, and all 6 records in `polymersData.ts`.
+- **Why it's a problem**: full rationale in `code-quality-assessment.md` Technical Debt item 7 (routing/layout/theming/modals plus all 3 tabs' hand-written markup in one file; one new property touches `App.tsx`, `polymer.ts`, and all 6 `polymersData.ts` records).
 
 ### Anti-pattern: Data-Model Feature Ahead of Implementation
 
-- **Location**: `SourcedValue.sourceId: string` (`src/types/polymer.ts` line 9), populated 269/269 times with the literal placeholder `'src_default'` in `src/data/polymersData.ts` (verified via `grep -c "sourceId" src/data/polymersData.ts` = 269 and `grep -c "src_default"` = 269 — every single occurrence). No component anywhere reads `.sourceId` (`grep -rn "sourceId" src/ --include=*.tsx` only matches a doc comment in `SourcedValue.tsx`, not executable code). `ResourcesModal.tsx` is a completely separate, hand-written bibliography with no join key back to individual data values. Net effect: the type system advertises per-value citation support that does not exist yet anywhere in the running application.
+- **Location**: `SourcedValue.sourceId: string` (`src/types/polymer.ts` line 9), populated 269/269 times with the literal placeholder `'src_default'` in `src/data/polymersData.ts`.
+- **Why it's a problem**: full verification (grep counts) and rationale in `code-quality-assessment.md` Technical Debt item 1 — no component reads `.sourceId`, and `ResourcesModal.tsx`'s bibliography has no join key back to individual values.
 
 ### Anti-pattern: Dead Code for a Non-Existent Material
 
-- **Location**: `src/components/AlloyingSimulator.tsx` (`isABS = polymer.id === 'abs'`), `src/components/ProcessingWindowSimulator.tsx` (7 occurrences of `polymer.id === 'abs'` branches for melt/mold temp ranges and drying requirements), `src/components/LCACircularEconomy.tsx` (`baseCo2Map` includes an `abs` key).
-- **Why it's a problem**: All three components contain conditional logic for a 7th polymer, `'abs'` (ABS plastic), that does not exist anywhere in `polymersData` (only `ldpe`, `hdpe`, `pp`, `pvc`, `pet`, `ps` are defined). This code is unreachable today; it is either leftover from a planned-but-not-yet-added material or was scaffolded ahead of the data.
+- **Location**: `src/components/AlloyingSimulator.tsx` (`isABS = polymer.id === 'abs'`), `src/components/ProcessingWindowSimulator.tsx` (7 occurrences of `polymer.id === 'abs'` branches), `src/components/LCACircularEconomy.tsx` (`baseCo2Map` includes an `abs` key).
+- **Why it's a problem**: full rationale in `code-quality-assessment.md` Technical Debt item 8 — all three contain conditional logic for a 7th polymer, `'abs'`, that does not exist in `polymersData` (only `ldpe`, `hdpe`, `pp`, `pvc`, `pet`, `ps`), so this code is unreachable today.
 
 ## Critical Dependencies
 
@@ -183,5 +183,4 @@ index.html
 ### KaTeX (CDN CSS only — not an npm dependency)
 
 - **Version**: `0.16.8` (pinned in the `index.html` CDN URL)
-- **Usage**: `.katex` CSS class overrides exist in `src/index.css`, but the KaTeX **JS** library is never loaded and no component calls it — see `architecture.md` Integration Points. Effectively unused/dead integration.
-- **Purpose**: (Intended) math-formula typesetting; not currently exercised.
+- **Usage / Purpose**: intended math-formula typesetting via `.katex` CSS overrides in `src/index.css`; effectively dead — full explanation in `architecture.md` Integration Points.

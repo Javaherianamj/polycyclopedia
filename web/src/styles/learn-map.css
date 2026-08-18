@@ -1,0 +1,390 @@
+/* L2 — «نقشه» / MAP (lab-concepts-spec.md). Ported from design/fe-0/lab/
+ * map.css onto this app's real token vocabulary (--fs-*, --r-*, --dur-x
+ * and --ease-x instead of lab.css's own --t) — same visual language, same class
+ * names where FE-0 already had one, new rules only for the parts FE-0 never
+ * needed (the HTML marker button overlay; see MapIsland.tsx's header for
+ * why the marker is a <button>, not an SVG shape).
+ *
+ * `.mchip`/`.tray-grid`/`.offcurve` are near-verbatim copies of FE-0's
+ * classes, including the is-active/is-dim/is-locked states that ARE the
+ * spec's teaching mechanism ("with the others visibly greyed rather than
+ * hidden, so the reader learns that tools belong to regimes") — do not
+ * replace `.is-dim` with `display:none` anywhere in this file; that would
+ * silently break the one thing this page exists to demonstrate.
+ *
+ * R34: `--ramp-*` is the only colour system used on the plot itself
+ * (bands, curve marker, region pill) — it encodes a NUMBER (temperature),
+ * exactly what the rule reserves it for. Everything else here (chip
+ * borders, locked-state dashing, links) uses the ordinary structure/status
+ * tokens the rest of Learn already uses.
+ */
+
+.map-body {
+  padding-block: 4px 12px;
+  display: grid;
+  gap: 26px;
+}
+
+/* --------------------------------------------------------------------- plot */
+
+.plot-wrap {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 18px 10px 8px;
+  min-inline-size: 0;
+}
+
+/* The SVG and its HTML marker-button overlay share this frame so percentage
+ * positioning lines up exactly between the two (MapIsland.tsx computes both
+ * from the same VB_W/VB_H viewBox). Forced `dir="ltr"` in markup (not here)
+ * — see MapIsland.tsx's header for why the plot itself is never mirrored. */
+.map-plot-frame {
+  position: relative;
+  inline-size: 100%;
+  aspect-ratio: 900 / 460;
+  touch-action: none;
+}
+
+.map-plot {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+
+.map-band {
+  opacity: 0.14;
+}
+
+.map-gridline {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.map-axis-line {
+  stroke: var(--line-2);
+  stroke-width: 1.4;
+}
+
+.map-axis-y,
+.map-axis-x {
+  fill: var(--muted);
+  font-size: 15px;
+  font-family: var(--font-num, serif);
+}
+
+.map-axis-title {
+  fill: var(--muted-2);
+  font-size: 14px;
+}
+
+.map-refline {
+  stroke: var(--line-2);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.map-ref-label {
+  fill: var(--muted);
+  font-size: 13px;
+  font-family: var(--font-num, serif);
+}
+
+.map-plateau-label {
+  fill: var(--ink-2);
+  font-size: 14px;
+}
+
+.map-curve-solid {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.map-curve-dashed {
+  stroke: var(--muted-2);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 2 7;
+}
+
+.map-anchor-dot {
+  fill: var(--on-phase, var(--panel));
+  stroke: var(--act);
+  stroke-width: 2.5;
+}
+
+.map-marker-line {
+  stroke: var(--region-c, var(--act));
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+  transition: stroke var(--dur-fast, 160ms) var(--ease-out);
+  pointer-events: none;
+}
+
+/* The marker itself: a real <button>, not an SVG shape (MapIsland.tsx's
+ * header explains why) — this is what guarantees the ≥44px pointer target
+ * R30 requires regardless of how narrow the responsive SVG has been scaled
+ * down to. The visible dot is a ::before, sized independently of the hit
+ * area so the target can stay large without looking oversized. */
+.map-marker-btn {
+  position: absolute;
+  inline-size: 44px;
+  block-size: 44px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  cursor: grab;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+
+.map-marker-btn:active {
+  cursor: grabbing;
+}
+
+.map-marker-btn::before {
+  content: '';
+  inline-size: 15px;
+  block-size: 15px;
+  border-radius: 50%;
+  background: var(--region-c, var(--act));
+  border: 2.5px solid var(--on-phase, var(--panel));
+  box-shadow: 0 0 0 1px var(--region-c, var(--act));
+  transition: background-color var(--dur-fast, 160ms) var(--ease-out);
+}
+
+.map-marker-btn:focus-visible {
+  outline: none;
+}
+
+.map-marker-btn:focus-visible::before {
+  outline: 3px solid var(--act);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ readout */
+
+.readout {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  min-inline-size: 0;
+}
+
+.readout-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ro-temp {
+  font-family: var(--font-display, serif);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.ro-unit {
+  color: var(--muted);
+}
+
+.ro-state {
+  margin-inline-start: auto;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  transition: background-color var(--dur-fast, 160ms) var(--ease-out);
+}
+
+.readout-sub {
+  margin-block-start: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.readout-sub b {
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.ro-sentence {
+  margin: 14px 0 0;
+  color: var(--ink-2);
+  max-inline-size: 68ch;
+}
+
+.ro-caption {
+  margin: 10px 0 0;
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--line);
+  font-size: var(--fs-caption);
+  color: var(--muted-2);
+}
+
+.ro-caption:first-of-type {
+  border-block-start: none;
+  padding-block-start: 0;
+}
+
+/* --------------------------------------------------------------------- tray */
+
+.tray-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink-2);
+  margin: 0 0 12px;
+}
+
+.tray-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.mchip {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  background: var(--panel);
+  padding: 12px 14px;
+  min-inline-size: 0;
+  transition:
+    opacity var(--dur-fast, 160ms) var(--ease-out),
+    border-color var(--dur-fast, 160ms) var(--ease-out),
+    background-color var(--dur-fast, 160ms) var(--ease-out);
+}
+
+.mchip-label {
+  display: block;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.mchip-note,
+.mchip-reason {
+  margin: 6px 0 0;
+  font-size: var(--fs-caption);
+  color: var(--muted);
+}
+
+.mchip-link {
+  display: inline-block;
+  margin-block-start: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--act);
+}
+
+.mchip-link:hover {
+  color: var(--ink);
+}
+
+.mchip.is-active {
+  border-color: var(--act-line, var(--act));
+  background: var(--act-bg, var(--panel-2));
+}
+
+/* THE TEACHING MECHANISM — see this file's header. A dim chip stays fully
+ * in the DOM (readable, tabbable) at reduced opacity; it is never hidden or
+ * removed when its region is not the current one. */
+.mchip.is-dim {
+  opacity: 0.42;
+}
+
+.mchip.is-locked {
+  border-style: dashed;
+  background: transparent;
+}
+
+.mchip.is-locked .mchip-label {
+  color: var(--muted-2);
+}
+
+.mchip.is-locked .mchip-label::before {
+  content: '⊘ ';
+}
+
+.mchip.is-locked .mchip-reason {
+  color: var(--muted-2);
+  border-inline-start: 2px solid var(--muted-2);
+  padding-inline-start: 8px;
+}
+
+.mchip.is-locked.is-active {
+  border-color: var(--muted-2);
+  background: transparent;
+}
+
+.mchip.off {
+  display: block;
+  background: var(--panel);
+}
+
+.mchip.off:hover {
+  border-color: var(--act);
+}
+
+/* ------------------------------------------------------------------ offcurve */
+
+.offcurve {
+  padding-block-start: 4px;
+}
+
+.offcurve .learn-tool-intro {
+  margin-block-end: 14px;
+}
+
+/* ------------------------------------------------------------------ mobile
+ * R27: no horizontal overflow at 320/375/768. The plot frame already scales
+ * fluidly (aspect-ratio + inline-size:100%); only text sizes and the state
+ * pill's layout need adjusting at narrow widths.
+ */
+@media (max-width: 640px) {
+  .ro-temp {
+    font-size: 1.9rem;
+  }
+
+  .readout-main {
+    gap: 8px;
+  }
+
+  .ro-state {
+    margin-inline-start: 0;
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .map-axis-y,
+  .map-axis-x,
+  .map-ref-label {
+    font-size: 18px;
+  }
+
+  .map-plateau-label {
+    font-size: 16px;
+  }
+
+  .plot-wrap {
+    padding: 12px 4px 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-marker-line,
+  .map-marker-btn::before,
+  .ro-state {
+    transition: none;
+  }
+}

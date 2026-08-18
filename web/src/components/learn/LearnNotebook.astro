@@ -1,0 +1,192 @@
+---
+// L4 — «دفترچه» / NOTEBOOK (lab-concepts-spec.md). The fourth and final
+// FE-0 Learn concept: "the lab is not a toolbox, it is a publication with
+// live figures... a tool is a figure inside an argument, not a tile in a
+// grid." Ported from design/fe-0/lab/notebook.html + notebook.css +
+// notebook.js — same shape (masthead, byline, review block, TOC rail,
+// alternating two-column article body with margin sidenotes, one static
+// figure, one live figure, a pull-quote, a hover-term, a closing note) —
+// adapted the same way MAP/GRAPH's own ports were: the prototype hardcoded
+// one material's numbers inline; this reads them live from the API with
+// real provenance marks, and the prose itself lives in a typed content
+// module (`content/notebook/`) rather than this file's markup, so a
+// second article does not require touching this component at all.
+//
+// ROUTE DECISION: the fourth instance of the exact seam LearnMap.astro's
+// header laid out and LearnGraph.astro's header confirmed — a separate
+// route, `/{locale}/learn/notebook`, sibling to SCALE/MAP/GRAPH, opening
+// with `<LearnConceptNav current="notebook">`. No new pattern invented.
+//
+// SINGLE-ARTICLE TODAY: this component renders `NOTEBOOK_ARTICLES[0]`
+// directly rather than taking a `slug` param — there is exactly one
+// article, and building a slug-routed index for a collection of one would
+// be speculative. `content/notebook/index.ts`'s header states this gap
+// explicitly and says what a second article needs (a route param here,
+// nothing else) — the content shape, the figure resolution, the reading-
+// time calculation and the chrome script all already operate on
+// `NotebookArticle` generically.
+//
+// LIVE VALUES (R1/R5/R8): the article's subject material's full
+// `MaterialDetail` is fetched ONCE, server-side, at build time (the same
+// SSG pattern `m/[slug].astro` already uses via `getMaterial`) — a
+// `liveValue` segment (content/notebook/types.ts) is then a lookup into
+// this already-fetched object, resolved by `ProseSegments.astro`, never a
+// second network call and never a hardcoded number. A failed fetch fails
+// the build loudly, matching `m/[slug].astro`'s own "no partial-site
+// outcome is better than a loud failure" posture — this page's entire
+// premise is that its quoted numbers are real, so silently degrading to
+// placeholder numbers would be worse than not building at all.
+//
+// STRUCTURE/CSS is Astro + learn-notebook.css; TOC scroll-spy, the
+// reading-progress bar and the mobile sidenote toggle are one small
+// vanilla script (`notebook-chrome.ts`, the same pattern `SectionRail.
+// astro`'s `section-rail.ts` already established for the datasheet) —
+// none of that needs component state, so it is not a React island (build
+// brief: "only genuinely interactive parts... are islands or small
+// scripts"). The one thing that DOES need live client state — figure 2's
+// material binding — is `NotebookFigureIsland`, the fourth island
+// following MAP/GRAPH's "thin island, physics/data in lib/" split.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import LearnConceptNav from './LearnConceptNav.astro';
+import ProseSegments from './ProseSegments.astro';
+import NotebookFigure1 from './NotebookFigure1.astro';
+import NotebookFigureIsland from '../../islands/NotebookFigureIsland';
+import { NOTEBOOK_ARTICLES } from '../../content/notebook';
+import type { ArticleBlock } from '../../content/notebook/types';
+import { articleReadingTimeMinutes } from '../../lib/notebook/reading-time';
+import { getMaterial } from '../../lib/api/client';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const article = NOTEBOOK_ARTICLES[0];
+
+const materialResult = await getMaterial(article.materialSlug);
+if (!materialResult.ok) {
+  throw new Error(
+    `NOTEBOOK: failed to fetch its subject material '${article.materialSlug}': ${materialResult.error.message}`,
+  );
+}
+const material = materialResult.data;
+const materialName = locale === 'fa' ? material.nameFa : material.nameEn;
+
+const readingTime = articleReadingTimeMinutes(article, locale);
+const citation = article.review.sampleCitation;
+const citationBody = locale === 'fa' ? citation.workFa : citation.workEn;
+
+type HeadingBlock = Extract<ArticleBlock, { kind: 'heading' }>;
+const headings = article.sections
+  .map((section) => section.blocks.find((b): b is HeadingBlock => b.kind === 'heading'))
+  .filter((b): b is HeadingBlock => b !== undefined);
+---
+
+<main class="learn-page nb-page">
+  <div class="nb-progress" aria-hidden="true"><i class="nb-progress-fill"></i></div>
+
+  <header class="learn-hero nb-head">
+    <LearnConceptNav locale={locale} current="notebook" />
+    <p class="learn-kicker" dir="ltr">{t(locale, 'learn.notebook.kicker')}</p>
+    <h1 class="nb-title">{article.title[locale]}</h1>
+    <p class="nb-standfirst">{article.standfirst[locale]}</p>
+
+    <div class="nb-byline">
+      <b>{t(locale, 'learn.notebook.byline.editorial')}</b><span class="nb-dot">·</span>
+      <span>
+        <span class="num" dir="ltr">{article.dateSample}</span> <i>({t(locale, 'learn.notebook.byline.dateSampleTag')})</i>
+      </span><span class="nb-dot">·</span>
+      <span data-testid="notebook-reading-time">
+        {t(locale, 'learn.notebook.byline.readingTime').replace('{minutes}', String(readingTime))}
+      </span><span class="nb-dot">·</span>
+      <span class="num" dir="ltr">{material.code}</span>
+    </div>
+
+    <div class="nb-review" data-testid="notebook-review">
+      <h2>{t(locale, 'learn.notebook.review.title')}</h2>
+      <p><ProseSegments segments={article.review.claim} locale={locale} material={null} /></p>
+      <div class="nb-cite">
+        {t(locale, 'learn.notebook.review.sourceLabel')} {citationBody}
+        <button
+          type="button"
+          class="nb-mark"
+          aria-label={t(locale, 'learn.notebook.review.markAria')}
+          data-testid="notebook-review-mark"
+        >
+          §
+          <span class="nb-pop">
+            <b>{t(locale, 'learn.notebook.review.sampleTag')}</b>
+            <span>{citationBody}</span>
+            <span class="nb-pop-meta" dir="ltr">
+              {citation.workEn} · {t(locale, 'value.citation.edition')} {citation.edition} · {t(locale, 'value.citation.page')} {citation.page}
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nb-toc" aria-label={t(locale, 'learn.notebook.toc.title')}>
+    <h2>{t(locale, 'learn.notebook.toc.title')}</h2>
+    <ol>
+      {headings.map((h) => (
+        <li>
+          <a href={`#${h.id}`}>{h.tocLabel[locale]}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <div class="nb-body">
+    <div class="nb-article">
+      {article.sections.map((section) => (
+        <section class={`nb-block nb-block--${section.side}`}>
+          {section.blocks.map((block) => {
+            switch (block.kind) {
+              case 'heading':
+                return <h2 id={block.id}>{block.text[locale]}</h2>;
+              case 'para':
+                return (
+                  <p>
+                    <ProseSegments segments={block.segments} locale={locale} material={material} />
+                  </p>
+                );
+              case 'pullquote':
+                return (
+                  <blockquote class="nb-pull">
+                    <ProseSegments segments={block.segments} locale={locale} material={material} />
+                  </blockquote>
+                );
+              case 'figureSchematic':
+                return <NotebookFigure1 locale={locale} caption={block.caption} />;
+              case 'figureLive':
+                return (
+                  <figure class="nb-fig" data-testid="notebook-figure-live-wrap">
+                    <NotebookFigureIsland client:load locale={locale} defaultMaterialSlug={article.materialSlug} />
+                  </figure>
+                );
+              default:
+                return null;
+            }
+          })}
+        </section>
+      ))}
+    </div>
+  </div>
+
+  <div class="nb-closing">
+    <p>
+      <ProseSegments segments={article.closing} locale={locale} material={material} />
+    </p>
+    <p class="nb-template-note">{t(locale, 'learn.notebook.closing.templateNote')}</p>
+  </div>
+
+  <p class="sr-only" data-testid="notebook-material-context">
+    {materialName}
+  </p>
+</main>
+
+<script>
+  import './notebook-chrome';
+</script>

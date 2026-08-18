@@ -3,7 +3,7 @@
 **Stage**: Requirements Analysis
 **Created**: 2026-07-31T19:39:43Z
 
-**How this file works**: Normally AI-DLC stops here and waits for you to fill in every `[Answer]:` tag. You asked to proceed continuously and report briefly, so each question below has a **pre-filled recommended answer** based on the roadmap you already approved. Work continues on those assumptions. Change any `[Answer]:` line and tell me, and I will revise the affected work.
+**How this file works**: Normally AI-DLC stops here and waits for you to fill in every `[Answer]:` tag. You asked to proceed continuously and report briefly, so each question below has a **pre-filled recommended answer** based on the roadmap you already approved. Work continues on those assumptions. Change any `[Answer]:` line and tell me, and I will revise the affected work. Wherever "X) Other" is offered, write your own answer as free text after the tag.
 
 ---
 
@@ -15,7 +15,7 @@ A) Yes — enforce all SECURITY rules as blocking constraints (recommended for p
 
 B) No — skip all SECURITY rules (suitable for PoCs, prototypes, and experimental projects)
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: A — the database will hold citation provenance and, per the roadmap's Phase 4, eventual multi-tenant company data. The roadmap explicitly flags tenant-isolation failure as business-ending, so the schema should be built with those constraints from the start rather than retrofitted.
 
@@ -29,7 +29,7 @@ A) Yes — apply the resiliency baseline as directional best practices and desig
 
 B) No — skip the resiliency baseline (suitable for PoCs, prototypes, and experimental projects where rapid iteration matters more than reliability)
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: B — the roadmap specifies a deliberately boring single-host Docker Compose deployment for a 1–3 person team at pre-revenue stage. Backup/restore discipline is still in scope (it is called out explicitly in the roadmap's Phase 1 exit criteria), but full Well-Architected resiliency work is premature.
 
@@ -45,7 +45,7 @@ B) Partial — enforce PBT rules only for pure functions and serialization round
 
 C) No — skip all PBT rules
 
-X) Other (please describe after [Answer]: tag below)
+X) Other
 
 [Answer]: B — the value-string parser (ranges, inequalities, unicode superscripts, mangled units) and the unit normalizer are pure functions where PBT is genuinely strong. CRUD and schema wiring do not benefit enough to justify blocking constraints.
 

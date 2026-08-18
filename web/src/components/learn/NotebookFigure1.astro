@@ -1,0 +1,40 @@
+---
+// Figure 1 — the static linear-vs-branched chain schematic
+// (`lib/notebook/chain-schematic.ts`). Non-interactive, server-rendered
+// SVG: an illustration for teaching, never a measured or simulated
+// structure (its own caption, passed in via `caption`, says so).
+//
+// SCOPE NOTE for a second article: this component draws ONE fixed
+// schematic (linear vs. branched chain). `ArticleBlock`'s `figureSchematic`
+// kind does not yet parametrise which drawing to show — an article
+// needing a different static figure would extend that block kind with a
+// `variant` field and add a branch here, rather than this component
+// growing an unrelated drawing mode. Left as a stated gap rather than
+// speculatively built for a figure nothing needs yet.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import type { ProseSegment } from '../../content/notebook/types';
+import ProseSegments from './ProseSegments.astro';
+import { BRANCH_VERTEX_INDICES, branchPathD, chainPathD } from '../../lib/notebook/chain-schematic';
+
+interface Props {
+  locale: Locale;
+  caption: ProseSegment[];
+}
+
+const { locale, caption } = Astro.props;
+---
+
+<figure class="nb-fig" data-testid="notebook-figure-schematic">
+  <svg viewBox="0 0 340 140" role="img" aria-label={t(locale, 'learn.notebook.fig1.ariaLabel')}>
+    <text x="330" y="24" class="nb-fig1-label" text-anchor="end">{t(locale, 'learn.notebook.fig1.linearLabel')}</text>
+    <path d={chainPathD(30)} class="nb-fig1-chain" />
+
+    <text x="330" y="104" class="nb-fig1-label" text-anchor="end">{t(locale, 'learn.notebook.fig1.branchedLabel')}</text>
+    <path d={chainPathD(110)} class="nb-fig1-chain" />
+    {BRANCH_VERTEX_INDICES.map((idx) => <path d={branchPathD(110, idx)} class="nb-fig1-branch" />)}
+  </svg>
+  <figcaption class="nb-fig-cap">
+    <ProseSegments segments={caption} locale={locale} material={null} />
+  </figcaption>
+</figure>

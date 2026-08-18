@@ -1,0 +1,16 @@
+---
+// L3 — «شبکه» / GRAPH, Persian route (default locale). A SEPARATE route from
+// `/{locale}/learn` (SCALE) and `/{locale}/learn/map` (MAP), sibling to
+// both — see components/learn/LearnGraph.astro's header for the full
+// routing rationale and fa/learn/map.astro's own header for the precedent
+// this follows exactly.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LearnGraph from '../../../components/learn/LearnGraph.astro';
+import { t } from '../../../i18n/t';
+
+const locale = 'fa' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.graph.pageTitle')} surface="lab">
+  <LearnGraph locale={locale} />
+</BaseLayout>

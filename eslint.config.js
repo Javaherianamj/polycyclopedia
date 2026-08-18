@@ -6,7 +6,9 @@ import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { ignores: ['dist', 'tools/legacy', 'graphify-out'] },
+  // web/ is its own package (like api/), with its own tooling boundary —
+  // this config has no .astro support and isn't meant to reach into it.
+  { ignores: ['dist', 'tools/legacy', 'graphify-out', 'web'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

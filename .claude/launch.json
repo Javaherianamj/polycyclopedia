@@ -6,6 +6,30 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "fe0-design",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "3100", "--strictPort", "design/fe-0"],
+      "port": 3100
+    },
+    {
+      "name": "fe1-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "web", "--", "--port", "4321"],
+      "port": 4321
+    },
+    {
+      "name": "web-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--prefix", "web", "--", "--port", "4330"],
+      "port": 4330
+    },
+    {
+      "name": "polypedia-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "api"],
+      "port": 3001
     }
   ]
 }

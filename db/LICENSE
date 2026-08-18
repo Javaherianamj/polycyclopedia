@@ -1,0 +1,44 @@
+POLYPEDIA CURATED DATABASE — PROPRIETARY, ALL RIGHTS RESERVED
+Copyright 2026 Polypedia
+
+THIS DIRECTORY IS NOT COVERED BY THE AGPL.
+
+The GNU AGPL v3.0 in /LICENSE covers the project's SOURCE CODE. It does not
+cover the curated data. This file exists because that boundary is easy to miss
+when you are looking at a directory full of .sql files: the schema migrations
+here are source code, the seeded property values are not, and they sit side by
+side.
+
+WHAT IS SOURCE CODE (AGPL v3.0)
+    db/migrations/*.sql     schema structure -- tables, constraints, triggers
+    db/tests/*.sql          constraint checks
+    db/run.sh, db/test.sh   tooling
+
+WHAT IS PROPRIETARY DATA (all rights reserved)
+    db/seeds/*.sql          curated property values, sources, citations,
+                            taxonomy content and coverage data
+    curation/*.csv          the curation working set, including the extracted
+                            Hansen solvent and correlation tables
+    any export, dump, fixture or derivative of the above
+
+A seed file that contains BOTH structure and data is proprietary in whole.
+Split it before treating any part of it as source.
+
+WHAT YOU MAY NOT DO WITHOUT A WRITTEN LICENCE
+    - copy, redistribute or publish the data, in whole or in substantial part
+    - extract a substantial part of it into another database or product
+    - use it to train, fine-tune or ground a machine-learning model or
+      retrieval system (see docs/legal/ai-usage-policy.md)
+    - present it, or figures derived from it, as your own dataset
+
+Individual factual values are not themselves copyrightable in most
+jurisdictions. This reservation is over the curated COMPILATION -- the
+selection, verification, citation and arrangement of those values, which is
+where the work went and where the rights subsist. Where the EU database right
+(Directive 96/9/EC) applies, extraction of a substantial part is separately
+prohibited regardless of the factual nature of the contents.
+
+Licensing enquiries, including commercial licences that permit exactly the
+uses listed above: legal@polycyclopedia.ir
+
+Full terms: docs/legal/database-license.md

@@ -38,7 +38,20 @@ GAPS_EXPORT_FIELDS = [
 ]
 
 # Columns the curator fills in. Blank unless they've done the work.
+#
+# grade_class identifies *which subject* the value attaches to. Blank (the
+# common case) means the value describes the polymer as a class and lands as
+# subject_type='material', exactly as before this column existed. A key like
+# `injection` or `film` means it describes one processing family and lands as
+# subject_type='grade_class' against that material's grade -- the distinction
+# EXTRACTION-TARGET.md section 2 exists to protect, previously expressible
+# only in raw SQL. The two name columns are needed only when the key is new
+# for that material (grade_class.name_fa/name_en are NOT NULL), mirroring
+# import_materials.py's family_name_fa/family_name_en rule.
 GAPS_CURATOR_FIELDS = [
+    "grade_class",
+    "grade_class_name_fa",
+    "grade_class_name_en",
     "value_min",
     "value_max",
     "value_typical",
@@ -54,9 +67,29 @@ GAPS_CURATOR_FIELDS = [
     "note_fa",
     "confidence",
     "skip",
+    "role",
 ]
 
-GAPS_FIELDNAMES = GAPS_EXPORT_FIELDS + GAPS_CURATOR_FIELDS
+# Columns import_values.py writes back into the file after a run. Never
+# curator-authored, never read by export_gaps.py. Kept out of
+# GAPS_CURATOR_FIELDS because "the curator fills this in" and "the tool
+# reports back into this" are different contracts (row_is_blank() below
+# would otherwise treat a tool-written error as a curator edit).
+GAPS_REPORT_FIELDS = [
+    "import_error",
+]
+
+GAPS_FIELDNAMES = GAPS_EXPORT_FIELDS + GAPS_CURATOR_FIELDS + GAPS_REPORT_FIELDS
+
+# Multiple gaps.csv rows may share the same (material_slug, property_key) --
+# that's how a curator cites several sources for one value (see
+# curation-design.md's multi-citation extension). `role` records how each
+# row's citation relates to the property_value it attaches to; blank
+# defaults to "primary" for the row that sets the value and "corroborating"
+# for the rest, in import_values.py. Mirrors the DB's evidence_role enum
+# (db/migrations/0001_extensions_and_enums.sql) exactly, so no translation
+# layer is needed on write.
+EVIDENCE_ROLES = {"primary", "corroborating", "conflicting", "derived_from"}
 
 SOURCES_FIELDNAMES = [
     "source_key",

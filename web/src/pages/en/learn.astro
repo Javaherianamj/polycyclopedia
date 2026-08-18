@@ -1,0 +1,13 @@
+---
+// The Learn surface, English route. See fa/learn.astro for the note on the
+// restructure — identical here, just the locale.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LearnScale from '../../components/learn/LearnScale.astro';
+import { t } from '../../i18n/t';
+
+const locale = 'en' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.pageTitle')} surface="lab">
+  <LearnScale locale={locale} />
+</BaseLayout>

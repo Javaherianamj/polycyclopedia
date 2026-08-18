@@ -1,0 +1,66 @@
+---
+// FE-1b — the theme toggle, illustrated.
+//
+// Owner feedback on the first pass: "the button for it is so simple, make it
+// match the theme more! also it must be completely illlustrated." The first
+// version was two emoji characters (☀/☾), which render in the reader's
+// system emoji font — a different visual language from everything else on
+// the site, and not controllable.
+//
+// This is a DIAL, not a swap: sun and moon sit at opposite ends of one
+// wheel, and toggling rotates the wheel 180deg so the other body rises into
+// the aperture. That reads as a sky turning over rather than an icon being
+// replaced, which is the same idea as the full-screen sweep in chrome.css.
+//
+// SVG only, no icon library (R24 — this ships in every route's chrome).
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<button
+  type="button"
+  class="theme-toggle"
+  data-theme-toggle
+  aria-label={t(locale, 'theme.toggleLabel')}
+  data-label-to-dark={t(locale, 'theme.toDark')}
+  data-label-to-light={t(locale, 'theme.toLight')}
+  data-testid="theme-toggle"
+>
+  <span class="theme-aperture" aria-hidden="true">
+    <svg class="theme-dial" viewBox="0 0 40 80" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sun: disc + eight rays, sitting in the aperture at rest (light). -->
+      <g class="dial-sun">
+        <circle cx="20" cy="20" r="7.5"></circle>
+        <g class="sun-rays">
+          <line x1="20" y1="5" x2="20" y2="9.5"></line>
+          <line x1="20" y1="30.5" x2="20" y2="35"></line>
+          <line x1="5" y1="20" x2="9.5" y2="20"></line>
+          <line x1="30.5" y1="20" x2="35" y2="20"></line>
+          <line x1="9.4" y1="9.4" x2="12.6" y2="12.6"></line>
+          <line x1="27.4" y1="27.4" x2="30.6" y2="30.6"></line>
+          <line x1="9.4" y1="30.6" x2="12.6" y2="27.4"></line>
+          <line x1="27.4" y1="12.6" x2="30.6" y2="9.4"></line>
+        </g>
+      </g>
+
+      <!-- Moon: a crescent cut by a mask, never a filled circle with a bite
+           drawn over it in the background colour -- the button sits on
+           several different surfaces, so the cut has to be real. -->
+      <mask id="theme-moon-cut">
+        <rect x="0" y="40" width="40" height="40" fill="#fff"></rect>
+        <circle cx="25.5" cy="55" r="8" fill="#000"></circle>
+      </mask>
+      <g class="dial-moon">
+        <circle cx="20" cy="60" r="8.5" mask="url(#theme-moon-cut)"></circle>
+        <circle class="moon-star" cx="31" cy="68" r="1.1"></circle>
+        <circle class="moon-star" cx="9" cy="49" r="0.9"></circle>
+      </g>
+    </svg>
+  </span>
+</button>

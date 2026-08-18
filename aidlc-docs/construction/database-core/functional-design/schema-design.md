@@ -249,7 +249,8 @@ ASTM/ISO methods already referenced in `ResourcesModal.tsx`.
 | `subject_id`                              | bigint NOT NULL                                | polymorphic — see integrity note below  |
 | `property_id`                             | bigint NOT NULL REFERENCES property_definition |                                         |
 | `value_min`, `value_max`, `value_typical` | double precision                               | canonical unit                          |
-| `value_text`                              | text                                           | for `text` data_type                    |
+| `value_text`                              | text                                           | DEPRECATED by 0030 — see the pair below |
+| `value_text_fa`, `value_text_en`          | text                                           | for `text` data_type (0030)             |
 | `value_enum`                              | text                                           | for `enum` data_type                    |
 | `value_bool`                              | boolean                                        | for `boolean` data_type                 |
 | `unit_display`                            | text                                           | what to show, may differ from canonical |
@@ -265,7 +266,7 @@ ASTM/ISO methods already referenced in `ResourcesModal.tsx`.
 
 **Constraints:**
 
-- `CHECK`: at least one of `value_min`, `value_max`, `value_typical`, `value_text`, `value_enum`, `value_bool` is NOT NULL — an empty value row is meaningless.
+- `CHECK`: at least one of `value_min`, `value_max`, `value_typical`, `value_text`, `value_text_fa`, `value_text_en`, `value_enum`, `value_bool` is NOT NULL — an empty value row is meaningless. (`value_text_fa`/`value_text_en` added to the check by 0030, so a row carrying only the bilingual pair is valid.)
 - `CHECK`: `value_min <= value_max` when both are present.
 - **Partial unique index**: one live value per (subject, property, conditions) — `WHERE superseded_by IS NULL AND status <> 'superseded'`.
 - Polymorphic `subject_id` cannot use a plain FK. Integrity is enforced by a trigger validating existence in the target table. _(Alternative considered: separate `material_property_value`/`grade_property_value` tables. Rejected — it doubles every query and every index for the same guarantee.)_
@@ -379,7 +380,7 @@ Seeded empty. Row-level security is enabled on `material`, `grade`, `property_va
 | View                    | Purpose                                                                                                            |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `v_material_properties` | Flattened material + property + value + group, live rows only. The read path a `GET /materials/:slug` will use.    |
-| `v_unsourced_values`    | Every value with `status='unsourced'`, joined to material and property names. **The citation campaign work list.** |
+| `v_unsourced_values`    | Every live value that no `evidence` row supports (since 0026 — not `status='unsourced'`, which drifts), joined to its subject and property names across all four subject types. **The citation campaign work list.** |
 | `v_citation_coverage`   | Per material: total values, cited values, coverage percentage. The roadmap's data-quality dashboard in embryo.     |
 
 ---
@@ -420,7 +421,7 @@ Python 3 (the only runtime available here), clearly scoped as one-shot migration
 | mangled unit        | value `'150 - 200 µm/'`, unit `'°C'` | min=150, max=200, unit repaired to `µm/°C` |
 | non-numeric         | `'نیمه‌شفاف (Translucent)'`          | text                                       |
 
-**Hard rule**: anything the parser cannot confidently classify raises and aborts the run. It never guesses. Unparseable inputs are reported as a list for human decision.
+**Hard rule**: anything the parser cannot confidently classify raises and aborts the run rather than guessing; unparseable inputs are reported as a list for human decision.
 
 **Validation oracle**: for every material with shadow fields, assert parsed values agree — `tg.typical == tgValue`, `density.min == minDensity`, `density.max == maxDensity`, `crystallinity.min == minCrystallinity`, etc. Disagreement is either a parser bug or a genuine defect in the source data; both must be surfaced, not silently accepted.
 

@@ -1,0 +1,319 @@
+/* THE LAB — shared foundation for the three concepts.
+ *
+ * Dark palette base is #3E436F (owner-specified) — a muted slate-indigo,
+ * cool, and unmistakably not the datasheet's warm ember. Every other dark
+ * variable below is derived from it proportionally (panel lighter for
+ * elevation, bg-2 darker for the glow falloff, line/ink recalculated for
+ * contrast) rather than only the one variable being swapped in place.
+ * Warm/cool still carries the surface (D39): the datasheet is cream and
+ * ember, the lab is slate-blue and indigo.
+ *
+ * Colour rules are unchanged (R33/R34):
+ *   STATUS    clay = you can do this · sage = sourced · dashed grey = no data
+ *   ENCODING  --ramp-* only ever stands in for a number
+ */
+
+@import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/estedad/index.css');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-num: 'Newsreader', Georgia, serif;
+  --font-display: 'Newsreader', Georgia, serif;
+
+  /* LIGHT — soft blue slate, shifted from green to pair with the indigo dark */
+  --bg: #e9eef4;
+  --bg-2: #dfe6ef;
+  --panel: #f7f9fc;
+  --panel-2: #eef2f8;
+  --line: #ccd7e6;
+  --line-2: #b3c2d7;
+  --ink: #16203a;
+  --ink-2: #3b476a;
+  /* Contrast pass (2026-08-03). The light palette was never audited — Agent A
+     was redirected to measure-only on this file, and the dark palette was the
+     one redesigned. Consolidating the tokens for FE-1 surfaced four real AA
+     failures here. All four fixed by darkening on a held hue. */
+  --muted: #606b88; /* was #6a7796 — 3.84 → 4.55 on --bg */
+  /* --muted-2 is "provenance absent". Same tension as the dark palette: in
+     light mode "dimmer" means lighter, but AA demands darker, so it cannot be
+     lighter than --muted and still pass. Resolved the same way for consistency
+     — distinguished by DESATURATION (sat 8 vs 17), not by lightness. Greyer
+     reads as absence, which is the meaning D21/R33 actually wants. */
+  --muted-2: #666b78; /* was #94a0ba — 2.25 → 4.57 on --bg */
+  --bar-bg: rgba(233, 238, 244, 0.86);
+
+  --act: #975c42; /* was #a8674a — 3.83 → 4.59 on --bg */
+  --act-line: #ddc4b6;
+  --act-bg: #f2e4dc;
+  --ok: #567259; /* was #5f7f63 — 3.83 → 4.56 on --bg */
+  --ok-line: #b9cdba;
+
+  --ramp-glass: #3f63ab;
+  --ramp-rubber: #2f8a83;
+  --ramp-melt: #b57728;
+  --ramp-burn: #a54a3f;
+  --on-phase: #fbfcfe;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --t: 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
+  --measure: 1140px;
+  --pad-x: 28px;
+}
+
+/* DARK — "recessed instrument wells". Ground is #3E436F, unchanged.
+ *
+ * The previous version of this block was a mechanical tint ladder generated off
+ * #3E436F — bg, then panel 8% lighter, then line 8% lighter again. That ladder
+ * is the tell of a generic dark theme, and it was also broken: measured against
+ * WCAG AA, dim text on it failed badly (muted-2 sat at 2.1:1).
+ *
+ * THE IDENTITY MOVE: surfaces are milled INTO the housing, not stacked on top
+ * of it. Panels are DARKER than the ground, not lighter. Generic dark UI always
+ * lifts a card off the page; recessing it reads as machined metal, and it spends
+ * no contrast — it buys some, because text then sits on a darker field than the
+ * page itself. Depth comes from the edge catching light (--line is brighter than
+ * the ground it cuts through), not from a stack of ever-paler greys.
+ *
+ * Every pair below was computed, not eyeballed — WCAG 2.1 relative luminance.
+ * Text steps on the ground: ink 8.70 · ink-2 7.16 · muted 5.14 · muted-2 4.57.
+ * A four-step hierarchy, all clearing 4.5:1.
+ *
+ * --muted-2 is "provenance absent". It has to clear AA because it carries real
+ * small text, so it cannot be dimmer than --muted by luminance. It stays
+ * distinguishable by being DESATURATED instead (sat 14 vs 35) — greyer reads as
+ * absent, which is the meaning we actually want (D21/R33).
+ *
+ * --line and --line-2 sit at 1.70 and 2.25 against the ground, below 3:1, and
+ * that is deliberate and compliant: WCAG 1.4.11 governs UI components and
+ * meaningful graphics, not decorative edges between surfaces. The focus ring —
+ * which genuinely is covered — uses --act at 5.96 against the ground.
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #3e436f; /* the owner's colour, untouched */
+  --bg-2: #454a79; /* the one lift: haze above the housing */
+  --panel: #2f3357; /* recessed well */
+  --panel-2: #282c4a; /* deeper well */
+  --line: #5e659b; /* light on a milled edge */
+  --line-2: #7078b4;
+  --ink: #f5f6fc;
+  --ink-2: #dde0f2;
+  --muted: #b9bedf;
+  --muted-2: #b2b4c5; /* desaturated, not dimmer — see header */
+  --bar-bg: rgba(62, 67, 111, 0.86);
+
+  --act: #ffc199; /* lamp amber — the warm signature on a cool ground */
+  --act-line: #7d6550;
+  --act-bg: #3a3352;
+  --ok: #a5ddb1;
+  --ok-line: #55795f;
+
+  --ramp-glass: #93aff5;
+  --ramp-rubber: #63cfbe;
+  --ramp-melt: #f5b269;
+  --ramp-burn: #ee8878;
+  --on-phase: #23263f;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.9;
+  color: var(--ink);
+  background: var(--bg);
+  min-block-size: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--act);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+  transition: none !important;
+}
+
+.wrap {
+  max-inline-size: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--pad-x);
+}
+
+/* ------------------------------------------------------------------ header */
+
+.labbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 40;
+  background: var(--bar-bg);
+  border-block-end: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+
+.labbar .wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  block-size: 60px;
+}
+
+.labbrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.labbrand small {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.pill {
+  font-size: 0.8rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  transition:
+    color var(--t),
+    border-color var(--t),
+    background-color var(--t);
+}
+
+.pill:hover {
+  color: var(--act);
+  border-color: var(--act);
+}
+
+.pill.act {
+  color: var(--act);
+  border-color: var(--act-line);
+}
+
+.pill.act:hover {
+  background: var(--act-bg);
+}
+
+/* theme.js's themeButton() emits <button class="theme">. It belongs here, not
+   in each concept's stylesheet — the L1/L2 agent correctly flagged that it was
+   missing and had to duplicate it twice. */
+.theme {
+  font-size: 0.8rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  flex: none;
+  transition:
+    color var(--t),
+    border-color var(--t);
+}
+
+.theme:hover {
+  color: var(--act);
+  border-color: var(--act);
+}
+
+.spacer {
+  margin-inline-start: auto;
+}
+
+/* --------------------------------------------------------- shared bits */
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--act);
+  letter-spacing: 0.05em;
+}
+
+.needs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.need {
+  font-size: 0.73rem;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.need.ok {
+  color: var(--ok);
+  border-color: var(--ok-line);
+}
+
+.need.no {
+  color: var(--muted-2);
+  border-style: dashed;
+}
+
+.labfoot {
+  border-block-start: 1px solid var(--line);
+  padding-block: 22px 46px;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}
+
+/* The lab bar is a nowrap flex row: brand + spacer + pill. Below ~480px the
+   brand's descriptor is what pushes the pill past the edge, and since the root
+   clips overflow the pill loses its trailing characters rather than wrapping.
+   The descriptor is the decorative half of the brand, so it is what gives way. */
+@media (max-width: 480px) {
+  .labbrand small {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

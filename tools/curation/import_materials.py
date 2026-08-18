@@ -26,6 +26,12 @@ Design notes, mirroring import_values.py's conventions:
   in place rather than creating a duplicate. New materials are created
   status='draft' (never published sight-unseen); re-running does not
   downgrade an existing material's status back to draft.
+* On an update, a blank optional column means "leave the existing value
+  alone", not "clear it" -- so a row written purely to add overview_en to an
+  existing material cannot wipe its hand-written overview_fa. Clearing a
+  field back to empty is therefore not expressible through this CSV, which
+  is the correct trade for a tool whose failure mode would otherwise be
+  silent destruction of curated prose.
 * A blank row, or a row whose slug starts with '#', is treated as a comment
   and ignored silently -- same convention gaps.csv uses for blank rows, and
   what --template relies on to ship an illustrative example that isn't
@@ -311,11 +317,25 @@ def execute_plan(
             with conn.cursor() as cur:
                 cur.execute(
                     """
+                    -- COALESCE on every optional column: a blank cell means
+                    -- "leave this alone", never "erase it". Without this, a
+                    -- row filled in to add an English overview to an existing
+                    -- material would silently wipe its Persian overview,
+                    -- because every other column in that row is blank -- and
+                    -- overview_fa is hand-written prose that exists nowhere
+                    -- else. Same convention import_values.py already uses for
+                    -- citation-only rows ("the existing database value is
+                    -- kept as-is"). name_fa/name_en are assigned directly, not
+                    -- COALESCEd: they are validated non-blank for every row,
+                    -- so there is no blank case to protect against.
                     UPDATE material SET
                         field_id = %(field_id)s, family_id = %(family_id)s,
-                        name_fa = %(name_fa)s, name_en = %(name_en)s, code = %(code)s,
-                        discovery_year = %(discovery_year)s, overview_fa = %(overview_fa)s,
-                        overview_en = %(overview_en)s, chain_type = %(chain_type)s,
+                        name_fa = %(name_fa)s, name_en = %(name_en)s,
+                        code = COALESCE(%(code)s, code),
+                        discovery_year = COALESCE(%(discovery_year)s, discovery_year),
+                        overview_fa = COALESCE(%(overview_fa)s, overview_fa),
+                        overview_en = COALESCE(%(overview_en)s, overview_en),
+                        chain_type = COALESCE(%(chain_type)s, chain_type),
                         updated_at = now()
                     WHERE id = %(material_id)s;
                     """,

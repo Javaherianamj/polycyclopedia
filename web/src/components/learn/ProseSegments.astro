@@ -1,0 +1,103 @@
+---
+// Renders one `ProseSegment[]` (content/notebook/types.ts) in reading
+// order. This is the ONE place that pattern-matches every segment kind —
+// paragraphs, the pull-quote, figure captions, the review claim and the
+// closing note all route through this component rather than each
+// re-implementing "how does a sidenote/term/live-value render" — so a
+// second article's prose (any new `articles/<slug>.ts`) gets identical
+// rendering for free.
+//
+// `material` is the article's SUBJECT material's `MaterialDetail`,
+// fetched once by `LearnNotebook.astro` (not per-segment — a `liveValue`
+// segment is a lookup into an already-fetched object, never its own
+// network call). `null` is a legitimate state (the fetch failed) and
+// degrades every `liveValue` segment to InlineCitedValue's own "missing"
+// rendering, never a client-side error.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import type { ProseSegment } from '../../content/notebook/types';
+import type { MaterialDetail, PropertyValue } from '../../lib/api/types';
+import InlineCitedValue from './InlineCitedValue.astro';
+import { celsiusToFahrenheit } from '../../lib/notebook/units';
+
+interface Props {
+  segments: ProseSegment[];
+  locale: Locale;
+  material: MaterialDetail | null;
+}
+
+const { segments, locale, material } = Astro.props;
+
+function findProperty(group: string, key: string): PropertyValue | null {
+  if (!material) return null;
+  const propGroup = material.propertyGroups.find((g) => g.key === group);
+  return propGroup?.properties.find((p) => p.key === key) ?? null;
+}
+
+/** The one supported transform (`units.ts`'s `celsiusToFahrenheit`)
+ * applied to a range/typical value, formatted the same way the API's own
+ * `display` strings are (`"{min} - {max}"` / a single number) — arithmetic
+ * on the same live number, never a second fact (types.ts's own header). */
+function convertedDisplay(pv: PropertyValue): string | null {
+  if (pv.valueMin != null && pv.valueMax != null) {
+    return `${celsiusToFahrenheit(pv.valueMin)} - ${celsiusToFahrenheit(pv.valueMax)}`;
+  }
+  if (pv.valueTypical != null) return String(celsiusToFahrenheit(pv.valueTypical));
+  return null;
+}
+---
+
+{
+  segments.map((seg) => {
+    switch (seg.kind) {
+      case 'text':
+        return seg.text[locale];
+      case 'num':
+        return (
+          <span class="num" dir="ltr">
+            {seg.value}
+          </span>
+        );
+      case 'note':
+        return (
+          <>
+            <button
+              type="button"
+              class="nb-note-ref"
+              data-note-for={seg.id}
+              aria-expanded="false"
+              aria-controls={seg.id}
+              aria-label={t(locale, 'learn.notebook.note.ariaLabel')}
+              data-testid={`notebook-note-ref-${seg.id}`}
+            >
+              {seg.refText[locale]}
+            </button>
+            <span class="nb-note" id={seg.id} data-testid={`notebook-note-${seg.id}`}>
+              {seg.note[locale]}
+            </span>
+          </>
+        );
+      case 'term':
+        return (
+          <span class="nb-term" tabindex="0" data-testid="notebook-term">
+            {seg.word[locale]}
+            <span class="nb-pop">{seg.definition[locale]}</span>
+          </span>
+        );
+      case 'liveValue': {
+        const pv = findProperty(seg.group, seg.key);
+        if (seg.transform === 'celsiusToFahrenheit') {
+          const display = pv ? convertedDisplay(pv) : null;
+          return display ? (
+            <InlineCitedValue value={pv} locale={locale} displayOverride={display} />
+          ) : (
+            <span class="nbv-missing">{t(locale, 'value.missing')}</span>
+          );
+        }
+        return <InlineCitedValue value={pv} locale={locale} />;
+      }
+      default:
+        return null;
+    }
+  })
+}

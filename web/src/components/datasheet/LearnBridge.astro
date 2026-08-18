@@ -1,0 +1,53 @@
+---
+// R28/S10: the bridge card at the end of a section, linking to the matching
+// Learn tool. Renders nothing when learnBridgeMap has no entry for this
+// group (three of six groups today) -- absence here means "not decided
+// yet," not a bug, see learn-bridge-map.ts.
+//
+// Points at /{locale}/learn?material={slug}#{anchor} -- FE-8 step 1 built
+// Learn as ONE global route, not a per-material `/m/{slug}/learn` as
+// originally sketched here (the universal-concept tools this step ships,
+// StateSimulator and DPCalculator, teach a mechanism true of every polymer
+// and are not material-scoped pages at all -- see StateSimulatorIsland.tsx's
+// own header).
+//
+// REVISED 2026-08-14: `slug` is no longer unused. The owner's correction to
+// HansenSpaceIsland ("the polymer we have our page dedicated to") means a
+// reader arriving here needs the tool bound to THIS material, not a free
+// pick among all of them -- so the link now carries `?material={slug}`,
+// read by `lib/learn/learn-url-state.ts`'s `getMaterialParam`, the same
+// pre-fill-slug convention `search/url-state.ts`'s `?from=` and
+// `compare/url-state.ts`'s `?subjects=` already use. Every tool gets the
+// param on its link (not just Hansen's) so a later material-scoped Learn
+// tool can reuse the same contract without inventing a second one.
+import type { Locale } from '../../i18n/config';
+import { learnBridgeMap } from '../../lib/datasheet/learn-bridge-map';
+import { buildMaterialParam } from '../../lib/learn/learn-url-state';
+import { t } from '../../i18n/t';
+
+interface Props {
+  groupKey: string;
+  slug: string;
+  locale: Locale;
+}
+
+const { groupKey, slug, locale } = Astro.props;
+const tools = learnBridgeMap[groupKey];
+const arrow = locale === 'fa' ? '←' : '→';
+---
+
+{
+  tools?.map((tool) => (
+    <a
+      class="bridge"
+      href={`/${locale}/learn?${buildMaterialParam(slug)}#${tool.anchor}`}
+      data-testid="datasheet-learn-bridge"
+    >
+      <span class="bridge-label">{locale === 'fa' ? tool.nameFa : tool.nameEn}</span>
+      <span class="bridge-hint">{t(locale, 'datasheet.learnHint')}</span>
+      <span class="bridge-go" aria-hidden="true">
+        {arrow}
+      </span>
+    </a>
+  ))
+}

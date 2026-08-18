@@ -109,6 +109,16 @@ COLUMN_GUIDANCE: list[tuple[str, str, str, str]] = [
      "Sanity ceiling -- see plausible_min.", "2.3"),
     ("current_value", "Pre-filled (context)",
      "What the old prototype claimed, for comparison. Not read on import.", "0.91 - 0.94"),
+    ("grade_class", "You fill in (optional)",
+     "Leave blank for a value describing the polymer as a class. Fill in a grade key "
+     "only when the value describes ONE processing family, so it doesn't overwrite the "
+     "general value.", "injection"),
+    ("grade_class_name_fa", "You fill in (only for a NEW grade)",
+     "Persian name, required only when grade_class is a key that doesn't exist yet.",
+     "قالب‌گیری تزریقی"),
+    ("grade_class_name_en", "You fill in (only for a NEW grade)",
+     "English name, required only when grade_class is a key that doesn't exist yet.",
+     "Injection Moulding"),
     ("value_min", "You fill in", "For a range: the bottom.", "0.910"),
     ("value_max", "You fill in", "For a range: the top.", "0.925"),
     ("value_typical", "You fill in",
@@ -131,6 +141,12 @@ COLUMN_GUIDANCE: list[tuple[str, str, str, str]] = [
     ("note_fa", "You fill in", "Anything worth remembering, in Persian.", "یادداشت"),
     ("confidence", "You fill in", "0 to 1. Leave blank for the default (0.9).", "0.9"),
     ("skip", "You fill in", "Put \"y\" to ignore this row for now.", "y"),
+    ("role", "You fill in",
+     "Only needed when citing more than one source for the same material+property: how this "
+     "row's source relates to the value. Leave blank -- the importer defaults it sensibly "
+     "(primary for the row that sets the value, corroborating for the rest). Use "
+     "\"conflicting\" if a source disagrees, \"derived_from\" if the number was calculated "
+     "rather than read directly.", "corroborating"),
 ]
 
 TIER_GUIDANCE = [
@@ -158,6 +174,9 @@ COLUMN_WIDTHS: dict[str, int] = {
     "plausible_min": 12,
     "plausible_max": 12,
     "current_value": 16,
+    "grade_class": 16,
+    "grade_class_name_fa": 20,
+    "grade_class_name_en": 20,
     "value_min": 12,
     "value_max": 12,
     "value_typical": 13,

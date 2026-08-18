@@ -17,6 +17,8 @@ from __future__ import annotations
 
 import csv
 import datetime
+
+from openpyxl.utils import get_column_letter
 import subprocess
 import sys
 from pathlib import Path
@@ -249,7 +251,8 @@ def test_date_typed_cell_is_rejected_with_readable_error_not_a_crash():
     with pytest.raises(WorkbookCellError) as exc:
         cell_text("Values", ws.cell(row=2, column=page_col))
     message = str(exc.value)
-    assert "Values!N2" in message
+    expected_ref = f"Values!{get_column_letter(page_col)}2"
+    assert expected_ref in message
     assert "looks like a date" in message
     assert "2026-04-01" in message
     assert "Format the column as Text or Number" in message

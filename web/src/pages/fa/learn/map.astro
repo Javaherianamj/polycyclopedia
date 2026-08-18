@@ -1,0 +1,16 @@
+---
+// L2 — «نقشه» / MAP, Persian route (default locale). A SEPARATE route from
+// `/{locale}/learn` (SCALE), sibling to it exactly the way `m/[slug]/
+// sources.astro` already sits beside `m/[slug].astro` in this app — see
+// components/learn/LearnMap.astro's header for the full reasoning and for
+// the seam GRAPH/NOTEBOOK should follow next.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LearnMap from '../../../components/learn/LearnMap.astro';
+import { t } from '../../../i18n/t';
+
+const locale = 'fa' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.map.pageTitle')} surface="lab">
+  <LearnMap locale={locale} />
+</BaseLayout>

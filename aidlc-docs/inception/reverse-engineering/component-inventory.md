@@ -16,12 +16,12 @@ None as separate installable packages, but within the single application package
 
 - `src/types/polymer.ts` - Models - the `PolymerData` data model and its 10 nested interfaces; imported by nearly every file in `src/components/` and by `src/App.tsx`.
 - `src/data/polymersData.ts` - Static Data - the single dataset (6 records), imported directly by `App.tsx` and passed down as props from there.
-- `src/components/SourcedValue.tsx` - Utility/Presentation - shared `{value, unit, note}` -> JSX formatter, replacing 5 previously-duplicated local `formatVal` helpers (still-present thin wrappers in `App.tsx`, `CatalogPage.tsx`, `CompareModal.tsx`, `StateSimulator.tsx`, `DPCalculator.tsx` now delegate to it).
+- `src/components/SourcedValue.tsx` - Utility/Presentation - shared `{value, unit, note}` -> JSX formatter, replacing 5 previously-duplicated local `formatVal` helpers; consumer list and wrapper-pattern detail in `code-structure.md` "Shared Sourced-Value Formatter".
 - `src/components/InfoTooltip.tsx` - Utility/Presentation - reusable hover/click info-icon tooltip, used by `App.tsx` and at least 6 simulator/calculator components.
 
 ## Test Packages
 
-- None. No test framework is installed (`package.json` has no `vitest`/`jest`/`@testing-library/*`/`playwright`/`cypress` dependency), no `*.test.*`/`*.spec.*` files exist anywhere in the repository (verified via filesystem search), and `.github/workflows/ci.yml` has no test step — it runs `typecheck`, `lint`, `format:check`, and `build` only.
+- None. No test framework installed (`package.json` has no `vitest`/`jest`/`@testing-library/*`/`playwright`/`cypress`), no `*.test.*`/`*.spec.*` files anywhere, and `.github/workflows/ci.yml` has no test step (runs `typecheck`, `lint`, `format:check`, `build` only) — see `code-quality-assessment.md` Test Coverage for implications.
 
 ## Full Module Inventory (single application package, by directory)
 

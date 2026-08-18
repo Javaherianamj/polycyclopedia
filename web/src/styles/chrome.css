@@ -1,0 +1,518 @@
+/* FE-1b — global header chrome.
+ *
+ * Ships on every route, so everything here is subject to R24 (no libraries)
+ * and must stay small. No island: navigation cannot depend on hydration.
+ */
+
+/* ------------------------------------------------------------- skip link */
+
+.skip-link {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--panel);
+  color: var(--ink);
+  /* FE-8: chrome ships on every route, including Learn's `data-surface="lab"`
+   * (frontend-plan D37/D39), which never defined --rule (a datasheet-only
+   * border shorthand) -- an undefined custom property resolves to nothing,
+   * silently dropping the border rather than erroring. --line (lab's nearest
+   * equivalent, a bare colour) is the fallback everywhere --rule appears in
+   * this file. */
+  border: var(--rule, 1px solid var(--line, currentcolor));
+  border-radius: 0 0 var(--r-md, 8px) 0;
+  transform: translateY(-120%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------- header */
+
+.site-header {
+  border-block-end: var(--rule, 1px solid var(--line, currentcolor));
+  background: var(--panel);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-inline-size: 1120px;
+  margin-inline: auto;
+  padding: 12px 20px;
+  flex-wrap: wrap;
+}
+
+.wordmark-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: var(--r-sm, 4px);
+  /* Non-negotiable 8: expansion must overflow, never push siblings. The
+   * link reserves only the compressed width; the SVG is allowed to paint
+   * outside it. */
+  overflow: visible;
+}
+
+.site-nav {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.site-nav-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.site-nav-link {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: var(--r-sm, 4px);
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: var(--fs-small);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.site-nav-link:hover {
+  color: var(--ink);
+  /* --accent-soft is datasheet-only; --act-bg is lab's nearest equivalent
+   * role (a soft wash behind an interactive element). See the --rule
+   * fallback comment above -- same undefined-custom-property class of bug. */
+  background: var(--accent-soft, var(--act-bg, transparent));
+}
+
+.site-nav-link.is-current {
+  color: var(--accent, var(--act, inherit));
+  font-weight: 600;
+}
+
+.site-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
+.lang-switch {
+  padding: 6px 10px;
+  border-radius: var(--r-sm, 4px);
+  border: var(--rule, 1px solid var(--line, currentcolor));
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: var(--fs-caption);
+}
+
+.lang-switch:hover {
+  color: var(--ink);
+  background: var(--accent-soft, var(--act-bg, transparent));
+}
+
+/* ----------------------------------------------------- theme toggle dial
+ * Illustration tokens, brand-only. Like --wm-cyclo these deliberately do
+ * NOT reuse D36's five semantic hues: a sun drawn in "measurement teal" or
+ * "provenance sage" would leak meaning into decoration.
+ */
+:root {
+  --sky-day-1: #cfe4ee;
+  --sky-day-2: #f6e2c0;
+  --sky-sun: #d99036;
+  --sky-night-1: #1d2740;
+  --sky-night-2: #38304d;
+  --sky-moon: #e8e2d2;
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  padding: 0;
+  border: var(--rule, 1px solid var(--line, currentcolor));
+  border-radius: 999px;
+  /* The button is a little window onto the sky, so it carries the sky's
+   * colour rather than the panel's — this is the "match the theme more"
+   * the owner asked for. */
+  background: linear-gradient(160deg, var(--sky-day-1), var(--sky-day-2));
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    box-shadow var(--dur-fast) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+:root[data-theme='dark'] .theme-toggle {
+  background: linear-gradient(160deg, var(--sky-night-1), var(--sky-night-2));
+}
+
+.theme-toggle:hover {
+  box-shadow: var(--shadow-1, 0 1px 4px rgb(0 0 0 / 18%));
+}
+
+/* The aperture crops the dial so only one body is ever in view. */
+.theme-aperture {
+  display: block;
+  inline-size: 22px;
+  block-size: 22px;
+  overflow: hidden;
+  position: relative;
+}
+
+.theme-dial {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 22px;
+  block-size: 44px;
+  /* Spring easing: a body rising over a horizon overshoots and settles.
+   * This is the ONE motion R35's "switching a setting is not an animation"
+   * is deliberately overridden for -- the owner asked for it explicitly
+   * ("create a niche animation"), and it is scoped to the control itself
+   * plus the sweep below, never to the page's own restyle. */
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+:root[data-theme='dark'] .theme-dial {
+  transform: translateY(-22px);
+}
+
+.dial-sun circle {
+  fill: var(--sky-sun);
+}
+
+.sun-rays line {
+  stroke: var(--sky-sun);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.dial-moon circle {
+  fill: var(--sky-moon);
+}
+
+.moon-star {
+  fill: var(--sky-moon);
+  opacity: 0.75;
+}
+
+/* ------------------------------------------------------- celestial sweep
+ * "when i change it a sun or moon passes from the back of the screen".
+ * Fixed, non-interactive, and behind the page's content (#main is lifted
+ * to z-index 1 in global.css), so the body genuinely passes BEHIND the
+ * text rather than over it.
+ */
+.sky-sweep {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sky-body {
+  position: absolute;
+  inline-size: clamp(160px, 22vw, 280px);
+  block-size: auto;
+  inset-block-start: 12vh;
+  inset-inline-start: -30vw;
+  opacity: 0;
+}
+
+.sky-body-sun circle {
+  fill: var(--sky-sun);
+}
+
+.sky-rays line {
+  stroke: var(--sky-sun);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.sky-body-moon circle {
+  fill: var(--sky-moon);
+}
+
+/* An arc, not a straight line: rise, cross, set. `translate` and `opacity`
+ * only -- nothing here triggers layout. */
+@keyframes sky-arc {
+  0% {
+    opacity: 0;
+    transform: translate(0, 30vh) scale(0.7) rotate(0deg);
+  }
+  25% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(75vw, -6vh) scale(1) rotate(90deg);
+  }
+  75% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(150vw, 30vh) scale(0.7) rotate(180deg);
+  }
+}
+
+[data-sweeping='dark'] .sky-body-moon,
+[data-sweeping='light'] .sky-body-sun {
+  animation: sky-arc 1500ms var(--ease-in-out) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-dial {
+    transition: none;
+  }
+
+  [data-sweeping='dark'] .sky-body-moon,
+  [data-sweeping='light'] .sky-body-sun {
+    animation: none;
+  }
+}
+
+/* R35: switching a setting is not an animation. While the root carries
+ * data-theme-changing, nothing anywhere transitions. */
+:root[data-theme-changing] *,
+:root[data-theme-changing] *::before,
+:root[data-theme-changing] *::after {
+  transition: none !important;
+}
+
+/* ...with exactly one exemption. R35's rule is that the PAGE must not
+ * animate its restyle -- colours must not crossfade while you read. The
+ * toggle's own dial is the control you just pressed, and its motion is
+ * what the owner explicitly asked for. Higher specificity than the blanket
+ * rule above, so it survives the suppression it would otherwise inherit. */
+:root[data-theme-changing] .theme-dial {
+  transition: transform var(--dur-slow) var(--ease-spring) !important;
+}
+
+/* Stacking: the sweep sits at z-index 0, so the header and the page content
+ * must both be lifted above it or the body would pass in FRONT of the text
+ * instead of behind it. */
+.site-header {
+  position: relative;
+  z-index: 2;
+}
+
+#main {
+  position: relative;
+  z-index: 1;
+}
+
+/* -------------------------------------------------------------- wordmark
+ * D55 / wordmark-animation-spec.md. `poly` and `pedia` crack apart, `cyclo`
+ * is revealed between them, then the halves drive back in and SQUEEZE it
+ * out. Spec §3: "If only one thing survives review, it is that `cyclo` is
+ * squeezed out, never faded out" — hence scaleX only, opacity pinned at 1.
+ *
+ * Spec §5 forbids a continuous loop in persistent chrome (WCAG 2.2.2): in
+ * the header it plays once per session, then replays on hover and keyboard
+ * focus. The homepage hero loop, and its required pause control, are NOT
+ * built here — that is hero work, not chrome.
+ */
+
+.wordmark {
+  overflow: visible;
+  color: var(--ink);
+}
+
+/* The wordmark is the one place on the site with its own typographic voice.
+ * Owner feedback on the first pass: "the polypedia on header is really
+ * small, make it bigger, use a bold font or something ... especially the
+ * persian font is aweful."
+ *
+ * Constraint worth stating plainly: this project self-hosts exactly two
+ * faces — Estedad (the only Persian face available) and Newsreader — and
+ * will not ship a webfont whose licence is unresolved (frontend-plan §
+ * "One licence flag before FE-0 starts"). So a genuinely NEW typeface is
+ * not something that can be introduced here; what is available is
+ * Estedad's variable weight axis, which runs to 900 and has never been
+ * used above 700 anywhere on this site. That is the real lever for the
+ * Persian lockup, and it is what is used below.
+ *
+ * Latin takes Newsreader at 600 — the display/numeral voice (D38), which
+ * is already a different family from the body text, so the wordmark does
+ * not read as a bolded paragraph.
+ */
+.wm-part {
+  font-family: var(--font-display, serif);
+  font-weight: 600;
+  font-size: 27px;
+  letter-spacing: -0.01em;
+  fill: currentColor;
+}
+
+/* Persian needs a different family (Estedad is the only Persian face), a
+ * heavier weight to hold its own against Newsreader's serif mass, and
+ * slightly tighter tracking — Persian joins, so default tracking reads as
+ * a gap rather than as letterspacing. */
+[dir='rtl'] .wm-part {
+  font-family: var(--font-display-fa, sans-serif);
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: 0;
+}
+
+/* Non-negotiable: a sixth, brand-only hue. It deliberately does NOT borrow
+ * one of D36's five semantic hues, which have fixed jobs — an accent that
+ * meant "measurement" or "actionable" on a wordmark would dilute them.
+ * OPEN DECISION flagged for the owner: this specific value is a default,
+ * not an owner choice. */
+.wm-cyclo {
+  fill: var(--wm-cyclo, #b06a3b);
+}
+
+:root {
+  /* Half the expanded gap. Measured against the real rendered lockup, not
+   * guessed: at the sizes set above `cyclo` is ~60px wide and `سیکلو` ~69px,
+   * so 36px of travel left only ~1.5px clearance on the Persian mark. 40px
+   * gives both locales room without the gap reading as a hole. */
+  --wm-travel: 40px;
+  /* Sign of the outward travel. In RTL the lockup mirrors, so `poly` sits
+   * to the right of the seam and must move the other way. Only the sign
+   * changes — one animation serves both locales. */
+  --wm-dir: 1;
+}
+
+[dir='rtl'] {
+  --wm-dir: -1;
+}
+
+/* Rest state (compressed) is the DEFAULT, with no animation attached. That
+ * is what makes hover a clean restart: the animation only exists while the
+ * trigger condition holds, so re-entering replays it from frame 0 without
+ * any JS or animation-name juggling. */
+#wm-cyclo {
+  transform: scaleX(0);
+  transform-origin: 100px 28px;
+}
+
+@keyframes wm-poly-crack {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  55% {
+    transform: translateX(calc(var(--wm-travel) * var(--wm-dir) * -1.02));
+  }
+  70%,
+  74% {
+    transform: translateX(calc(var(--wm-travel) * var(--wm-dir) * -1));
+  }
+  /* Drive back in, accelerating, then a 1.5% impact compression. */
+  92% {
+    transform: translateX(calc(var(--wm-travel) * var(--wm-dir) * 0.015));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes wm-pedia-crack {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  55% {
+    transform: translateX(calc(var(--wm-travel) * var(--wm-dir) * 1.02));
+  }
+  70%,
+  74% {
+    transform: translateX(calc(var(--wm-travel) * var(--wm-dir) * 1));
+  }
+  92% {
+    transform: translateX(calc(var(--wm-travel) * var(--wm-dir) * -0.015));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes wm-cyclo-reveal {
+  0%,
+  40% {
+    transform: scaleX(0);
+  }
+  /* Revealed by the gap opening — never before there is room for it. */
+  70%,
+  74% {
+    transform: scaleX(1);
+  }
+  /* Squeezed, in step with the closing gap. scaleY never changes and
+   * opacity is never touched: the disappearance is a consequence of the
+   * halves meeting, not a fade. */
+  92%,
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+.wordmark-link:hover .wm-part,
+.wordmark-link:focus-visible .wm-part,
+[data-wm-intro] .wm-part {
+  animation-duration: 2700ms;
+  animation-timing-function: var(--ease-out);
+  animation-iteration-count: 1;
+}
+
+.wordmark-link:hover #wm-poly,
+.wordmark-link:focus-visible #wm-poly,
+[data-wm-intro] #wm-poly {
+  animation-name: wm-poly-crack;
+}
+
+.wordmark-link:hover #wm-pedia,
+.wordmark-link:focus-visible #wm-pedia,
+[data-wm-intro] #wm-pedia {
+  animation-name: wm-pedia-crack;
+}
+
+.wordmark-link:hover #wm-cyclo,
+.wordmark-link:focus-visible #wm-cyclo,
+[data-wm-intro] #wm-cyclo {
+  animation-name: wm-cyclo-reveal;
+}
+
+/* Non-negotiable 1: reduced motion gets the STATIC compressed wordmark —
+ * not a slower version, none. */
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-link:hover .wm-part,
+  .wordmark-link:focus-visible .wm-part,
+  [data-wm-intro] .wm-part {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- mobile
+ * R27: no horizontal overflow at 320px. The nav wraps to its own row and
+ * the controls stay beside the wordmark. */
+@media (max-width: 560px) {
+  .site-header-inner {
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .site-nav-list {
+    gap: 2px;
+  }
+
+  .site-nav-link {
+    padding: 6px 8px;
+  }
+}

@@ -1,0 +1,69 @@
+Polypedia — پلی‌پدیا
+Copyright 2026 Polypedia
+
+Originally developed in collaboration with the Scientific Association of
+Polymer Engineering (Founding Academic Partner).
+
+------------------------------------------------------------------------------
+SCOPE OF THE GNU AGPL v3.0 IN THIS REPOSITORY
+------------------------------------------------------------------------------
+
+The GNU Affero General Public License v3.0 in the accompanying LICENSE file
+applies to the SOURCE CODE of this project ONLY. It does not apply to the
+repository as a whole.
+
+The AGPL was chosen over a permissive licence (this project shipped under
+Apache 2.0 until 2026-08-16) for one specific reason: Polypedia is a hosted
+service, and the AGPL is the only common licence whose copyleft reaches
+network use. Under section 13, anyone who modifies this code and offers it to
+users over a network must offer those users the corresponding source of their
+modified version. A permissive licence would have allowed a competitor to
+take the search engine, close it, and run it as a competing service with no
+reciprocal obligation.
+
+Because Polypedia holds copyright in this code (see the Contributor Licence
+Agreement in docs/legal/), the AGPL is not the only way to obtain it: a
+separate commercial licence, without the AGPL's source-disclosure obligation,
+is available on request at the contact address below.
+
+The following are NOT licensed under the AGPL. They are proprietary and all
+rights are reserved:
+
+  * The curated database — property values, citations, sources and coverage
+    data. This includes, but is not limited to:
+        db/seeds/0005_materials_ldpe_hdpe.sql
+        curation/*.csv
+        src/data/polymersData.ts
+        any export, dump or fixture derived from the database
+
+  * Scientific content — written prose, material overviews, learning material,
+    explanations, illustrations and diagrams, including the guides in docs/
+
+  * Branding and visual identity — the Polypedia name, the پلی‌پدیا name, the
+    logo, wordmark, icons, colour palette, UI/UX identity, illustrations and
+    marketing materials, including the contents of assets/, public/ and design/
+
+  * Trademarks, whether registered or unregistered
+
+Forking this repository grants the rights in the GNU AGPL v3.0 over the source
+code, and carries that licence's obligations with it -- including the network
+clause: a fork you make available to users over a network must offer those
+users its corresponding source. Forking does not grant any right to use the
+Polypedia name, logo, branding or trademarks, and it does not grant any right
+to the database or the scientific content. Forks must remove all Polypedia
+branding unless explicit written permission has been granted.
+
+A fork therefore cannot ship the curated data. The AGPL obliges you to
+publish your modified SOURCE; it neither obliges nor entitles you to publish
+the proprietary database, which is not licensed to you at all.
+
+Full terms, and the exact file-by-file boundary, are in:
+
+    docs/legal/README.md          licensing overview and scope
+    docs/legal/database-license.md    database ownership and licensing
+    db/LICENSE                    data terms, at the data
+    docs/legal/branding-policy.md     brand and trademark policy
+    docs/legal/ai-usage-policy.md     AI, embeddings, RAG and training
+    docs/legal/terms-of-service.md    terms governing use of the platform
+
+Contact: legal@polycyclopedia.ir

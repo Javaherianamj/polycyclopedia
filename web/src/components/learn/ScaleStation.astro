@@ -1,0 +1,67 @@
+---
+// One station of the zoom. Structure and layout are Astro + CSS with zero
+// client JS — the only interactive things on this page are the five tool
+// islands and the rail's scroll listener, so a station is markup.
+//
+// The slot holds the tool(s) that live at this length scale. That is the
+// whole point of D50: a tool is not a card in a stack, it is the instrument
+// you find when you zoom to the scale its subject exists at.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import StationIcon from './StationIcon.astro';
+import type { Station } from './scale-stations';
+
+interface Props {
+  station: Station;
+  locale: Locale;
+}
+
+const { station, locale } = Astro.props;
+const headingId = `station-${station.key}-title`;
+---
+
+<section
+  class="station"
+  id={`scale-${station.key}`}
+  data-station={station.key}
+  aria-labelledby={headingId}
+>
+  {
+    /* The exponent, oversized and nearly invisible behind the content. It is
+       the one piece of pure atmosphere here, and it earns its place: it makes
+       the magnification legible while scrolling fast, when the small readout
+       at the top is not what the eye is on. dir="ltr" because 10⁻¹⁰ is a
+       mathematical expression and does not mirror in RTL (D18/R6). */
+  }
+  <div class="station-ghost num" dir="ltr" aria-hidden="true">10<sup>{station.exp}</sup></div>
+
+  <div class="station-in">
+    <div class="station-obj">
+      <StationIcon kind={station.icon} />
+    </div>
+
+    <div class="station-text">
+      <p class="station-exp num" dir="ltr">10<sup>{station.exp}</sup> m</p>
+      <h2 id={headingId}>{t(locale, station.nameKey)}</h2>
+      <p class="station-sentence">{t(locale, station.sentenceKey)}</p>
+
+      {
+        /* R7 / FE-0 constraint 6: a scale the spec promised a tool for, where
+           this codebase has none, says so in its own words. It is drawn as a
+           dashed outline — D21's "no data" grammar, the same dashed-grey the
+           datasheet uses for an absent value — so "not built" is visually the
+           same species of statement as "not measured", which is what it is. */
+        station.gapKey && (
+          <div class="station-gap">
+            <p class="station-gap-label">{t(locale, 'learn.scale.emptyLabel')}</p>
+            <p class="station-gap-reason">{t(locale, station.gapKey)}</p>
+          </div>
+        )
+      }
+
+      <div class="station-tools">
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>

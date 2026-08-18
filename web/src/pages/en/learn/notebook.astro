@@ -1,0 +1,14 @@
+---
+// L4 — «دفترچه» / NOTEBOOK, English route. See fa/learn/notebook.astro
+// and components/learn/LearnNotebook.astro for the rationale — identical
+// here, just the locale.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LearnNotebook from '../../../components/learn/LearnNotebook.astro';
+import { t } from '../../../i18n/t';
+
+const locale = 'en' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.notebook.pageTitle')} surface="lab">
+  <LearnNotebook locale={locale} />
+</BaseLayout>

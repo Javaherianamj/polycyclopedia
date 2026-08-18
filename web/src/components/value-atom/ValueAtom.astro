@@ -1,0 +1,155 @@
+---
+// The value atom (FE-2): value display, provenance mark + citation popover,
+// and the property-explanation (i) button. Every screen that shows a
+// property value goes through this component (R1) rather than reimplementing
+// its own — that is the entire reason this unit exists before any product
+// screen does.
+//
+// Popovers use the native Popover API (`popover` attribute / `popovertarget`)
+// per the FE-0 gate record's explicit recommendation — not hand-managed
+// `position: absolute` + hover/focus CSS the way FE-0's own prototypes and
+// FE-1's placeholder pages had to. The base open/close mechanic needs no
+// JavaScript and works identically whether this ends up on a static
+// datasheet page or inside a hydrated island later; popover-hover.ts adds
+// the desktop-hover half of "desktop hover, mobile sheet" as a progressive
+// enhancement on top.
+import type { PropertyDefinition, PropertyValue } from '../../lib/api/types';
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+import { formatLocator, provenanceState } from './logic';
+
+interface Props {
+  property: PropertyDefinition;
+  value: PropertyValue | null;
+  locale: Locale;
+}
+
+const { property, value, locale } = Astro.props;
+const state = provenanceState(value);
+
+const name = locale === 'fa' ? property.nameFa : property.nameEn;
+const description = locale === 'fa' ? property.descriptionFa : property.descriptionEn;
+
+// dataType is only guaranteed Latin/ASCII for numeric, range and boolean
+// (see api/src/format.ts). text/enum values may be authored in Persian and
+// must not be forced into an LTR run (R6) — only the types the formatter
+// actually produces Latin output for get the LTR wrapper (R25).
+const displayIsLatin =
+  value !== null &&
+  (value.dataType === 'numeric' || value.dataType === 'range' || value.dataType === 'boolean');
+
+// Found via FE-3's real data, not FE-2's own demo (which only ever showed a
+// numeric and a short text value): numeric/range/boolean displays are short
+// by construction (api/src/format.ts), but text/enum values can be a full
+// sentence (LDPE's rheology_notes is 131 characters). .value's default
+// white-space:nowrap, correct for a number, forces a 130-character string
+// onto one unbroken line -- this is what actually caused it, not the grid
+// tracks the rest of this bug hunt fixed first.
+const displayCanBeLong = value !== null && (value.dataType === 'text' || value.dataType === 'enum');
+
+const uid = crypto.randomUUID();
+const infoPopoverId = `pop-info-${uid}`;
+const markPopoverId = `pop-mark-${uid}`;
+// Unique per instance -- CSS anchor-name can't be generated from a shared
+// class the way scoped styling can. Only takes effect where CSS anchor
+// positioning is supported and the viewport is wide (value-atom.css); every
+// other browser and the mobile sheet ignore these entirely.
+const infoAnchorName = `--info-anchor-${uid}`;
+const markAnchorName = `--mark-anchor-${uid}`;
+---
+
+<div class="prop">
+  <div class="prop-label">
+    <span class="prop-name">{name}</span>
+    {
+      property.symbol && (
+        <span class="prop-sym" dir="ltr">
+          {property.symbol}
+        </span>
+      )
+    }
+    {
+      description && (
+        <>
+          <button
+            type="button"
+            class="info"
+            popovertarget={infoPopoverId}
+            aria-label={name}
+            style={`anchor-name: ${infoAnchorName}`}
+            data-testid="value-atom-info-button"
+          >
+            i
+          </button>
+          <div
+            id={infoPopoverId}
+            class="pop pop-info"
+            popover="auto"
+            style={`position-anchor: ${infoAnchorName}`}
+          >
+            <span>{description}</span>
+          </div>
+        </>
+      )
+    }
+  </div>
+
+  {
+    state === 'missing' ? (
+      <span class="value is-missing">
+        <span class="value-missing">{t(locale, 'value.missing')}</span>
+        <a class="value-cta" href="#contribute" data-testid="value-atom-missing-cta">
+          {t(locale, 'value.missingCta')}
+        </a>
+      </span>
+    ) : (
+      <span class={displayCanBeLong ? 'value value-wrap' : 'value'}>
+        <span class="value-display" dir={displayIsLatin ? 'ltr' : undefined}>
+          {value!.display}
+        </span>
+        <button
+          type="button"
+          class={`mark mark-${state}`}
+          popovertarget={markPopoverId}
+          aria-label={state === 'cited' ? t(locale, 'value.sourced') : t(locale, 'value.uncited')}
+          style={`anchor-name: ${markAnchorName}`}
+          data-testid="value-atom-mark-button"
+        >
+          {state === 'cited' ? '§' : '?'}
+        </button>
+        <div
+          id={markPopoverId}
+          class="pop"
+          popover="auto"
+          style={`position-anchor: ${markAnchorName}`}
+        >
+          {state === 'cited' ? (
+            <>
+              <b>{t(locale, 'value.sourced')}</b>
+              <ul class="citation-list">
+                {value!.citations.map((citation) => (
+                  <li class="citation-entry">
+                    {citation.role === 'conflicting' && (
+                      <span class="citation-flag">{t(locale, 'value.citation.conflicting')}</span>
+                    )}
+                    <span>{citation.sourceTitle}</span>
+                    <span class="pop-meta" dir="ltr">
+                      {citation.sourceEdition &&
+                        `${t(locale, 'value.citation.edition')} ${citation.sourceEdition} · `}
+                      {formatLocator(citation.locator, locale)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <>
+              <b>{t(locale, 'value.uncited')}</b>
+              <span>{t(locale, 'value.uncitedLong')}</span>
+            </>
+          )}
+        </div>
+      </span>
+    )
+  }
+</div>

@@ -100,19 +100,19 @@ Note: `vite` is listed in both `dependencies` and `devDependencies` in `package.
 
 ### Development (`devDependencies` in `package.json`)
 
-| Dependency                    | Version    | Purpose                                                                                                                                                                                                     | License    |
-| ----------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| `typescript`                  | `~5.8.2`   | Type-checking (`tsc --noEmit`)                                                                                                                                                                              | Apache-2.0 |
-| `typescript-eslint`           | `^8.19.0`  | TypeScript-aware ESLint rules                                                                                                                                                                               | MIT        |
-| `eslint`                      | `^9.17.0`  | Linting                                                                                                                                                                                                     | MIT        |
-| `@eslint/js`                  | `^9.17.0`  | ESLint's own recommended JS rule set                                                                                                                                                                        | MIT        |
-| `eslint-plugin-react-hooks`   | `^5.1.0`   | Rules-of-hooks linting                                                                                                                                                                                      | MIT        |
-| `eslint-plugin-react-refresh` | `^0.4.16`  | Fast-Refresh-safety linting                                                                                                                                                                                 | MIT        |
-| `eslint-config-prettier`      | `^9.1.0`   | Disables ESLint stylistic rules that conflict with Prettier                                                                                                                                                 | MIT        |
-| `prettier`                    | `^3.4.2`   | Code formatting                                                                                                                                                                                             | MIT        |
-| `globals`                     | `^15.14.0` | Global-variable definitions for ESLint's flat config                                                                                                                                                        | MIT        |
-| `autoprefixer`                | `^10.4.21` | CSS vendor prefixing (present, but Tailwind v4's `@tailwindcss/vite` plugin handles its own pipeline — no PostCSS config file references it, so it is likely unused/vestigial from a pre-Tailwind-v4 setup) | MIT        |
-| `@types/node`                 | `^22.14.0` | Node.js types (used by `vite.config.ts`'s `path`/`__dirname` usage)                                                                                                                                         | MIT        |
+| Dependency                    | Version    | Purpose                                                                           | License    |
+| ----------------------------- | ---------- | --------------------------------------------------------------------------------- | ---------- |
+| `typescript`                  | `~5.8.2`   | Type-checking (`tsc --noEmit`)                                                    | Apache-2.0 |
+| `typescript-eslint`           | `^8.19.0`  | TypeScript-aware ESLint rules                                                     | MIT        |
+| `eslint`                      | `^9.17.0`  | Linting                                                                           | MIT        |
+| `@eslint/js`                  | `^9.17.0`  | ESLint's own recommended JS rule set                                              | MIT        |
+| `eslint-plugin-react-hooks`   | `^5.1.0`   | Rules-of-hooks linting                                                            | MIT        |
+| `eslint-plugin-react-refresh` | `^0.4.16`  | Fast-Refresh-safety linting                                                       | MIT        |
+| `eslint-config-prettier`      | `^9.1.0`   | Disables ESLint stylistic rules that conflict with Prettier                       | MIT        |
+| `prettier`                    | `^3.4.2`   | Code formatting                                                                   | MIT        |
+| `globals`                     | `^15.14.0` | Global-variable definitions for ESLint's flat config                              | MIT        |
+| `autoprefixer`                | `^10.4.21` | CSS vendor prefixing; likely vestigial — see `code-quality-assessment.md` item 12 | MIT        |
+| `@types/node`                 | `^22.14.0` | Node.js types (used by `vite.config.ts`'s `path`/`__dirname` usage)               | MIT        |
 
 ### CDN Resources (not in `package.json` at all — loaded via `<link>` tags in `index.html`)
 

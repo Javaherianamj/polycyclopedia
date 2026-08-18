@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Lab — four concepts | Polypedia FE-0</title>
+    <link rel="stylesheet" href="lab.css" />
+    <style>
+      .hero {
+        padding-block: 46px 8px;
+      }
+      .hero h1 {
+        margin: 8px 0 0;
+        font-size: 2.2rem;
+        letter-spacing: -0.025em;
+      }
+      .hero p {
+        margin: 14px 0 0;
+        max-inline-size: 64ch;
+        color: var(--ink-2);
+      }
+      .why {
+        margin-block-start: 26px;
+        padding: 18px 20px;
+        border: 1px dashed var(--line);
+        border-radius: var(--r-md);
+        max-inline-size: 70ch;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .why b {
+        color: var(--ink-2);
+      }
+
+      .grid {
+        display: grid;
+        /* min(300px, 100%), not 300px: below ~356px the fixed minimum is wider
+           than the content box and the track overflows the padding. */
+        grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+        gap: 18px;
+        padding-block: 34px 60px;
+      }
+      .concept {
+        display: block;
+        padding: 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        transition:
+          border-color var(--t),
+          background-color var(--t),
+          transform var(--t);
+      }
+      .concept:hover {
+        border-color: var(--act);
+        transform: translateY(-2px);
+      }
+      .concept .tag {
+        font-family: var(--font-num);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        color: var(--act);
+      }
+      .concept h2 {
+        margin: 6px 0 0;
+        font-size: 1.25rem;
+      }
+      .concept .en {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .concept p {
+        margin: 12px 0 0;
+        font-size: 0.9rem;
+        color: var(--ink-2);
+      }
+      .concept .teaches {
+        margin-block-start: 14px;
+        padding-block-start: 12px;
+        border-block-start: 1px solid var(--line);
+        font-size: 0.83rem;
+        color: var(--muted);
+      }
+      .pending {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="labbar">
+      <div class="wrap">
+        <a class="labbrand" href="../e.html">
+          <span aria-hidden="true">🧪</span>
+          <span dir="ltr">Polypedia</span>
+          <small dir="ltr">Lab concepts</small>
+        </a>
+        <span class="spacer"></span>
+        <a class="pill act" href="../e.html">← بازگشت به دیتاشیت</a>
+      </div>
+    </header>
+
+    <div class="wrap hero">
+      <div class="eyebrow" dir="ltr">FE-0 · the lab</div>
+      <h1>چهار ایده برای محیط یادگیری</h1>
+      <p>
+        نسخه اول رد شد، و درست هم رد شد: یک ستون از کارت‌های یک‌شکل شماره‌دار بود که هیچ کاری
+        نمی‌کرد. این چهار ایده هرکدام ساختارشان خودشان یک چیزی یاد می‌دهند، و هر چهارتا فقط برای علم
+        پلیمر معنا دارند — نه برای هر محصولی.
+      </p>
+      <div class="why">
+        <b>معیار داوری:</b> پیش از آنکه یک کلمه بخوانی، چیدمان صفحه باید چیزی به تو گفته باشد. اگر
+        با عوض کردن متن‌ها به درد یک محصول دیگر هم می‌خورد، شکست خورده است.
+      </div>
+    </div>
+
+    <div class="wrap grid">
+      <a class="concept" href="scale.html">
+        <span class="tag" dir="ltr">L1</span>
+        <h2>مقیاس</h2>
+        <span class="en" dir="ltr">Scale</span>
+        <p>
+          صفحه یک بزرگ‌نمایی است: از ۱۰⁻¹⁰ متر تا خود سیاره. هر ابزار در مقیاسی می‌نشیند که به آن
+          تعلق دارد. مسیر حرکت، یک منو نیست — یک زوم است.
+        </p>
+        <div class="teaches">
+          چیزی که یاد می‌دهد: پلیمر یک علم چندمقیاسی است، و این مهم‌ترین چیزی است که یک تازه‌وارد
+          باید درونی کند.
+        </div>
+      </a>
+
+      <a class="concept" href="map.html">
+        <span class="tag" dir="ltr">L2</span>
+        <h2>نقشه</h2>
+        <span class="en" dir="ltr">Map</span>
+        <p>
+          منحنی مدول–دما همان منوی صفحه است. روی ناحیه شیشه‌ای کلیک کن، ابزارهای سفتی را می‌گیری؛
+          روی ناحیه جریان، ابزارهای فرآیند را.
+        </p>
+        <div class="teaches">
+          چیزی که یاد می‌دهد: فلات کم‌شیب بین Tg و Tm — همان چیزی که نیمه‌بلوری را از بی‌شکل جدا
+          می‌کند.
+        </div>
+      </a>
+
+      <a class="concept" href="graph.html">
+        <span class="tag" dir="ltr">L3</span>
+        <h2>شبکه</h2>
+        <span class="en" dir="ltr">Graph</span>
+        <p>
+          خواص پلیمر به هم زنجیر شده‌اند: شاخه‌ای شدن ← بلورینگی ← چگالی ← سفتی ← کاربرد. گرافی که
+          می‌شود هلش داد و اثر را در پایین‌دست دید.
+        </p>
+        <div class="teaches">
+          چیزی که یاد می‌دهد: هیچ خاصیتی تنها نیست. یال‌ها علیت‌اند، نه صرفاً پیوند.
+        </div>
+      </a>
+
+      <a class="concept" href="notebook.html">
+        <span class="tag" dir="ltr">L4</span>
+        <h2>دفترچه</h2>
+        <span class="en" dir="ltr">Notebook</span>
+        <p>
+          شکلی که آزمایشگاه باید در آن رشد کند: یک مقاله با شکل‌های زنده داخل استدلال. ابزار، کارت
+          نیست — «شکل ۳» است.
+        </p>
+        <div class="teaches">
+          چرا حالا: مرور مقاله و پست‌های آموزشی قرار است بیاید. اگر آزمایشگاه منو ساخته شود، با
+          اولین پست باید از نو ساخته شود.
+        </div>
+      </a>
+    </div>
+
+    <footer class="labfoot">
+      <div class="wrap">
+        صفحات نمونه برای انتخاب هویت بصری — داده‌ها واقعی‌اند، هیچ منبعی ساختگی نیست. ایده پنجم،
+        «میز» (هر ابزار به‌عنوان دستگاهی که آن عدد را اندازه گرفته)، در
+        <span dir="ltr">lab-concepts-spec.md</span> ثبت شده و فعلاً ساخته نشده.
+      </div>
+    </footer>
+
+    <script type="module">
+      import { initTheme, themeButton } from '../theme.js';
+      initTheme();
+      document.querySelector('.spacer').after(themeButton());
+    </script>
+  </body>
+</html>

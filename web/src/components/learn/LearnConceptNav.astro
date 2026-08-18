@@ -1,0 +1,75 @@
+---
+// Shared by every Learn surface (SCALE, MAP, and — the whole reason this
+// component exists as its own file rather than inline markup on each page —
+// GRAPH and NOTEBOOK once they land). The owner, verbatim: "we had a early
+// draft on learning phase had 4 parts! a map, and two others and fourth one
+// was this one you are showing as the learning interface. i want those four
+// parts!!!" -- lab-concepts-spec.md's L1-L4. This nav is what makes the four
+// read as ONE surface with four rooms rather than four unrelated pages that
+// happen to share a header.
+//
+// THE SEAM for GRAPH/NOTEBOOK: add one more entry to `items` below with
+// `built: true` and a real `href` once that route exists — nothing else
+// about this component, or about how SCALE/MAP already use it, needs to
+// change. An unbuilt entry renders as inert labelled text (not a link,
+// not a fake href to a 404) with a "coming soon" tag, so the reader sees
+// the whole four-part shape immediately, the same honesty posture the
+// rest of this project uses for a known-but-unbuilt gap (compare
+// `ScaleStation.astro`'s `station-gap` treatment).
+//
+// L4/NOTEBOOK flipped 2026-08-15 (fe-8): all four of the owner's "four
+// parts" ("we had a early draft on learning phase had 4 parts!... i want
+// those four parts!!!") are now real routes. Nothing in `items` is
+// `href: null` any more — the very case this file's own comments above
+// were written to describe no longer exists on this page, though the
+// PATTERN (dashed/disabled rendering below) stays in place for whenever a
+// fifth concept is proposed and not yet built.
+import type { Locale } from '../../i18n/config';
+import { t, type MessageKey } from '../../i18n/t';
+
+export type ConceptKey = 'scale' | 'map' | 'graph' | 'notebook';
+
+interface Props {
+  locale: Locale;
+  current: ConceptKey;
+}
+
+const { locale, current } = Astro.props;
+
+const items: { key: ConceptKey; href: string | null; labelKey: MessageKey }[] = [
+  { key: 'scale', href: `/${locale}/learn`, labelKey: 'learn.nav.scale' },
+  { key: 'map', href: `/${locale}/learn/map`, labelKey: 'learn.nav.map' },
+  // GRAPH: route now exists (LearnGraph.astro) — flipped to a real href,
+  // the same way MAP flipped from `null` before it.
+  { key: 'graph', href: `/${locale}/learn/graph`, labelKey: 'learn.nav.graph' },
+  // NOTEBOOK: route now exists (LearnNotebook.astro) — the fourth and
+  // last entry to flip. See this file's 2026-08-15 header note.
+  { key: 'notebook', href: `/${locale}/learn/notebook`, labelKey: 'learn.nav.notebook' },
+];
+---
+
+<nav class="concept-nav" aria-label={t(locale, 'learn.nav.label')}>
+  <ul class="concept-nav-list">
+    {
+      items.map((item) => (
+        <li>
+          {item.href ? (
+            <a
+              href={item.href}
+              class:list={['concept-nav-link', { 'is-current': item.key === current }]}
+              aria-current={item.key === current ? 'page' : undefined}
+              data-testid={`concept-nav-${item.key}`}
+            >
+              {t(locale, item.labelKey)}
+            </a>
+          ) : (
+            <span class="concept-nav-link is-disabled" data-testid={`concept-nav-${item.key}`}>
+              {t(locale, item.labelKey)}
+              <span class="concept-nav-soon">{t(locale, 'learn.nav.comingSoon')}</span>
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>

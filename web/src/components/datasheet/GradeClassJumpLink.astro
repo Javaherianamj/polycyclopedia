@@ -1,0 +1,38 @@
+---
+// Replaces FE-3's `GradeSelectorSlot` (a disabled <select> reading "Choose a
+// grade (coming soon)"). That slot was honest when it shipped -- 0 rows
+// existed in `grade` -- but FE-3b then landed the real grade-class band at
+// the bottom of the page, so the page carried a "coming soon" control above
+// a feature that was already working. This is the same anchor position,
+// pointing at what actually exists.
+//
+// Deliberately NOT a selector: FE-3b's owner decision was inline-expand at
+// the bottom of the datasheet, not a top selector that swaps the page. A
+// selector here would re-open a question that was already closed. This is a
+// jump link, so the top of the page tells you grade data exists and the
+// band stays the one place it lives.
+//
+// Renders nothing when the material has no grade classes -- same guard
+// posture as GradeClassBand (R7/R4). 14 of 17 materials have none today, so
+// this is the common path, not the edge case.
+import type { Locale } from '../../i18n/config';
+import type { GradeClass } from '../../lib/api/types';
+import { t } from '../../i18n/t';
+
+interface Props {
+  gradeClasses: GradeClass[];
+  locale: Locale;
+}
+
+const { gradeClasses, locale } = Astro.props;
+---
+
+{
+  gradeClasses.length > 0 && (
+    <div class="grade-slot" data-testid="datasheet-grade-jump">
+      <a href="#grade-classes" class="grade-jump">
+        {t(locale, 'datasheet.gradeJump').replace('{count}', String(gradeClasses.length))}
+      </a>
+    </div>
+  )
+}

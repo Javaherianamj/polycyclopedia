@@ -1,0 +1,451 @@
+/* L1 — SCALE. Per-concept styling on top of lab.css's foundation (tokens only,
+   lab.css itself is not touched). The page is a ruler: a fixed rail on the
+   leading edge (right, in RTL — inset-inline-start) whose tick spacing is
+   proportional to log-distance between stations, and six full-height stations
+   the reader scrolls through. */
+
+:root {
+  --rail-w: 132px;
+}
+
+.pill[dir='ltr'] {
+  font-family: var(--font-num);
+  letter-spacing: 0.02em;
+}
+
+.labbar .wrap {
+  flex-wrap: nowrap;
+}
+
+/* .theme now lives in lab.css — the duplicate here was removed. */
+
+.labbrand small {
+  display: inline;
+}
+
+@media (max-width: 560px) {
+  .concept-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .labbrand small {
+    display: none;
+  }
+
+  .back-pill-text {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------- scale readout */
+
+.scale-readout {
+  position: sticky;
+  inset-block-start: 60px; /* under .labbar */
+  z-index: 30;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding-block: 14px;
+  background: var(--bar-bg);
+  backdrop-filter: blur(10px);
+  border-block-end: 1px solid var(--line);
+}
+
+.sr-num {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.sr-num sup {
+  font-size: 0.5em;
+}
+
+.sr-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sr-name b {
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.sr-name span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------------------- doc */
+
+.scale-doc {
+  position: relative;
+  /* darkest at the atomic end, lightest at the bulk end — one gradient across
+     the whole document, not per-section boxes (spec: "subtle"). --bg-2 is
+     always the darker of the two existing tokens in both themes, so this
+     reuses lab.css's palette instead of inventing new colour. */
+  background: linear-gradient(to bottom, var(--bg-2), var(--bg) 85%);
+}
+
+.stations {
+  padding-inline-end: var(--rail-w);
+}
+
+/* ------------------------------------------------------------------- rail */
+
+.scale-rail {
+  position: fixed;
+  inset-block: calc(60px + 66px) 0; /* below labbar + readout */
+  inset-inline-start: 0; /* leading edge, right in RTL */
+  inline-size: var(--rail-w);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.rail-track {
+  position: relative;
+  block-size: 62vh;
+  margin-block-start: 19vh;
+  margin-inline-start: 22px;
+  border-inline-start: 1px solid var(--line-2);
+}
+
+.rail-tick {
+  position: absolute;
+  inset-inline-start: -5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  padding: 4px 0;
+  color: var(--muted-2);
+  transition:
+    color var(--t),
+    transform var(--t);
+}
+
+.rail-dot {
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  flex: none;
+  transition:
+    background-color var(--t),
+    border-color var(--t),
+    transform var(--t);
+}
+
+.rail-num {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.rail-tick:hover {
+  color: var(--act);
+}
+
+.rail-tick:hover .rail-dot {
+  border-color: var(--act);
+}
+
+.rail-tick.on {
+  color: var(--ink);
+}
+
+.rail-tick.on .rail-dot {
+  background: var(--act);
+  border-color: var(--act);
+  transform: scale(1.3);
+}
+
+@media (max-width: 780px) {
+  :root {
+    --rail-w: 34px;
+  }
+
+  .rail-num {
+    display: none;
+  }
+
+  .rail-track {
+    margin-inline-start: 12px;
+  }
+}
+
+/* --------------------------------------------------------------- station */
+
+.station {
+  position: relative;
+  min-block-size: 100vh;
+  display: flex;
+  align-items: center;
+  padding-block: 40px;
+  border-block-end: 1px dashed var(--line);
+  overflow: hidden;
+}
+
+.station:last-child {
+  border-block-end: 0;
+}
+
+.station-ghost {
+  position: absolute;
+  inset-inline-end: -0.05em;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: min(34vw, 20rem);
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0.035;
+  pointer-events: none;
+  user-select: none;
+}
+
+.station-in {
+  position: relative;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 44px;
+  align-items: start;
+}
+
+.station-obj {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  aspect-ratio: 1.1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.obj-icon {
+  inline-size: 78%;
+  block-size: 78%;
+  stroke: var(--act);
+  fill: var(--act);
+  stroke-width: 3;
+}
+
+.obj-icon path,
+.obj-icon line {
+  fill: none;
+}
+
+.obj-icon circle {
+  stroke-width: 2.4;
+}
+
+.station-exp {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--act);
+  margin-block-end: 6px;
+}
+
+.station-text h2 {
+  margin: 0 0 2px;
+  font-size: 1.7rem;
+}
+
+.station-en {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.station-sentence {
+  max-inline-size: 56ch;
+  color: var(--ink-2);
+  margin: 0 0 18px;
+}
+
+.station-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ----------------------------------------------------------------- chips */
+
+.tchip {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--panel);
+  padding: 9px 14px;
+  max-inline-size: 320px;
+}
+
+.tchip-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.tchip-note {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.tchip.is-locked {
+  border-style: dashed;
+  background: transparent;
+  opacity: 0.85;
+}
+
+.tchip.is-locked .tchip-label {
+  color: var(--muted-2);
+}
+
+.tchip.is-locked .tchip-label::before {
+  content: '⊘ ';
+}
+
+.tchip-reason {
+  margin: 5px 0 0;
+  font-size: 0.76rem;
+  color: var(--muted-2);
+  border-inline-start: 2px solid var(--muted-2);
+  padding-inline-start: 8px;
+}
+
+/* -------------------------------------------------------------- chain tool */
+
+.chain-tool {
+  margin-block-start: 20px;
+  padding: 20px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  max-inline-size: 640px;
+}
+
+.chain-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-block-end: 14px;
+}
+
+.chain-head h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.chain-head span {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.chain-body {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.chain-svg {
+  inline-size: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.chain-walk {
+  stroke: var(--act);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.chain-readout label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-block-end: 6px;
+}
+
+.chain-readout input[type='range'] {
+  inline-size: 100%;
+  accent-color: var(--act);
+  cursor: grab;
+}
+
+.chain-nums {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-block-start: 14px;
+}
+
+.chain-nums > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chain-nums span {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.chain-nums b {
+  font-size: 1.05rem;
+}
+
+.chain-caption {
+  margin: 16px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted-2);
+}
+
+@media (max-width: 780px) {
+  .station-in {
+    grid-template-columns: 1fr;
+  }
+
+  .station-obj {
+    max-inline-size: 160px;
+  }
+
+  .chain-body {
+    grid-template-columns: 1fr;
+  }
+
+  .chain-svg {
+    max-inline-size: 220px;
+    margin-inline: auto;
+  }
+
+  .station {
+    padding-block: 60px 40px;
+  }
+}
+
+@media (max-width: 420px) {
+  .station-in {
+    gap: 26px;
+  }
+
+  .scale-readout {
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

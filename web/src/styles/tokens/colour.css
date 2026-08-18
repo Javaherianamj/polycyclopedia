@@ -1,0 +1,140 @@
+/* FE-0 → FE-1 COLOUR TOKENS — generated from the FE-0 exploration files.
+ *
+ * Source of record: design/fe-0/themes/e-press.css (datasheet) and
+ * design/fe-0/lab/lab.css (lab). This file flattens both into one scope
+ * system so a single FE-1 bundle can carry both surfaces.
+ *
+ * FE-0 chose surface by which stylesheet a page linked. FE-1 cannot do that —
+ * it is one app. So surface becomes an ATTRIBUTE:
+ *
+ *     <html data-surface="datasheet" data-theme="light">
+ *     <html data-surface="lab"       data-theme="dark">
+ *
+ * data-surface  = which world you are in   (warm datasheet / cool lab)  — D39
+ * data-theme    = comfort setting, shared across both surfaces          — D42
+ *
+ * Defaults: surface=datasheet, theme=light. Both palettes pass WCAG 2.1 AA;
+ * working in aidlc-docs/construction/fe-0/contrast-audit.md. Colour is
+ * semantic (R33) — see tokens/README.md before adding any hue.
+ */
+
+:root,
+:root[data-surface='datasheet'] {
+  /* DATASHEET · LIGHT — warm cream paper */
+  --bg: #f9f6ef;
+  --panel: #fffdf7;
+  --pop-bg: #fffdf7;
+  --bar-bg: rgba(249, 246, 239, 0.86);
+  --note-bg: #f2eee3;
+  --chip: #eee8da;
+  --track: #e3ddcd;
+  --ink: #22282a;
+  --ink-2: #4a5153;
+  --muted: #6e7272; /* was #7c8180 — darkened for 4.5:1 on --bg (contrast audit) */
+  --muted-2: #777064; /* was #a49e93 — darkened for 4.5:1 on --bg (contrast audit) */
+  --accent: #2f5d62; /* measurement */
+  --accent-soft: #dde8e6;
+  --accent-soft-2: #a6c0bd;
+  --ok: #536e56; /* provenance satisfied — #5f7f63 → #5a785e (AA on --bg) → #536E56. */
+  --ok-soft: #e0e9df;
+  --act: #9f6246; /* something you can do — was #a8674a, darkened for 4.5:1 on --bg */
+  --act-soft: #f0e0d6;
+  --warn: #926a23; /* reserved, unused here — was #b1802a, darkened for 4.5:1 on --bg */
+  --accent-2: var(--act);
+  --hairline: 1px solid #e7e0d2;
+  --rule: 1px solid #ddd4c1;
+  --row-bg: #fffdf7;
+  --row-bg-hover: #fffefa;
+  --row-border: 1px solid #efe8da;
+  --row-border-hover: #d9d0bd;
+  --shadow-1: 0 1px 2px rgba(34, 40, 42, 0.04), 0 10px 26px -14px rgba(34, 40, 42, 0.16);
+  --shadow-2: 0 14px 36px -10px rgba(34, 40, 42, 0.22);
+  --measure-page: 1120px;
+  --bridge-bg: #22282a;
+  --bridge-border: 1px solid #22282a;
+}
+
+:root[data-theme='dark'],
+:root[data-surface='datasheet'][data-theme='dark'] {
+  /* DATASHEET · DARK — ember brown. Not black: the paper is fired, not switched off */
+  --bg: #241d17;
+  --panel: #2d251e;
+  --pop-bg: #322921;
+  --bar-bg: rgba(36, 29, 23, 0.86);
+  --note-bg: #2f271f;
+  --chip: #3a3128;
+  --track: #423830;
+  --ink: #f2e9dd;
+  --ink-2: #d8cbba;
+  --muted: #a6907c;
+  --muted-2: #9d8977; /* was #7f6c5b — lightened for 4.5:1 on --panel (contrast audit; see report re: rule 3 exception) */
+  --accent: #7ab8b2; /* measurement */
+  --accent-soft: #24413f;
+  --accent-soft-2: #4d7370;
+  --ok: #93bb96; /* provenance satisfied */
+  --ok-soft: #2c3c2e;
+  --act: #e5a37b; /* something you can do */
+  --act-soft: #3d2c22;
+  --warn: #d6a544; /* still reserved, still unused */
+  --accent-2: var(--act);
+  --hairline: 1px solid #3b3128;
+  --rule: 1px solid #4d4034;
+  --row-bg: #2a221b;
+  --row-bg-hover: #30281f;
+  --row-border: 1px solid #3b3128;
+  --row-border-hover: #574839;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 26px -14px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 14px 36px -10px rgba(0, 0, 0, 0.6);
+  --bridge-bg: #14100b;
+  --bridge-border: 1px solid #302619;
+}
+
+:root[data-surface='lab'] {
+  /* LAB · LIGHT — blue slate. Cool, so it never reads as the datasheet's paper */
+  --bg: #e9eef4;
+  --bg-2: #dfe6ef;
+  --panel: #f7f9fc;
+  --panel-2: #eef2f8;
+  --line: #ccd7e6;
+  --line-2: #b3c2d7;
+  --ink: #16203a;
+  --ink-2: #3b476a;
+  --muted: #606b88; /* was #6a7796 — 3.84 → 4.55 on --bg */
+  --muted-2: #666b78; /* was #94a0ba — 2.25 → 4.57 on --bg */
+  --bar-bg: rgba(233, 238, 244, 0.86);
+  --act: #975c42; /* was #a8674a — 3.83 → 4.59 on --bg */
+  --act-line: #ddc4b6;
+  --act-bg: #f2e4dc;
+  --ok: #567259; /* was #5f7f63 — 3.83 → 4.56 on --bg */
+  --ok-line: #b9cdba;
+  --ramp-glass: #3f63ab;
+  --ramp-rubber: #2f8a83;
+  --ramp-melt: #b57728;
+  --ramp-burn: #a54a3f;
+  --on-phase: #fbfcfe;
+}
+
+:root[data-surface='lab'][data-theme='dark'] {
+  /* LAB · DARK — slate-indigo #3E436F. Panels recessed BELOW the ground, not lifted above it */
+  --bg: #3e436f; /* the owner's colour, untouched */
+  --bg-2: #454a79; /* the one lift: haze above the housing */
+  --panel: #2f3357; /* recessed well */
+  --panel-2: #282c4a; /* deeper well */
+  --line: #5e659b; /* light on a milled edge */
+  --line-2: #7078b4;
+  --ink: #f5f6fc;
+  --ink-2: #dde0f2;
+  --muted: #b9bedf;
+  --muted-2: #b2b4c5; /* desaturated, not dimmer — see header */
+  --bar-bg: rgba(62, 67, 111, 0.86);
+  --act: #ffc199; /* lamp amber — the warm signature on a cool ground */
+  --act-line: #7d6550;
+  --act-bg: #3a3352;
+  --ok: #a5ddb1;
+  --ok-line: #55795f;
+  --ramp-glass: #93aff5;
+  --ramp-rubber: #63cfbe;
+  --ramp-melt: #f5b269;
+  --ramp-burn: #ee8878;
+  --on-phase: #23263f;
+}

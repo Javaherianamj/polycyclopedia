@@ -1,0 +1,286 @@
+/* ValueAtom (FE-2). Structural rules (.prop/.prop-label/.info/.value/.mark)
+ * are ported from design/fe-0/base.css near-verbatim — that markup was
+ * already designed and gate-tested (aidlc-docs/construction/fe-0/build-and-test.md).
+ * What changed is the popover mechanics: FE-0 (and FE-1's placeholder pages)
+ * used position:absolute plus :hover/:focus-visible opacity transitions,
+ * hand-managing what was and wasn't inside the trigger's containing block —
+ * exactly the class of bug the FE-0 gate found six of. This uses the native
+ * Popover API instead, per that gate record's explicit recommendation.
+ *
+ * Imported once into global.css, not scoped per-component-instance — this
+ * component appears dozens of times per page, and Astro's default
+ * per-component <style> scoping would duplicate every rule that many times
+ * in the output.
+ */
+
+.prop {
+  display: grid;
+  /* minmax(0, max-content), not plain auto: auto's automatic minimum is its
+     max-content size, which for a long wrappable text value (a text-type
+     property's display can be a full sentence) is the width of the whole
+     string on one line -- the column would size to fit it, defeating
+     .value-wrap's white-space:normal before it ever gets a chance to wrap.
+     An explicit 0 minimum lets the column shrink and the text actually
+     break. Numeric values are short enough that this never changes their
+     layout in practice. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
+  align-items: center;
+  gap: 16px;
+  padding: var(--row-pad);
+  background: var(--row-bg);
+  border: var(--row-border);
+  border-radius: var(--r-md);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.prop:hover {
+  background: var(--row-bg-hover);
+  border-color: var(--row-border-hover);
+}
+
+.prop-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+}
+
+.prop-name {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.prop-sym {
+  font-family: var(--font-num);
+  font-size: var(--fs-micro);
+  color: var(--muted-2);
+  background: var(--chip);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+/* the "what is this?" affordance -- anchored to the NAME */
+.info {
+  position: relative;
+  inline-size: 17px;
+  block-size: 17px;
+  border-radius: 50%;
+  border: 1px solid var(--muted-2);
+  color: var(--muted-2);
+  font-size: 0.66rem;
+  font-family: var(--font-num);
+  line-height: 1;
+  flex: none;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.info:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ------------------------------------------------------------- value atoms */
+
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* text/enum values can be a full sentence (FE-3 found LDPE's rheology_notes
+   at 131 characters) -- numeric/range/boolean values cannot (api/src/
+   format.ts). See ValueAtom.astro's displayCanBeLong for which gets this. */
+.value-wrap {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  white-space: normal;
+  max-inline-size: 46ch;
+}
+
+.value-wrap .value-display {
+  white-space: normal;
+}
+
+.value-display {
+  font-family: var(--font-num);
+  font-size: var(--fs-body);
+  font-weight: 500;
+}
+
+/* the "who says so?" affordance -- anchored to the VALUE */
+.mark {
+  position: relative;
+  align-self: flex-start;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 5px;
+  font-size: 0.62rem;
+  font-family: var(--font-num);
+  line-height: 1;
+  transition: filter var(--dur-fast) var(--ease-out);
+}
+
+.mark-uncited {
+  background: var(--track);
+  color: var(--muted-2);
+}
+
+/* FE-7 fix: this used `--accent` (teal, D36's "measurement") for the cited
+ * mark. D36 assigns "provenance satisfied" to sage (`--ok`), and FE-6's
+ * compare table (`.cmp-cell-cited-yes` in compare.css) already used the
+ * correct token -- so the datasheet and compare table visibly disagreed on
+ * what "sourced" looks like. Flagged in aidlc-docs/construction/fe-6/
+ * build-and-test.md §6, fixed here. `--ok-soft`/`--ok` mirror the
+ * `--accent-soft`/`--accent` pairing this replaces, so no other rule in
+ * this file needs to change. */
+.mark-cited {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.mark:hover {
+  filter: brightness(0.94);
+}
+
+.value.is-missing {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.value-missing {
+  font-size: var(--fs-small);
+  color: var(--muted-2);
+}
+
+.value-cta {
+  font-size: var(--fs-caption);
+  color: var(--accent);
+  border-block-end: 1px dashed currentColor;
+}
+
+/* ---------------------------------------------------------------- popovers
+ * A native [popover], once shown, is promoted to the top layer -- it is no
+ * longer inside its DOM parent's containing block at all, which is why the
+ * FE-0 gate's "make the row position:relative" fix cannot be reused here
+ * (that fix relies on ordinary containing-block behaviour; a top-layer
+ * element ignores it). Two tiers instead:
+ *
+ *   1. Baseline (every browser): a full-width sheet fixed to the viewport
+ *      edge. Always correct, needs no knowledge of where the trigger is.
+ *   2. Enhanced (@supports (anchor-name: --a)): CSS anchor positioning
+ *      places the popover next to its trigger on wide viewports; the sheet
+ *      returns below the mobile breakpoint via the same media query either
+ *      tier uses. This is "desktop hover, mobile sheet" — the sheet is not
+ *      a fallback UI, it is the deliberate mobile presentation.
+ */
+
+/* The UA stylesheet hides a closed popover with
+ *   [popover]:not(:popover-open) { display: none }
+ * but that rule lives in the USER-AGENT origin, and any author declaration
+ * beats it regardless of specificity. So an unconditional `display: grid`
+ * here silently defeated the popover mechanism entirely: every popover on
+ * the page rendered permanently, all 186 of them on the HDPE datasheet.
+ * The display value must therefore be scoped to the open state, and any
+ * future layout rule on `.pop` must never reintroduce a bare `display`.
+ */
+.pop {
+  position: fixed;
+  margin: 0;
+  inset: auto 0 0 0;
+  inline-size: 100%;
+  max-block-size: 60vh;
+  padding: 16px;
+  gap: 5px;
+  text-align: start;
+  white-space: normal;
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  color: var(--ink-2);
+  background: var(--pop-bg);
+  border: var(--hairline);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--shadow-2);
+}
+
+/* The only place `.pop` gets a display value: when it is actually open. */
+.pop:popover-open {
+  display: grid;
+}
+
+.pop b {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pop-meta {
+  font-family: var(--font-num);
+  font-size: var(--fs-caption);
+  color: var(--muted-2);
+}
+
+.citation-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citation-entry {
+  display: grid;
+  gap: 2px;
+}
+
+.citation-entry + .citation-entry {
+  padding-block-start: 10px;
+  border-block-start: var(--hairline);
+}
+
+.citation-flag {
+  justify-self: start;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--warn);
+  background: var(--note-bg);
+  border-radius: var(--r-sm);
+  padding: 1px 7px;
+}
+
+/* Enhanced tier: real anchor positioning, desktop widths only. `anchor-name`
+ * (on .info/.mark) and `position-anchor` (on their .pop) are set inline per
+ * instance in ValueAtom.astro, not here — CSS cannot generate a unique
+ * dashed-ident per component instance from a class alone the way `id` can.
+ * `anchor()`'s single-keyword form below reads implicitly from whichever
+ * anchor `position-anchor` names, so these rules stay generic and shared
+ * across every instance regardless of its actual anchor name. */
+@media (min-width: 640px) {
+  @supports (anchor-name: --a) {
+    .pop {
+      position: fixed;
+      inset: auto;
+      margin: 0;
+      inline-size: max-content;
+      max-inline-size: min(270px, calc(100vw - 32px));
+      max-block-size: none;
+      border-radius: var(--r-md);
+      inset-block-start: calc(anchor(bottom) + 8px);
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+
+    .pop-info {
+      inset-inline-start: anchor(start);
+    }
+
+    .pop:not(.pop-info) {
+      inset-inline-end: anchor(end);
+    }
+  }
+}

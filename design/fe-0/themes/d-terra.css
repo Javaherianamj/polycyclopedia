@@ -1,0 +1,141 @@
+/* D — TERRA
+   Premium as warmth. The vintage/Pinterest palette taken furthest: ochre, dusty
+   rose and olive on a cream ground, large soft radii, a geometric Latin face.
+   This is what the LEARN surface could look like — included as a datasheet so
+   you can judge how far the warm end can go before a datasheet stops reading as
+   authoritative. Deliberately the least dry of the four. */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-display-fa: 'Estedad Variable', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-num: 'Space Grotesk', ui-monospace, monospace;
+
+  --fs-body: 15.5px;
+  --lh-body: 1.92;
+  --fs-h1: 2.25rem;
+  --fw-h1: 700;
+  --fs-h2: 1.12rem;
+  --fw-h2: 700;
+  --fs-label: 0.92rem;
+  --fs-value: 1.1rem;
+  --fw-value: 700;
+  --num-tracking: -0.01em;
+
+  --bg: #fbf6ed;
+  --panel: #fffaf2;
+  --pop-bg: #fffaf2;
+  --bar-bg: rgba(251, 246, 237, 0.85);
+  --note-bg: #f6ece0;
+  --chip: #f1e4d3;
+  --track: #ecdcc7;
+
+  --ink: #3a2e28;
+  --ink-2: #5b4c43;
+  --muted: #8a7568;
+  --muted-2: #ab978a;
+
+  --accent: #c07d31;
+  --accent-soft: #f7e6cd;
+  --accent-soft-2: #dcb684;
+  --accent-2: #a8686a;
+  --accent-3: #7a8450;
+
+  --hairline: 1px solid #ecdcc7;
+  --rule: 1px solid #e0cbae;
+
+  --row-bg: #fffaf2;
+  --row-bg-hover: #fdf3e6;
+  --row-border: 1px solid #f2e5d3;
+  --row-border-hover: #dcb684;
+  --row-pad: 15px 20px;
+  --row-gap: 9px;
+  --sec-gap: 52px;
+  --sec-head-gap: 18px;
+
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 2px 3px rgba(58, 46, 40, 0.04), 0 14px 30px -16px rgba(58, 46, 40, 0.22);
+  --shadow-2: 0 16px 40px -12px rgba(58, 46, 40, 0.26);
+
+  --t-fast: 0.22s cubic-bezier(0.2, 0.8, 0.25, 1);
+  --t-pop: opacity 0.18s ease, transform 0.18s cubic-bezier(0.2, 0.8, 0.25, 1), visibility 0.18s;
+
+  --measure-page: 1140px;
+  --pad-x: 28px;
+  --bar-h: 66px;
+
+  --bridge-bg: linear-gradient(210deg, #f7e6cd, #f3e2e0);
+  --bridge-border: 1px solid #e9d3bd;
+}
+
+.hero {
+  padding-block-start: 36px;
+}
+
+.hero-code {
+  display: inline-block;
+  font-family: var(--font-display);
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fbf6ed;
+  letter-spacing: 0.12em;
+}
+
+.hero-facts {
+  border-radius: var(--r-lg);
+  background: linear-gradient(200deg, #fffaf2, #f9eee0);
+}
+
+.sec-head {
+  border-block-end: 0;
+  padding-block-end: 0;
+}
+
+.sec-head h2 {
+  padding: 5px 15px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a5a1e;
+}
+
+.value-num {
+  color: var(--ink);
+}
+
+.mark-unsourced {
+  background: #efe4d6;
+}
+
+.prop:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-1);
+}
+
+.coverage-bar {
+  block-size: 8px;
+}
+
+.coverage-bar i {
+  background: linear-gradient(90deg, var(--accent-3), var(--accent));
+}
+
+.bridge {
+  padding: 18px 22px;
+}
+
+.bridge-go {
+  color: var(--accent-2);
+}
+
+.tail-card {
+  background: linear-gradient(200deg, #fffaf2, #f8eee2);
+}

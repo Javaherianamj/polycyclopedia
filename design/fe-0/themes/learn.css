@@ -1,0 +1,516 @@
+/* LEARN — the second surface, in both modes.
+ *
+ * THE IDENTITY IS WARM vs COOL, NOT LIGHT vs DARK.
+ * The datasheet is warm in both its modes: cream paper, then fired brown.
+ * Learn is cool in both of its: soft slate-green, then instrument ink.
+ * So you always know which surface you are on, whichever mode you are in —
+ * and the light/dark choice stays a comfort setting instead of doing two jobs.
+ *
+ *   datasheet light   warm cream    #f9f6ef
+ *   datasheet dark    ember brown   #241d17
+ *   learn light       slate green   #e9f0ee   ← this file's default
+ *   learn dark        instrument    #1a1f21
+ *
+ * TWO PALETTES, ONE BOUNDARY — the answer to "colours must have meanings":
+ *
+ *   STATUS palette   sage / grey / clay. Provenance and actions. Identical in
+ *                    meaning to the datasheet; clay still means "you can do this".
+ *
+ *   ENCODING palette --ramp-*. A sequential physical scale, cold → hot. Exists
+ *                    only where a colour stands in for a NUMBER. Never
+ *                    decoration, never status. Both modes carry their own ramp,
+ *                    tuned for contrast against their own ground.
+ *
+ * --ramp-melt sitting near the reserved warning ochre was raised and accepted
+ * by the owner: they never appear on the same screen.
+ */
+
+@import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/estedad/index.css');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-num: 'Newsreader', Georgia, serif;
+  --font-display: 'Newsreader', Georgia, serif;
+
+  /* LIGHT — slate green. Cool, so it never reads as the datasheet's paper. */
+  --bg: #e9f0ee;
+  --bg-glow: #dfeae8;
+  --panel: #f7fbfa;
+  --panel-grad: linear-gradient(200deg, #f9fdfc, #eff6f4);
+  --line: #d1e0dc;
+  --line-2: #bdd0cb;
+  --ink: #1c2b2d;
+  --ink-2: #3d4f50;
+  --muted: #67807d;
+  --muted-2: #8fa5a1;
+  --bar-bg: rgba(233, 240, 238, 0.84);
+
+  /* status palette — same jobs as the datasheet */
+  --act: #a8674a;
+  --act-line: #ddc4b6;
+  --act-bg: #f3e5dc;
+  --ok: #5f7f63;
+  --ok-line: #b9cdba;
+  --track: #d1e0dc;
+
+  /* encoding palette — tuned for a light ground */
+  --ramp-glass: #40679f;
+  --ramp-rubber: #2f8a83;
+  --ramp-melt: #b57728;
+  --ramp-burn: #a54a3f;
+  --on-phase: #fdfdfb;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --t: 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
+  --measure: 1120px;
+  --pad-x: 28px;
+}
+
+/* DARK — instrument. The datasheet's ink, deepened; still cool. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #1a1f21;
+  --bg-glow: #253032;
+  --panel: #232a2c;
+  --panel-grad: linear-gradient(200deg, #262f31, #212829);
+  --line: #333c3e;
+  --line-2: #46514f;
+  --ink: #eef0ea;
+  --ink-2: #c3c9c4;
+  --muted: #8d9793;
+  --muted-2: #6b7570;
+  --bar-bg: rgba(26, 31, 33, 0.82);
+
+  --act: #d9a184;
+  --act-line: #48413c;
+  --act-bg: #2e2723;
+  --ok: #86ab89;
+  --ok-line: #3b4c3d;
+  --track: #333c3e;
+
+  --ramp-glass: #5d84bd;
+  --ramp-rubber: #4fa39a;
+  --ramp-melt: #d09244;
+  --ramp-burn: #c05f52;
+  --on-phase: #16191a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.9;
+  color: var(--ink);
+  background:
+    radial-gradient(1100px 480px at 78% -8%, var(--bg-glow) 0%, transparent 62%), var(--bg);
+  min-block-size: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--act);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap {
+  max-inline-size: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--pad-x);
+}
+
+/* ------------------------------------------------------------------ header */
+
+.lbar {
+  border-block-end: 1px solid var(--line);
+  background: var(--bar-bg);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+}
+
+.lbar .wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  block-size: 62px;
+}
+
+.lbrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.back {
+  font-size: 0.88rem;
+  color: var(--act);
+  border: 1px solid var(--act-line);
+  border-radius: 999px;
+  padding: 7px 16px;
+  transition:
+    background-color var(--t),
+    border-color var(--t),
+    color var(--t),
+    transform var(--t);
+}
+
+.back:hover {
+  background: var(--act-bg);
+}
+
+.theme {
+  margin-inline-start: auto;
+  font-size: 0.8rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 13px;
+  transition:
+    background-color var(--t),
+    border-color var(--t),
+    color var(--t),
+    transform var(--t);
+}
+
+.theme:hover {
+  color: var(--act);
+  border-color: var(--act);
+}
+
+/* -------------------------------------------------------------------- hero */
+
+.lhero {
+  padding-block: 40px 10px;
+}
+
+.lhero .eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--act);
+  letter-spacing: 0.06em;
+}
+
+.lhero h1 {
+  margin: 6px 0 0;
+  font-size: 2.15rem;
+  letter-spacing: -0.025em;
+}
+
+.lhero p {
+  margin: 12px 0 0;
+  max-inline-size: 60ch;
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------- the path */
+
+.path {
+  padding-block: 34px 70px;
+  display: grid;
+  gap: 16px;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  transition:
+    background-color var(--t),
+    border-color var(--t),
+    color var(--t),
+    transform var(--t);
+}
+
+.step:hover {
+  border-color: var(--line-2);
+  transform: translateX(-3px);
+}
+
+.step-n {
+  font-family: var(--font-num);
+  font-size: 1.5rem;
+  color: var(--muted-2);
+  text-align: center;
+}
+
+.step h3 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.step p {
+  margin: 3px 0 0;
+  font-size: 0.87rem;
+  color: var(--muted);
+}
+
+.needs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-block-start: 9px;
+}
+
+.need {
+  font-size: 0.74rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.need.ok {
+  color: var(--ok);
+  border-color: var(--ok-line);
+}
+
+.need.no {
+  color: var(--muted-2);
+  border-style: dashed;
+}
+
+.step-go {
+  color: var(--act);
+  font-size: 1.2rem;
+}
+
+/* R7 made visible: a tool with no data does not pretend. */
+.step.is-locked {
+  opacity: 0.62;
+  background: transparent;
+  border-style: dashed;
+}
+
+.step.is-locked:hover {
+  transform: none;
+  border-color: var(--line);
+}
+
+.step.is-locked .step-go {
+  color: var(--muted-2);
+}
+
+.locknote {
+  margin-block-start: 9px;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+  border-inline-start: 2px solid var(--muted-2);
+  padding-inline-start: 10px;
+}
+
+/* --------------------------------------------------------------- live tool */
+
+.tool {
+  margin-block: 8px 4px;
+  padding: 26px;
+  background: var(--panel-grad);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.tool-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-block-end: 22px;
+}
+
+.tool-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.tool-head span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-block-end: 18px;
+}
+
+.readout .temp {
+  font-family: var(--font-num);
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--phase, var(--ink));
+  transition: color 0.25s ease;
+}
+
+.readout .unit {
+  color: var(--muted);
+}
+
+.phase-tag {
+  margin-inline-start: auto;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: var(--on-phase);
+  background: var(--phase, var(--muted));
+  transition: background 0.25s ease;
+  font-weight: 600;
+}
+
+.scale {
+  position: relative;
+  block-size: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(
+    to left,
+    var(--ramp-glass) 0%,
+    var(--ramp-glass) 22%,
+    var(--ramp-rubber) 32%,
+    var(--ramp-rubber) 56%,
+    var(--ramp-melt) 64%,
+    var(--ramp-melt) 80%,
+    var(--ramp-burn) 90%
+  );
+}
+
+.ticks {
+  position: relative;
+  block-size: 34px;
+  margin-block-start: 6px;
+}
+
+.tick {
+  position: absolute;
+  transform: translateX(50%);
+  font-size: 0.74rem;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tick b {
+  display: block;
+  font-family: var(--font-num);
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+input[type='range'] {
+  inline-size: 100%;
+  margin-block-start: 14px;
+  accent-color: var(--phase, var(--act));
+  cursor: grab;
+}
+
+.tool-note {
+  margin-block-start: 18px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--line);
+  font-size: 0.88rem;
+  color: var(--ink-2);
+}
+
+.tool-src {
+  margin-block-start: 10px;
+  font-size: 0.78rem;
+  color: var(--muted-2);
+}
+
+/* -------------------------------------------------------------------- foot */
+
+.lfoot {
+  border-block-start: 1px solid var(--line);
+  padding-block: 24px 44px;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}
+
+.legend-note {
+  margin-block-start: 26px;
+  padding: 16px 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md);
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+@media (max-width: 780px) {
+  .step {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .step-go {
+    display: none;
+  }
+
+  .lhero h1 {
+    font-size: 1.7rem;
+  }
+
+  .readout .temp {
+    font-size: 2rem;
+  }
+
+  .phase-tag {
+    margin-inline-start: 0;
+  }
+
+  .readout {
+    flex-wrap: wrap;
+  }
+}
+
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,111 @@
+/* A — HANDBOOK
+   Premium as restraint. Warm paper, hairline rules instead of cards, a serif
+   Latin face for anything that is not a measurement, and numbers set tight and
+   tabular so a column of them reads like a printed table.
+   Closest to the "good scientific journal" register. Driest of the four. */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --font-body: 'Estedad Variable', system-ui, sans-serif;
+  --font-display-fa: 'Estedad Variable', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-num: 'Newsreader', Georgia, serif;
+
+  --fs-body: 15.5px;
+  --lh-body: 1.85;
+  --fs-h1: 2.05rem;
+  --fw-h1: 600;
+  --fs-h2: 1.12rem;
+  --fw-h2: 600;
+  --fs-label: 0.93rem;
+  --fs-value: 1.16rem;
+  --fw-value: 500;
+  --num-tracking: 0.01em;
+
+  /* paper, ink, and one bronze accent */
+  --bg: #faf7f0;
+  --panel: #fffdf8;
+  --pop-bg: #fffdf8;
+  --bar-bg: rgba(250, 247, 240, 0.88);
+  --note-bg: #f4efe4;
+  --chip: #efe9db;
+  --track: #e7dfcf;
+
+  --ink: #2b2620;
+  --ink-2: #4a4239;
+  --muted: #7a7064;
+  --muted-2: #9c9284;
+
+  --accent: #8a6f4e;
+  --accent-soft: #ece1cf;
+  --accent-soft-2: #cbb694;
+
+  --hairline: 1px solid #e4dccc;
+  --rule: 1px solid #d8cdb8;
+
+  --row-bg: transparent;
+  --row-bg-hover: #f4efe4;
+  --row-border: 0;
+  --row-border-hover: transparent;
+  --row-pad: 9px 4px;
+  --row-gap: 0;
+  --sec-gap: 44px;
+  --sec-head-gap: 14px;
+
+  --r-sm: 4px;
+  --r-md: 5px;
+  --r-lg: 6px;
+  --r-pill: 4px;
+
+  --shadow-1: none;
+  --shadow-2: 0 6px 20px rgba(43, 38, 32, 0.09);
+
+  --t-fast: 0.16s ease;
+  --t-pop: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+
+  --measure-page: 1120px;
+  --pad-x: 28px;
+  --bar-h: 60px;
+
+  --bridge-bg: transparent;
+  --bridge-border: 1px dashed #d8cdb8;
+}
+
+/* rules between rows, the way a printed table does it */
+.sec-body .prop + .prop {
+  border-block-start: 1px solid #eee7d9;
+}
+
+.hero-facts {
+  background: transparent;
+  border: 0;
+  border-inline-start: 1px solid #d8cdb8;
+  border-radius: 0;
+  padding-block: 2px;
+}
+
+.hero h1 {
+  font-weight: 600;
+}
+
+.hero-code {
+  font-family: var(--font-display);
+  font-style: italic;
+  letter-spacing: 0.1em;
+  font-size: 0.95rem;
+}
+
+.sec-head {
+  border-block-end: 2px solid var(--ink);
+}
+
+.mark {
+  border-radius: 3px;
+}
+
+.surface.is-on {
+  border-radius: 3px;
+}

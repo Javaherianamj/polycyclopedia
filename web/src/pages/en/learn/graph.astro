@@ -1,0 +1,16 @@
+---
+// L3 — «شبکه» / GRAPH, English route. See fa/learn/graph.astro for the note
+// on why this is a separate route from /learn (SCALE) and /learn/map
+// (MAP) — identical here, just the locale. Same three-line pairing every
+// other locale-paired route in this app uses (fa/learn/map.astro <->
+// en/learn/map.astro is the precedent).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LearnGraph from '../../../components/learn/LearnGraph.astro';
+import { t } from '../../../i18n/t';
+
+const locale = 'en' as const;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'learn.graph.pageTitle')} surface="lab">
+  <LearnGraph locale={locale} />
+</BaseLayout>

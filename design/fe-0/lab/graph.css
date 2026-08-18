@@ -1,0 +1,549 @@
+/* L3 — «شبکه» / GRAPH
+ *
+ * Structure IS the argument here, not decoration on top of one: a causal graph
+ * of branching → crystallinity → density/Tm/modulus/tensile → outcome, with
+ * three structural causes you can drag. Node shape carries meaning (rect =
+ * cause you can move, circle = measured/derived quantity, hexagon = terminal
+ * outcome) and colour stays inside the jobs lab.css already assigned:
+ *   clay --act    = a cause you can push on
+ *   sage --ok     = the underlying property IS sourced in the datasheet
+ *   dashed grey   = the underlying property has no citation yet
+ * "Suited" outcomes get a solid ink fill, not green — green here already means
+ * "provenance satisfied" and reusing it for "this pathway works out" would
+ * blur that meaning (see report).
+ */
+
+.wrap {
+  max-inline-size: var(--measure);
+}
+
+.gr-hero {
+  padding-block: 40px 8px;
+}
+
+.gr-hero .eyebrow {
+  font-size: 0.95rem;
+}
+
+.gr-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.5rem);
+  margin: 8px 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.gr-hero p {
+  max-inline-size: 62ch;
+  color: var(--ink-2);
+  font-size: 0.98rem;
+}
+
+.gr-hero .gr-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 14px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.gr-hint b {
+  color: var(--act);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ the diagram */
+
+.gr-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 22px;
+  align-items: start;
+  padding-block: 18px 10px;
+}
+
+@media (max-width: 900px) {
+  .gr-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.gr-figure {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 6px;
+  overflow: hidden;
+}
+
+.gr-figure svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  user-select: none;
+  touch-action: none;
+}
+
+/* legend strip above the svg */
+.gr-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 14px 4px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.gr-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gr-legend i {
+  display: inline-block;
+  inline-size: 11px;
+  block-size: 11px;
+  flex: none;
+}
+
+.gr-legend .sw-cause {
+  border-radius: 3px;
+  background: var(--act-bg);
+  border: 1.5px solid var(--act);
+}
+
+.gr-legend .sw-derived {
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+}
+
+.gr-legend .sw-outcome {
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--panel-2);
+  border: 1.5px solid var(--line-2);
+}
+
+/* ---------------------------------------------------------------- SVG node parts */
+
+.node-cause-track {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.node-cause-puck {
+  fill: var(--act-bg);
+  stroke: var(--act);
+  stroke-width: 2;
+  cursor: grab;
+  transition: filter var(--t);
+}
+
+.node-cause-puck:active {
+  cursor: grabbing;
+  filter: brightness(0.96);
+}
+
+.node-cause-puck.is-dragging {
+  filter: brightness(0.94);
+}
+
+.node-label {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  fill: var(--ink);
+  text-anchor: middle;
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+.node-sub {
+  font-family: var(--font-body);
+  font-size: 10px;
+  fill: var(--muted);
+  text-anchor: middle;
+}
+
+.node-val {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  text-anchor: middle;
+  direction: ltr;
+}
+
+.node-illustrative {
+  font-family: var(--font-body);
+  font-size: 8.6px;
+  fill: var(--muted-2);
+  text-anchor: middle;
+  font-style: italic;
+}
+
+.node-derived-circle {
+  fill: var(--panel-2);
+  stroke: var(--line-2);
+  stroke-width: 1.6;
+}
+
+.node-outcome-hex {
+  fill: var(--panel-2);
+  stroke: var(--line-2);
+  stroke-width: 1.6;
+  transition:
+    fill var(--t),
+    stroke var(--t);
+}
+
+.node-outcome-hex.is-suited {
+  fill: var(--ink);
+  stroke: var(--ink);
+}
+
+.node.is-suited .node-label,
+.node.is-suited .node-sub {
+  fill: var(--on-phase, #fff);
+}
+
+.mark-badge {
+  font-family: var(--font-num);
+  font-size: 8.5px;
+}
+
+.mark-badge.st-sourced circle {
+  fill: none;
+  stroke: var(--ok);
+}
+
+.mark-badge.st-sourced text {
+  fill: var(--ok);
+}
+
+.mark-badge.st-unsourced circle,
+.mark-badge.st-nodata circle {
+  fill: none;
+  stroke: var(--muted-2);
+  stroke-dasharray: 2 1.6;
+}
+
+.mark-badge.st-unsourced text,
+.mark-badge.st-nodata text {
+  fill: var(--muted-2);
+}
+
+/* edges */
+.gr-arrow-fill {
+  fill: var(--line-2);
+}
+
+.edge-path {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 1.6;
+}
+
+.edge-path.sign-neg {
+  stroke-dasharray: 5 3;
+}
+
+.edge-sign {
+  font-family: var(--font-num);
+  font-size: 12px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.edge-sign.sign-pos {
+  fill: var(--ok);
+}
+
+.edge-sign.sign-neg {
+  fill: var(--act);
+}
+
+.edge-pulse {
+  fill: var(--act);
+  opacity: 0;
+}
+
+/* -------------------------------------------------------------- reading panel */
+
+.gr-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 16px;
+  position: sticky;
+  inset-block-start: 76px;
+}
+
+.gr-panel h2 {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.gr-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: 6px 8px;
+  padding-block: 8px;
+  border-block-start: 1px solid var(--line);
+}
+
+.gr-row:first-of-type {
+  border-block-start: 0;
+}
+
+.gr-row-name {
+  font-size: 0.86rem;
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.gr-row-name .sym {
+  font-family: var(--font-num);
+  font-size: 0.72rem;
+  color: var(--muted);
+  direction: ltr;
+}
+
+.gr-row-val {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  font-weight: 600;
+  direction: ltr;
+  white-space: nowrap;
+}
+
+.gr-row-val small {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-inline-start: 3px;
+}
+
+.gr-row-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 15px;
+  block-size: 15px;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-family: var(--font-num);
+  margin-inline-start: 6px;
+  border: 1px solid var(--line-2);
+}
+
+.gr-row-mark.st-sourced {
+  color: var(--ok);
+  border-color: var(--ok-line);
+}
+
+.gr-row-mark.st-unsourced {
+  color: var(--muted-2);
+  border-style: dashed;
+}
+
+.gr-row-mark.st-nodata {
+  color: var(--muted-2);
+  border-style: dashed;
+}
+
+.gr-row-tag {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  color: var(--muted-2);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* the ⓘ affordance, per house convention */
+.gr-info {
+  position: relative;
+  inline-size: 15px;
+  block-size: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  font-size: 0.62rem;
+  color: var(--muted);
+  font-style: normal;
+  flex: none;
+}
+
+.gr-info:hover,
+.gr-info:focus-visible {
+  color: var(--act);
+  border-color: var(--act);
+}
+
+.gr-info .pop {
+  position: absolute;
+  inset-block-end: calc(100% + 8px);
+  inset-inline-start: 50%;
+  transform: translate(-50%, 4px);
+  inline-size: min(220px, calc(100vw - 32px));
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  font-style: normal;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: 0 14px 30px -12px rgba(10, 14, 26, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--t),
+    transform var(--t),
+    visibility var(--t);
+  z-index: 30;
+}
+
+.gr-info:hover .pop,
+.gr-info:focus-visible .pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.gr-panel-note {
+  margin-block-start: 12px;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--line);
+  font-size: 0.74rem;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------- outcomes strip */
+
+.gr-outcomes {
+  padding-block: 16px 40px;
+}
+
+.gr-outcomes h2 {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.gr-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .gr-outcome-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.oc-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  background: var(--panel);
+  transition:
+    border-color var(--t),
+    background-color var(--t);
+}
+
+.oc-card.is-suited {
+  border-color: var(--ink-2);
+  background: var(--panel-2);
+}
+
+.oc-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-block-end: 6px;
+}
+
+.oc-flag {
+  font-size: 0.7rem;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px dashed var(--line-2);
+  color: var(--muted-2);
+}
+
+.oc-card.is-suited .oc-flag {
+  border-style: solid;
+  border-color: var(--ink-2);
+  color: var(--ink);
+}
+
+.oc-card p {
+  font-size: 0.84rem;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* -------------------------------------------------------------- closing note */
+
+.gr-closing {
+  border-block-start: 1px solid var(--line);
+  padding-block: 22px 44px;
+}
+
+.gr-closing p {
+  max-inline-size: 68ch;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.9;
+}
+
+/* Same correction as base.css — the row, not the 15px trigger, is what the
+   popover is positioned against. Unconditional rather than inside a media
+   query: the panel is a fixed 300px column that sits against the page edge at
+   every width, so there is no width at which anchoring to the trigger is safe,
+   and spanning the row reads better on desktop anyway. */
+.gr-row-tag {
+  position: relative;
+}
+
+.gr-info {
+  position: static;
+}
+
+.gr-info .pop {
+  inset-inline: 0;
+  inline-size: auto;
+  transform: translateY(4px);
+}
+
+.gr-info:hover .pop,
+.gr-info:focus-visible .pop {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-cause-puck,
+  .oc-card,
+  .node-outcome-hex {
+    transition: none !important;
+  }
+}

@@ -191,6 +191,46 @@ def test_rerun_updates_in_place_without_duplicating(db_conn):
         assert cur.fetchone()[0] == "Test Material Renamed"
 
 
+def test_update_with_blank_optional_column_does_not_erase_existing_value(db_conn):
+    """The realistic destructive case: a curator adds an English overview to a
+    material that already has a hand-written Persian one, filling in only the
+    columns they care about. Every other optional column in that row is blank,
+    and a blank must mean "leave alone" -- overview_fa exists nowhere else, so
+    an unconditional UPDATE would destroy it silently.
+    """
+    valid_fields = load_fields(db_conn)
+    existing_families = load_families(db_conn)
+    existing_materials = load_materials_by_slug(db_conn)
+
+    created = make_material_row(
+        overview_fa="متن فارسی اصلی",
+        overview_en="",
+        code="ZZ",
+        chain_type="linear_pure",
+    )
+    plan1 = validate_row(2, created, valid_fields, existing_families, existing_materials)
+    execute_plan(db_conn, [plan1], valid_fields, existing_families, existing_materials)
+
+    existing_materials_2 = load_materials_by_slug(db_conn)
+    # Second pass fills in ONLY overview_en, exactly as the G6 English-content
+    # rows in curation/new_materials.csv do.
+    english_only = make_material_row(overview_en="Original English text")
+    plan2 = validate_row(3, english_only, valid_fields, existing_families, existing_materials_2)
+    execute_plan(db_conn, [plan2], valid_fields, existing_families, existing_materials_2)
+
+    with db_conn.cursor() as cur:
+        cur.execute(
+            "SELECT overview_fa, overview_en, code, chain_type FROM material WHERE slug = %s;",
+            (TEST_SLUG,),
+        )
+        overview_fa, overview_en, code, chain_type = cur.fetchone()
+
+    assert overview_fa == "متن فارسی اصلی", "blank overview_fa must not erase the Persian prose"
+    assert overview_en == "Original English text"
+    assert code == "ZZ", "blank code must not erase the existing code"
+    assert chain_type == "linear_pure"
+
+
 # ---------------------------------------------------------------------------
 # --template
 # ---------------------------------------------------------------------------

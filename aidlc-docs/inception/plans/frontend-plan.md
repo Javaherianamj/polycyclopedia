@@ -1,4 +1,4 @@
-# Frontend Rebuild — plan, rules, and delivery order
+python tools/curation/export_gaps.py --material ldpe --preset polyolefins# Frontend Rebuild — plan, rules, and delivery order
 
 **Created**: 2026-08-03
 **Inputs**: `inception/requirements/frontend-questions.md` and
@@ -62,7 +62,7 @@ examples.**
 | #   | Decision                                                                                                                       | From |
 | --- | ------------------------------------------------------------------------------------------------------------------------------ | ---- |
 | D16 | **Polypedia is its own brand.** The association's logo appears as a credit/sponsor mark, not as the site's identity            | Q17  |
-| D17 | **IRANSansX** for Persian, **Estedad** as the fallback if licensing does not clear (see §3 licence flag)                       | Q18  |
+| D17 | **Estedad** for Persian (SIL OFL). Owner accepted 2026-08-03 rather than resolve the IRANSansX commercial licence              | Q18  |
 | D18 | **Latin numerals everywhere**, including prose. `105 - 115`, never `۱۰۵ - ۱۱۵`                                                 | Q19  |
 | D19 | Light and dark both ship. **Light is the default**                                                                             | Q20  |
 | D20 | Premium means **craft** — B. Restraint (A) for the Datasheet surface, richness (C) for Learn, craft as the connective tissue   | Q21  |
@@ -236,8 +236,8 @@ starting API-1 so the work is not wasted.
 
 ## 5. Frontend unit map
 
-Replaces U3 / U7 / U8 / U9 in `project-plan.md`, which were defined before the
-rebuild decision and assumed an in-place refactor.
+Replaces U3 / U7 / U8 / U9 in `project-plan.md` — see §1 for why the in-place
+refactor was withdrawn.
 
 ```
   FE-0  visual identity ................. co-designed with owner; gate for everything visual
@@ -294,17 +294,23 @@ Google-Fonts-oriented and its RTL entries skew Hebrew.
 _Why first:_ every screen after this either uses the system or gets rebuilt when
 it arrives. And co-designing needs calendar time the later units do not.
 
-### FE-1 — App shell
+### FE-1 — App shell `CLOSED (2026-08-05)`
 
 Astro project, `/fa/` and `/en/` routing, i18n from the first string, design
 tokens from FE-0, API/data client, and the four states (R4) as shared
 components. No product screens.
 
+Delivered in `web/` — plan: `construction/plans/fe-1-code-generation-plan.md`,
+gate: `construction/fe-1/build-and-test.md`. Fonts self-hosted (Estedad
+Variable + Newsreader, SIL OFL) rather than the CDN references FE-0's
+prototypes use — an owner decision made mid-plan, not the original default.
+FE-2 onward build product screens against this shell.
+
 _Why here:_ cheapest to get right, most expensive to retrofit. i18n retrofit
 touches every file; route retrofit touches every link; loading-state retrofit
 touches every screen.
 
-### FE-2 — The value atom
+### FE-2 — The value atom `CLOSED (2026-08-05)`
 
 One component: value, unit, provenance state, citation popover (metadata only,
 D5), plus the ⓘ property explanation beside it. Desktop hover, mobile sheet.
@@ -314,7 +320,16 @@ _Why before any screen:_ it appears in the datasheet, in search results, in
 compare, in the sources table, and inside several simulators. Building it first
 means every screen inherits R1 for free instead of being audited for it later.
 
-### FE-3 — Datasheet surface
+Delivered in `web/src/components/value-atom/` — plan:
+`construction/plans/fe-2-code-generation-plan.md`, gate:
+`construction/fe-2/build-and-test.md`. Included a small in-scope fix to the
+API (`materials.ts`'s citation query didn't join through to `source`, so R11's
+work/edition requirement was previously unsatisfiable). Popovers use the
+native Popover API + CSS anchor positioning, per FE-0's gate-record
+recommendation, not hand-managed positioning. FE-3 onward consume this
+directly rather than rendering values themselves.
+
+### FE-3 — Datasheet surface `CLOSED (2026-08-05)`
 
 **This resolves Q24, which you left open.** The structure, and why:
 
@@ -350,10 +365,31 @@ and the catalog has two materials.
 _Why it is the first real screen:_ the most data types collide here, so it
 stress-tests the design system while the design system is still cheap to change.
 
-### FE-4 — Homepage and catalog
+Delivered in `web/src/pages/{fa,en}/m/[slug].astro` and
+`web/src/components/datasheet/` — plan:
+`construction/plans/fe-3-code-generation-plan.md`, gate:
+`construction/fe-3/build-and-test.md`. Producers/trade names/applications
+descoped on approval (0 real rows); processing techniques kept. Proved the
+"stress-tests the design system" claim true: found and fixed a real defect
+in FE-2's shared `ValueAtom` (long text-type values broke `white-space:
+nowrap`) and a grid-container overflow bug one level deeper than FE-0's
+`.rail` fix — neither was visible until real content at this unit's scale
+exercised them.
+
+### FE-4 — Homepage and catalog `CLOSED (2026-08-05)`
 
 Browsing and search as equals (D6). The homepage carries the "beauty wow" of the
 Q16 brief; the catalog carries family grouping, material cards and text search.
+
+Delivered in `web/src/pages/{fa,en}/{index,catalog}.astro` and
+`web/src/components/catalog/` — plan:
+`construction/plans/fe-4-code-generation-plan.md`, gate:
+`construction/fe-4/build-and-test.md`. Catalog search is client-side
+filtering over the real 7-material catalog, not FE-5's property search.
+**Recorded honestly, not closed as "done" in the full sense of D12/Q16**:
+FE-0's co-design process never covered a homepage, so this is a strong first
+pass on the existing tokens, worth an owner design review before treating the
+"beauty wow moment" as delivered the way the datasheet's design was.
 
 ### FE-5 — Property-first search
 
@@ -384,6 +420,39 @@ libraries confined here (R24). Quiz needs G4; processing-window and LCA need G5.
 _Why last of the feature units:_ largest, most self-contained, least coupled, and
 the one whose contents you want to revisit anyway (D14).
 
+#### FE-8 must include a quiz interface (added 2026-08-05, owner instruction)
+
+G4 is **delivered** — `quiz_question` exists in the database as of migration
+0012 — so the quiz is no longer blocked, and building somewhere for it to live
+on the Learn surface is now an FE-8 deliverable rather than a "if we get to
+it". The owner's instruction was explicit: the Learn environment needs a quiz
+interface. Placement within Learn is the frontend's call; its existence is not.
+
+What the table gives you, so the component can be designed against it rather
+than against `DynamicQuiz.tsx`'s old prop shape:
+
+| Column                     | Notes for the UI                                                                       |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `prompt_fa` / `prompt_en`  | `prompt_fa` is NOT NULL; `prompt_en` may be absent, so the English build needs a fallback |
+| `options_fa` / `options_en`| JSON arrays. When `options_en` exists the schema guarantees it is the **same length**    |
+| `correct_index`            | Zero-based, constrained to be in range — one index addresses both languages             |
+| `feedback_fa` / `feedback_en` | Shown after answering; both optional                                                 |
+| `difficulty`               | `intro` / `applied` / `advanced` — lets Learn build a graded run rather than one flat list |
+| `sort_order`               | Author-controlled ordering within a difficulty                                          |
+| `status`                   | `material_status`; render `published` only                                              |
+
+Two consequences worth designing around now rather than discovering later:
+
+1. **Quiz content is authored, not cited.** Unlike every other value on the
+   site, a quiz question carries no citation chain by design (see migration
+   0012's header). Do **not** render a provenance marker on it — the marker
+   means "this is traceable to a source", and putting one on invented content
+   would be a lie in the one place the whole site's credibility rests.
+2. **A material may have zero questions.** All four newly-added polymers do
+   today. The quiz island must render nothing at all in that case, per R7 —
+   not an empty shell, and not the "no data yet, add a source" call to action,
+   which is for missing *measurements*, not missing *teaching material*.
+
 ### FE-9 — Hardening, then launch
 
 Accessibility pass, performance budgets asserted in CI (R31), full RTL/LTR
@@ -410,21 +479,40 @@ failure, not a review comment (R24).
 
 ## 7. Dependencies outside the frontend
 
-All in `db/DATA-GAPS.md` except API-1.
+All in `db/DATA-GAPS.md` except API-1. **Updated 2026-08-05: every database
+dependency below is now delivered.** Only API-1 remains.
 
-| Dep       | What                                        | Blocks | Size                                    |
-| --------- | ------------------------------------------- | ------ | --------------------------------------- |
-| **G0**    | Migrate PP, PVC, PET, PS                    | FE-3   | ~1 day of your judgement on 7 values    |
-| **G3**    | Populate `applies_to_fields`                | FE-3   | half a day, needs domain judgement      |
-| **G1**    | `material_organization` join table          | FE-3   | 1 day                                   |
-| **G2**    | `trade_name` table                          | FE-3   | half a day                              |
-| **G6**    | English overviews (tooling already exists)  | FE-3   | content                                 |
-| **G4**    | `quiz_question` table                       | FE-8   | 1 day                                   |
-| **G5**    | 3 property definitions for simulator inputs | FE-8   | 1 day                                   |
-| **API-1** | Search backend **or** static index builder  | FE-5   | 3–5 days, or ~1 day for the index route |
+| Dep       | What                                        | Blocks | Status                                              |
+| --------- | ------------------------------------------- | ------ | --------------------------------------------------- |
+| **G0**    | Migrate PP, PVC, PET, PS                    | FE-3   | ✅ Done — 7 materials seeded, values await curation |
+| **G3**    | Property scoping                            | FE-3   | ✅ Done — `applies_to_families` added and seeded    |
+| **G1**    | `material_organization` join table          | FE-3   | ✅ Done — migration 0011                            |
+| **G2**    | `trade_name` table                          | FE-3   | ✅ Done — migration 0011, joined to G1              |
+| **G6**    | English overviews                           | FE-3   | ✅ Done — all 7 materials have `overview_en`        |
+| **G4**    | `quiz_question` table                       | FE-8   | ✅ Done — migration 0012; see the FE-8 note above   |
+| **G5**    | Property definitions for simulator inputs   | FE-8   | ✅ Done — seed 0007, plus `material_process` fork   |
+| **G7**    | Section-level narrative prose               | FE-3   | ✅ Done — `material_section_note`, migration 0012   |
+| **API-1** | Search backend **or** static index builder  | FE-5   | ⬜ Outstanding — 3–5 days, or ~1 day for the index route |
 
-**G0 is the one to act on first.** Everything else degrades a section; G0
-degrades the catalog from six materials to two.
+Three of these landed in a shape the frontend plan did not previously assume,
+and FE-3/FE-8 should be read with them in mind:
+
+- **G3 is two levels, not one.** `applies_to_fields` (coarse) is ANDed with the
+  new `applies_to_families` (fine). The fine level is what lets a PVC page stop
+  demanding a melting point. `GET /api/properties` now returns both arrays per
+  property, so the empty-state logic can tell "unsourced" from "inapplicable"
+  without hardcoding polymer science in the frontend.
+- **G5 grew a table.** Processing data is no longer flat on the material: a
+  material (or a grade) has many `material_process` rows, one per technique,
+  and the melt/mould/pressure numbers hang off *those*. The
+  ProcessingWindowSimulator should therefore be driven by a chosen technique,
+  not by a polymer id alone.
+- **G7 produced a citable table**, not folded-in prose as this plan originally
+  guessed. `material_section_note` carries `group_key`, so section notes render
+  inside their datasheet section, and they **do** get a provenance marker —
+  unlike quiz content.
+
+**API-1 is now the only thing to act on.**
 
 ---
 
@@ -440,12 +528,247 @@ degrades the catalog from six materials to two.
 
 ---
 
-## 9. Approval gate
+## 9. Approval gate — CLEARED 2026-08-03
 
-Construction begins with **FE-0**. Before it starts, three things need you:
+All three items answered by the owner:
 
-1. **The IRANSansX licence** (§3). Proceeding on Estedad unless you say
-   otherwise — this does not block FE-0 starting.
-2. **Confirmation of the Q3 and Q21 interpretations** (§2).
-3. **G0** scheduled. Not a blocker for FE-0 or FE-1, but it must land before FE-3
-   is reviewed, and only you can do it.
+1. **Font** — Estedad accepted (D17). The IRANSansX licence question is closed,
+   not deferred.
+2. **Interpretations** — Q3 (nothing hidden) and Q21 (craft is the house style)
+   both confirmed.
+3. **G0** — deferred by decision. The rebuild ships with LDPE and HDPE; the other
+   four materials join through normal curation. Catalog and search must therefore
+   be designed to look right with a small catalog (`db/DATA-GAPS.md` G0).
+
+**Construction started at FE-0.**
+
+---
+
+## 10. FE-0 outcome — the house style
+
+**Reviewed 2026-08-03.** Four treatments built and compared; the owner chose a
+merge rather than one of them.
+
+| #   | Decision                                                                                                                                                                                                                                                               | Source      |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| D35 | The house style is **E "Press"**: Studio's structure and row cards, Handbook's entry (serif code, title, and the fact rail as a rule rather than a card), a warmer paper ground between Handbook and Terra, and Atlas's dark plate for the Learn door                  | FE-0 review |
+| D36 | **Colour is semantic.** Five hues, five jobs: graphite = structure, teal = measurement, sage = provenance satisfied, grey = provenance absent, clay = something you can do. Ochre is reserved for warnings and is therefore absent from a healthy page                 | FE-0 review |
+| D37 | **Learn inverts the system.** Paper becomes instrument-dark; the same status palette carries the same meanings; a separate sequential `--ramp-*` scale encodes temperature and never borrows the status palette. The contrast between the two surfaces is the identity | FE-0 review |
+| D38 | One numeral voice — **Newsreader** — across both surfaces, carrying Handbook's charm into the data column instead of stopping at the masthead                                                                                                                          | FE-0 review |
+
+### New rules
+
+| #       | Rule                                                                                                                                                              |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R33** | A hue that carries a meaning may not be used decoratively anywhere else. Adding a colour to a screen requires naming its job first (D36)                          |
+| **R34** | Status colour and data-encoding colour are separate palettes with a documented boundary. Encoding colour appears only where a colour stands in for a number (D37) |
+
+### Deliverables
+
+`design/fe-0/` — `e.html` (datasheet), `learn.html` (Learn surface),
+`a`–`d.html` (the four source directions, kept for reference), `index.html`
+(comparison). One `data.js`, one `render.js`, one `base.css` skeleton, one theme
+file per direction: the same registry-driven structure FE-1 inherits (R2).
+
+The Learn page doubles as evidence for R7 — two of its eight tools are locked
+and say why, which is `db/DATA-GAPS.md` G4 and G5 made visible rather than faked.
+
+### Both modes, both surfaces — added 2026-08-03
+
+| #   | Decision                                                                                                                                                                                                                                                                       | Source |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| D39 | **The surface axis is warm vs cool, not light vs dark.** Datasheet is warm in both modes (cream paper → ember brown); Learn is cool in both (slate green → instrument ink). So the surface is always legible, and light/dark stays a comfort setting instead of doing two jobs | owner  |
+| D40 | Datasheet dark is **ember brown `#241d17`**, not black. The Learn door goes _darker_ than the page rather than lighter, so it still reads as a door                                                                                                                            | owner  |
+| D41 | Learn light is **slate green `#e9f0ee`**, deliberately neither white nor warm                                                                                                                                                                                                  | owner  |
+| D42 | One shared theme preference across both surfaces; each surface renders its own interpretation of it. Light is the default (D19)                                                                                                                                                | design |
+| D43 | `--ramp-melt` overlapping the reserved warning ochre is **accepted**: they never appear on the same screen                                                                                                                                                                     | owner  |
+
+| #       | Rule                                                                                                                                                                                |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R35** | No `transition: all`. Transitions name their properties, and a theme switch suppresses them entirely — switching a setting is not an animation (found as a real defect during FE-0) |
+
+### The four lab concepts — verdict, 2026-08-03
+
+The owner's response assigned each concept a different job rather than picking
+one: _"loved the scale one, graph is extraordinary, map is perfect for later"_,
+plus fixes to notebook.
+
+| #   | Decision                                                                                                                        | Source |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| D50 | **Scale is the Learn surface's organising structure.** You arrive at the zoom; each tool sits at the length scale it belongs to | owner  |
+| D51 | **Graph is a first-class tool inside Learn**, not navigation — D45 already closed the navigation question                       | owner  |
+| D52 | **Map is deferred.** It is a per-material view and wants more than two materials to be worth its space                          | owner  |
+| D53 | **Notebook is C3's template**, not C2's — the shape educational content arrives in                                              | owner  |
+
+### Remaining before FE-0 closes
+
+- [x] Datasheet dark mode — ember (D40)
+- [x] Learn light mode — slate blue (D41), dark base `#3E436F` (owner)
+- [x] Lab concept verdict (D50–D53)
+- [x] Full type scale, Persian and Latin, with the Newsreader/Estedad pairing verified at every step — `tokens/type.css`, `type.html`
+- [x] Motion spec for Learn (R19), respecting `prefers-reduced-motion` — `tokens/motion.css`, `motion.html`
+- [x] Contrast audit of all four palettes against WCAG AA — `construction/fe-0/contrast-audit.md`, 6 pairs corrected
+- [x] Tokens exported in the form FE-1 will consume — **integration, not delegated**; `design/fe-0/tokens/`, frozen, README states the import contract
+- [x] Gate: contrast AA · no `transition: all` · no overflow at 320/375/768 · both themes — `construction/fe-0/build-and-test.md`. PASS after six layout defects found and fixed
+
+Spec for the four: `construction/fe-0/closeout-spec.md`. Gate record:
+`construction/fe-0/build-and-test.md`.
+
+**FE-0 is closed.** FE-1 may begin.
+
+---
+
+## 11. The three cores and the material tree — 2026-08-03
+
+Owner correction. Full model in `inception/requirements/three-cores-and-the-tree.md`;
+`deep-taxonomy-impact.md` §3–§5 is superseded and marked as such.
+
+| #   | Decision                                                                                                                                                                                                            | Source |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| D44 | **Three cores**: C1 datasheet (database + search, the spine), C2 learning environment (interactive, heavy, walled off), C3 educational content (blogs, concept pages, article reviews — later)                      | owner  |
+| D45 | **"Obsidian" meant wiki cross-linking, not a graph view.** concepts ⇄ learning ⇄ datasheet, all directions. Links must be data so backlinks work. No graph navigation                                               | owner  |
+| D46 | **No value inheritance.** A child page carries only what differs and never repeats the parent; the breadcrumb is how the reader reaches general values. FE-2's value atom is unchanged and unblocked                | owner  |
+| D47 | **Processing moves to the end of the datasheet** and is the branch junction: the cards down to LDPE/HDPE, then to film/tube/melt grades, sit there — because processing is where the material stops being one thing | owner  |
+| D48 | **Leaf pages are small**: their own processing window, the tools that apply there, the concepts connected at that point. Not a datasheet clone                                                                      | owner  |
+| D49 | `docs/polypedia_architecture_deep_v2.md` is **not authoritative** — generated elsewhere with poor context. Mined for content vocabulary, not implemented as a schema                                                | owner  |
+
+| #       | Rule                                                                                                                                                           |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R36** | A child material page never restates a parent's property. If a value is not specific to this node, it is not on this page — link up instead (D46, D48)         |
+| **R37** | Every cross-link between a datasheet, a tool and a concept is stored as data, never written as an inline anchor, so backlinks resolve in both directions (D45) |
+
+### Consequences
+
+- **FE-2 is unblocked.** No inherited/specific state on the value atom.
+- `material.parent_id` is still wanted, for breadcrumb and child cards only — a
+  navigation link, not a resolution mechanism.
+- **`property_group.sort_order` for `processing` is 10 today — it is first.**
+  It must become last (70, after `academic`). One seed `UPDATE`, and it changes
+  the shape of every datasheet.
+- A `topic`/`concept` entity and a `link` table with backlinks are both still
+  required — they are what C3 and the net rest on.
+- L3 GRAPH is no longer a navigation candidate; it remains one of the four
+  learning-surface concepts under consideration.
+
+---
+
+## 12. Hybrid build and the wordmark — 2026-08-04
+
+Owner decisions taken during the U11 deployment inception. Full requirements in
+`inception/requirements/deployment-requirements.md`; execution in
+`inception/plans/deployment-plan.md`.
+
+**§4's open question is now closed, and the answer is "both".** That section left
+"static index or live API" to be decided at FE-5 start and recommended the static
+index for v1. The owner's decision keeps it and adds the other half behind it:
+the site is built statically from the database, and a live API serves only
+continuously-changing polymer statistics, which are explicitly not a current
+goal. FE-5 therefore starts on the static index with no decision left to make.
+
+| #   | Decision                                                                                                                                                                                                                         | Source |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| D54 | **Hybrid build, split by volatility.** Build-time static for everything a reader reads — datasheets, values, citations, Learn, concepts, the search index. Live API for polymer statistics only. v1 ships 100% static            | owner  |
+| D55 | **The wordmark animates the domain.** `poly` and `pedia` crack apart, `cyclo` appears between them in an accent hue, then the halves drive back in and squeeze it out. Spec: `construction/fe-0/wordmark-animation-spec.md`      | owner  |
+| D56 | **Hosting is ArvanCloud**, domestic, on the free tier: object storage for the static site, CDN for TLS, caching and DNS. GitHub/Cloudflare remains an international mirror, not the main stream. This closes D27's deferred half | owner  |
+
+| #       | Rule                                                                                                                                                                                     |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R38** | Every API-backed value has a build-time fallback baked into the HTML it appears in. An island may replace a number; it may never be the only source of one (D54)                         |
+| **R39** | The build never requires the API to be reachable. It reads PostgreSQL directly, so a deploy cannot fail because a service is down (D54)                                                  |
+| **R40** | The public API stays read-only, unauthenticated and CORS-restricted to the site origin for as long as it serves statistics only. The first write endpoint makes U12 a prerequisite (D54) |
+
+### Consequences
+
+- **R23 survives intact.** Nothing requires a Node host at serve time; the API is
+  additive and optional, which is precisely why the hybrid is safe.
+- **R38 is the rule that will break first**, and it is cheap to enforce: render in
+  CI with the API stubbed out and fail the build if any element renders empty.
+- **FE-9 gains a deployment gate**, not just a hardening one — success criteria in
+  `deployment-requirements.md` §7.
+- **The wordmark is header chrome on every route**, so it inherits R24: CSS and SVG
+  only, no animation library, or it lands in every Datasheet bundle.
+- Two FE-0 decisions are now open and blocking the wordmark: the accent hue for
+  `cyclo` (it must not borrow one of D36's five semantic hues) and whether the
+  Persian lockup پلی|سیکلو|پدیا animates too.
+
+---
+
+## 13. Open item, 2026-08-12 — material overview prose needs its own inception
+
+Owner observation, reviewing the running site:
+
+> "the intro of each polymer is ugly aligned, very ai deriven and not well
+> worked on, it must be a steo for later work with inceotion and rules."
+
+Two distinct complaints, deliberately NOT fixed reactively:
+
+1. **Typography and alignment of the overview block** — a presentation defect
+   in the datasheet's intro region.
+2. **The prose itself reads as machine-written** — `material.overview_en` /
+   `overview_fa` were bulk-generated (G6, "English overviews", closed as done
+   in §8's gap table). Closing that gap produced *text*, not *editorial*.
+
+The second is the real problem and it is not a CSS fix. It touches questions
+this plan has never asked: who writes the overview, what an overview is FOR
+on a citation-first site, whether it carries provenance at all (it currently
+carries none, like quiz content), how long it should be, and whether the two
+languages are translations of each other or independently authored.
+
+**Therefore this becomes its own unit with a proper Requirements Analysis
+round**, not a defect ticket. It should not be picked up as part of FE-8 or
+FE-9. Prerequisite reading when it starts: D4, R7, and migration 0012's
+`material_section_note` (G7, section-level narrative prose), which already
+established that narrative content on this site is a separate concern from
+measured values.
+
+Status: **not started, awaiting inception.** Deliberately excluded from
+FE-8 and FE-9 scope.
+
+---
+
+## 14. Open unit, 2026-08-13 — manufacturers and trade names are NOT delivered
+
+Owner, reviewing the running site:
+
+> "looking at the legacy and my prototype, i don't see the manifacturers and
+> companies that make each material! in iran and world, which i am
+> disapointed since we said don't miss a single part from it."
+
+**The complaint is correct, and §8's gap table is misleading.** It records:
+
+| **G1** | `material_organization` join table | FE-3 | ✅ Done — migration 0011 |
+| **G2** | `trade_name` table                 | FE-3 | ✅ Done — migration 0011, joined to G1 |
+
+Both entries are true about the *schema* and false about the *feature*.
+Verified against the live database, 2026-08-13:
+
+| Thing | State |
+| ----- | ----- |
+| `organization` rows | **25** — 20 manufacturers, incl. 8 Iranian petrochemicals (Bandar Imam, Jam, Amirkabir, Tabriz, Shazand/Arak, Laleh, Ilam, Morvarid) and 12 international (SABIC, Dow, ExxonMobil, Borealis, LyondellBasell, INEOS, …) |
+| `material_organization` rows | **0** |
+| `trade_name` rows | **0** |
+| API exposure | **none** — no route selects `organization` or `trade_name` |
+| Frontend | **none** — no component renders a manufacturer |
+
+So the tables exist, the companies exist, and nothing connects or shows them.
+§5's FE-3 entry even anticipated this — *"Wants: G0, G1, G2, G3, G6 … or
+those sections ship empty"* — and they shipped empty without anyone noticing,
+because the gap table said Done.
+
+**Lesson worth keeping**: a gap table entry must record whether the READER
+can see the thing, not whether a migration ran. "Schema exists" is not
+"delivered".
+
+### What the unit needs
+
+1. **Data** — `material_organization` links (which producer makes which
+   polymer) and `trade_name` rows. This is curation, and it should be cited
+   like everything else: "X produces Y" is a factual claim. Iranian
+   producers are the differentiating half and are the reason this matters.
+2. **API** — expose producers and trade names per material.
+3. **UI** — a producers section on the datasheet, and plausibly a
+   company-browse surface (by country, by material).
+
+Status: **not started.** Not part of FE-8. Should be sequenced by the owner
+against the remaining Learn work; the data half is owner-side curation and
+is the long pole.

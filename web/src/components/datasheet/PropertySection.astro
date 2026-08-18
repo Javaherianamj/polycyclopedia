@@ -1,0 +1,47 @@
+---
+// One registry group rendered once, reused for all six datasheet groups
+// (processing through molecular) rather than six hand-written sections —
+// R2: sections come from the registry, not from JSX.
+import type { Locale } from '../../i18n/config';
+import type { MaterialSection } from '../../lib/pages/material-detail';
+import type { ProcessingTechnique } from '../../lib/api/types';
+import ValueAtom from '../value-atom/ValueAtom.astro';
+import LearnBridge from './LearnBridge.astro';
+import ProcessingTechniqueList from './ProcessingTechniqueList.astro';
+import { t } from '../../i18n/t';
+
+interface Props {
+  section: MaterialSection;
+  slug: string;
+  locale: Locale;
+  // Only meaningful when section.key === 'processing' — see
+  // ProcessingTechniqueList.astro for why this isn't its own rail section.
+  processingTechniques?: ProcessingTechnique[];
+}
+
+const { section, slug, locale, processingTechniques } = Astro.props;
+---
+
+<section class="sec" id={section.key} data-testid={`datasheet-section-${section.key}`}>
+  <header class="sec-head">
+    <h2>{locale === 'fa' ? section.nameFa : section.nameEn}</h2>
+    <span class="sec-en" dir="ltr">{section.nameEn}</span>
+  </header>
+  {
+    section.rows.length > 0 ? (
+      <div class="sec-body">
+        {section.rows.map((row) => (
+          <ValueAtom property={row.property} value={row.value} locale={locale} />
+        ))}
+      </div>
+    ) : (
+      <p class="sec-empty">{t(locale, 'datasheet.sectionEmpty')}</p>
+    )
+  }
+  {
+    processingTechniques && (
+      <ProcessingTechniqueList techniques={processingTechniques} locale={locale} />
+    )
+  }
+  <LearnBridge groupKey={section.key} slug={slug} locale={locale} />
+</section>

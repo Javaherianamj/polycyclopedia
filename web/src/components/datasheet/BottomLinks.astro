@@ -1,0 +1,37 @@
+---
+// D24/S6/S7: "similar to this, but…" and quick-compare at the bottom of
+// every material page. Neither is a built feature here -- S7's actual
+// acceptance criterion needs FE-5 (pre-filling search with this material's
+// values); S6 (N-way compare) is FE-6's unit entirely. This component is
+// only the two entry points the stories ask FE-3 for: links reachable from
+// the bottom of the page. Both routes 404 until those units land --
+// documented, not silent.
+//
+// FE-7 adds a third card: the per-material sources page
+// (m/[slug]/sources.astro). Same "leave the datasheet for a related,
+// single-purpose view" pattern as the two above, not a new one -- see that
+// page's own header comment for why it is a route rather than a datasheet
+// section. Unlike similar/compare this route is real today, not a 404
+// placeholder.
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/t';
+
+interface Props {
+  slug: string;
+  locale: Locale;
+}
+
+const { slug, locale } = Astro.props;
+---
+
+<div class="tail">
+  <a class="tail-card" href={`/${locale}/search?from=${slug}`} data-testid="datasheet-similar-link">
+    {t(locale, 'datasheet.similar')}
+  </a>
+  <a class="tail-card" href={`/${locale}/compare?add=${slug}`} data-testid="datasheet-compare-link">
+    {t(locale, 'datasheet.quickCompare')}
+  </a>
+  <a class="tail-card" href={`/${locale}/m/${slug}/sources`} data-testid="datasheet-sources-link">
+    {t(locale, 'sources.materialLinkLabel')}
+  </a>
+</div>

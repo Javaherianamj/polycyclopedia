@@ -1,0 +1,72 @@
+---
+// The object at each length scale, drawn rather than named. Ported from
+// design/fe-0/lab/scale.js's `objectIcon()` — same six glyphs, same
+// viewBox, same "stroke only, no fill" grammar.
+//
+// WHY A DRAWING AT ALL: the FE-0 spec's complaint about the rejected page
+// was that nothing in it was specific to polymers. A bond, a coil, a folded
+// lamella, a Maltese-cross spherulite, a dogbone tensile specimen and a
+// recycling loop are six objects a polymer scientist recognises instantly
+// and nobody else draws in that sequence. They carry the argument at a
+// glance; the prose underneath only confirms it.
+//
+// aria-hidden throughout: every icon restates the station's own heading, so
+// exposing it to a screen reader would just double every station name.
+import type { StationIconKind } from './scale-stations';
+
+interface Props {
+  kind: StationIconKind;
+}
+
+const { kind } = Astro.props;
+---
+
+<svg viewBox="0 0 110 100" class="station-icon" aria-hidden="true">
+  {
+    kind === 'bond' && (
+      <>
+        <circle cx="34" cy="50" r="9" />
+        <circle cx="76" cy="50" r="9" />
+        <line x1="43" y1="50" x2="67" y2="50" />
+      </>
+    )
+  }
+  {kind === 'chain' && <path d="M14 60 Q30 20 46 60 T78 60 T110 40" />}
+  {
+    kind === 'lamella' && (
+      <>
+        <path d="M10 30 L40 30 L40 70 L70 70 L70 30 L100 30" />
+        <path d="M10 46 L40 46 L40 86 L70 86 L70 46 L100 46" opacity="0.55" />
+      </>
+    )
+  }
+  {
+    kind === 'spherulite' && (
+      <>
+        <circle cx="55" cy="50" r="34" />
+        <circle cx="55" cy="50" r="21" opacity="0.6" />
+        <line x1="55" y1="16" x2="55" y2="84" />
+        <line x1="21" y1="50" x2="89" y2="50" />
+        <line x1="31" y1="26" x2="79" y2="74" />
+        <line x1="79" y1="26" x2="31" y2="74" />
+      </>
+    )
+  }
+  {
+    kind === 'specimen' && (
+      <>
+        <rect x="16" y="38" width="30" height="24" rx="2" />
+        <path d="M46 44 L64 44 L64 56 L46 56" />
+        <rect x="64" y="38" width="30" height="24" rx="2" />
+      </>
+    )
+  }
+  {
+    kind === 'cycle' && (
+      <>
+        <path d="M28 34 A26 26 0 1 1 26 66" />
+        <path d="M22 24 L28 34 L36 26" />
+      </>
+    )
+  }
+</svg>

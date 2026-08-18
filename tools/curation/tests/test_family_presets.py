@@ -98,7 +98,7 @@ def test_material():
                 material_id = row[0]
                 cur.execute(
                     """
-                    DELETE FROM evidence WHERE property_value_id IN (
+                    DELETE FROM evidence WHERE subject_type = 'property_value' AND subject_id IN (
                         SELECT id FROM property_value
                         WHERE subject_type = 'material' AND subject_id = %s
                     )
@@ -366,7 +366,7 @@ def test_preset_filtered_single_material_file_imports_via_existing_importer(
                 FROM property_value pv
                 JOIN property_definition pd ON pd.id = pv.property_id
                 JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
-                JOIN evidence e ON e.property_value_id = pv.id
+                JOIN evidence e ON e.subject_type = 'property_value' AND e.subject_id = pv.id
                 JOIN citation ct ON ct.id = e.citation_id
                 JOIN source_document sd ON sd.id = ct.source_document_id
                 JOIN source s ON s.id = sd.source_id

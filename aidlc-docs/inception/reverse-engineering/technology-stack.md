@@ -36,4 +36,4 @@
 ## Third-Party CDN Resources (not npm packages, loaded via `<link>` tags in `index.html`)
 
 - **Google Fonts** - Vazirmatn (Farsi UI typeface, weights 300-900) and JetBrains Mono (numeric/code typeface) via `fonts.googleapis.com` / `fonts.gstatic.com`.
-- **KaTeX** - `0.16.8` - **CSS only** (`cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css`); the KaTeX JavaScript rendering engine is not loaded anywhere and no component invokes it, so this CDN dependency is currently dead weight (styles with no corresponding rendered markup to target, beyond the pre-existing `.katex` class overrides in `src/index.css`).
+- **KaTeX** - `0.16.8` - **CSS only** (`cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css`); JS engine never loaded, currently dead weight — full detail in `architecture.md` Integration Points.

@@ -121,7 +121,7 @@ def test_material():
                 material_id = row[0]
                 cur.execute(
                     """
-                    DELETE FROM evidence WHERE property_value_id IN (
+                    DELETE FROM evidence WHERE subject_type = 'property_value' AND subject_id IN (
                         SELECT id FROM property_value
                         WHERE subject_type = 'material' AND subject_id = %s
                     )
@@ -248,9 +248,9 @@ def run_export(workdir: Path, *args: str) -> subprocess.CompletedProcess:
     )
 
 
-def count(conn, sql: str) -> int:
+def count(conn, sql: str, params: tuple = ()) -> int:
     with conn.cursor() as cur:
-        cur.execute(sql)
+        cur.execute(sql, params)
         return cur.fetchone()[0]
 
 
@@ -408,7 +408,7 @@ def test_import_builds_the_full_citation_chain(workdir, conn, clean_db, test_mat
             FROM property_value pv
             JOIN property_definition pd ON pd.id = pv.property_id
             JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
-            JOIN evidence e ON e.property_value_id = pv.id
+            JOIN evidence e ON e.subject_type = 'property_value' AND e.subject_id = pv.id
             JOIN citation ct ON ct.id = e.citation_id
             JOIN source_document sd ON sd.id = ct.source_document_id
             JOIN source s ON s.id = sd.source_id
@@ -449,11 +449,10 @@ def test_new_source_row_is_created_once_not_duplicated(workdir, conn, clean_db, 
     assert count(conn, f"SELECT count(*) FROM source WHERE title = '{TEST_SOURCE_TITLE}'") == 1
 
 
-def test_one_bad_row_rolls_back_the_whole_file(workdir, conn, clean_db, test_material):
-    """All-or-nothing. A half-applied import is worse than none, because the
-    curator cannot tell which half landed."""
+def test_one_bad_row_does_not_block_a_good_row_in_the_same_file(workdir, conn, clean_db, test_material):
+    """Rows are no longer all-or-nothing: a bad row is rejected and reported,
+    but a good row elsewhere in the file still lands."""
     before_citations = count(conn, "SELECT count(*) FROM citation")
-    before_unsourced = count(conn, "SELECT count(*) FROM v_unsourced_values")
 
     write_sources(workdir / "sources.csv")
     write_gaps(workdir / "gaps.csv", [
@@ -462,10 +461,11 @@ def test_one_bad_row_rolls_back_the_whole_file(workdir, conn, clean_db, test_mat
                 source_key=TEST_SOURCE_KEY),  # no locator -> rejected
     ])
     r = run_import(workdir)
-    assert r.returncode != 0
+    assert r.returncode != 0, "non-zero exit still signals that something was rejected"
+    assert "no citation locator given" in r.stdout
 
-    assert count(conn, "SELECT count(*) FROM citation") == before_citations
-    assert count(conn, "SELECT count(*) FROM v_unsourced_values") == before_unsourced
+    # The good density row still landed even though the tg row failed.
+    assert count(conn, "SELECT count(*) FROM citation") == before_citations + 1
 
 
 def test_persian_notes_round_trip(workdir, conn, clean_db, test_material):
@@ -504,3 +504,93 @@ def test_reciting_an_existing_value_supersedes_rather_than_overwrites(workdir, c
     assert r.returncode == 0, r.stdout + r.stderr
 
     assert count(conn, "SELECT count(*) FROM property_value WHERE superseded_by IS NOT NULL") >= 1
+
+
+# ---------------------------------------------------------------------------
+# Multi-citation: several sources for one value
+# ---------------------------------------------------------------------------
+
+
+def test_multiple_rows_for_one_property_combine_into_one_value_with_two_citations(workdir, conn, clean_db, test_material):
+    """8 sources for one density range should mean 1 live property_value
+    with N evidence rows, not N supersessions -- one row sets the value, the
+    rest are citation-only rows (blank value columns) that attach as extra
+    evidence instead."""
+    write_sources(workdir / "sources.csv")
+    write_gaps(workdir / "gaps.csv", [
+        gap_row(value_min="0.910", value_max="0.925", source_key=TEST_SOURCE_KEY, page="45"),
+        gap_row(source_key=TEST_SOURCE_KEY, page="90", role="corroborating"),
+    ])
+    r = run_import(workdir)
+    assert r.returncode == 0, r.stdout + r.stderr
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT pv.id FROM property_value pv
+            JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
+            JOIN property_definition pd ON pd.id = pv.property_id
+            WHERE m.slug = %s AND pd.key = 'density' AND pv.superseded_by IS NULL
+            """,
+            (TEST_MATERIAL_SLUG,),
+        )
+        live_rows = cur.fetchall()
+        assert len(live_rows) == 1, "the two citations must land on one property_value, not two"
+        pv_id = live_rows[0][0]
+
+        cur.execute("SELECT role FROM evidence WHERE subject_type = 'property_value' AND subject_id = %s;", (pv_id,))
+        roles = sorted(r[0] for r in cur.fetchall())
+    assert roles == ["corroborating", "primary"]
+
+
+def test_two_rows_setting_conflicting_values_for_same_property_are_both_rejected(workdir, conn, clean_db, test_material):
+    """A curator must settle on one number per (material, property); two
+    rows both trying to set a new value in the same file is ambiguous and
+    rejects the whole group rather than silently picking one."""
+    write_sources(workdir / "sources.csv")
+    write_gaps(workdir / "gaps.csv", [
+        gap_row(value_min="0.910", value_max="0.925", source_key=TEST_SOURCE_KEY, page="45"),
+        gap_row(value_min="0.915", value_max="0.930", source_key=TEST_SOURCE_KEY, page="46"),
+    ])
+    r = run_import(workdir)
+    assert r.returncode != 0
+    assert "all try to set a new value" in r.stdout
+    # Scoped to this test's own material: an unscoped count over the whole
+    # table would fail as soon as any real curated data carries a legitimate
+    # supersession, which says nothing about whether THIS file was rejected.
+    assert count(
+        conn,
+        """
+        SELECT count(*) FROM property_value pv
+        JOIN material m ON m.id = pv.subject_id AND pv.subject_type = 'material'
+        WHERE m.slug = %s AND pv.superseded_by IS NOT NULL
+        """,
+        (TEST_MATERIAL_SLUG,),
+    ) == 0
+
+
+# ---------------------------------------------------------------------------
+# CSV rewrite: imported rows removed, rejected rows annotated in place
+# ---------------------------------------------------------------------------
+
+
+def test_successful_row_is_removed_and_failed_row_is_annotated_in_the_csv(workdir, conn, clean_db, test_material):
+    gaps_path = workdir / "gaps.csv"
+    write_sources(workdir / "sources.csv")
+    write_gaps(gaps_path, [
+        gap_row(value_min="0.910", value_max="0.925", source_key=TEST_SOURCE_KEY, page="45"),
+        gap_row(property_key="tg", unit="°C", value_typical="-110",
+                source_key=TEST_SOURCE_KEY),  # no locator -> rejected
+    ])
+    r = run_import(workdir)
+    assert r.returncode != 0
+
+    with gaps_path.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+
+    density_rows = [row for row in rows if row["property_key"] == "density"]
+    assert density_rows == [], "the successfully-imported row must be removed from the file"
+
+    tg_rows = [row for row in rows if row["property_key"] == "tg"]
+    assert len(tg_rows) == 1
+    assert "no citation locator given" in tg_rows[0]["import_error"]

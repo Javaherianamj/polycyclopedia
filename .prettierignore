@@ -23,3 +23,8 @@ db/
 
 # Generated lockfiles
 package-lock.json
+
+# web/ is its own package (like api/) with its own devDependencies,
+# including prettier-plugin-astro for .astro files this root config doesn't
+# know how to parse. Format it via `npm run format --prefix web`, not root's.
+web/
