@@ -27,6 +27,8 @@ jobs:
       - run: npm ci
       - name: Build static site (fixture mode)
         run: PUBLIC_STATIC_FALLBACK=true npm run build
+      - name: Fix internal links for GitHub Pages repo prefix
+        run: python3 scripts/rewrite-links.py dist /polymer-encyclopedia
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
