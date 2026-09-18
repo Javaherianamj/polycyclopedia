@@ -1,0 +1,6 @@
+name = "polypedia"
+compatibility_date = "2025-04-01"
+
+[pages]
+build_output = "dist"
+build_command = "PUBLIC_STATIC_FALLBACK=true npm run build"
