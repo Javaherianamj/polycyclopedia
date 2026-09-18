@@ -6,7 +6,7 @@ import react from '@astrojs/react';
 // Base path for GitHub Pages project-site deployment: the repo name.
 // Override with PUBLIC_BASE_PATH env var when moving to a custom domain.
 // When base is empty (local dev), no prefix is added.
-const base = process.env.PUBLIC_BASE_PATH || '/polymer-encyclopedia';
+const base = process.env.PUBLIC_BASE_PATH || '/polycyclopedia';
 
 export default defineConfig({
   site: 'https://polycyclopedia.ir',
