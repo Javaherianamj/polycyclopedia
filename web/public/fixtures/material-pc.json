@@ -1,0 +1,33 @@
+{
+  "slug": "pc",
+  "nameFa": "پلی‌کربنات",
+  "nameEn": "Polycarbonate",
+  "code": null,
+  "status": "published",
+  "overviewFa": null,
+  "overviewEn": null,
+  "discoveryYear": null,
+  "chainType": null,
+  "field": {
+    "key": "thermoplastics",
+    "nameFa": "پلیمرهای مهندسی",
+    "nameEn": "Thermoplastics"
+  },
+  "family": {
+    "key": "polycarbonates",
+    "nameFa": "پلی‌کربنات‌ها",
+    "nameEn": "Polycarbonates"
+  },
+  "coverage": {
+    "totalValues": 0,
+    "citedValues": 0,
+    "coveragePct": 0.0
+  },
+  "identifiers": {},
+  "propertyGroups": [],
+  "chemicalResistance": [],
+  "marketShare": [],
+  "structure": null,
+  "processingTechniques": [],
+  "gradeClasses": []
+}

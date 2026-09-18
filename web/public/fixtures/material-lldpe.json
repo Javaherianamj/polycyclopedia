@@ -1,0 +1,86 @@
+{
+  "slug": "lldpe",
+  "nameFa": "پلی‌اتیلن خطی با چگالی پایین",
+  "nameEn": "Linear Low-Density Polyethylene",
+  "code": null,
+  "status": "published",
+  "overviewFa": null,
+  "overviewEn": null,
+  "discoveryYear": null,
+  "chainType": null,
+  "field": {
+    "key": "thermoplastics",
+    "nameFa": "پلیمرهای مهندسی",
+    "nameEn": "Thermoplastics"
+  },
+  "family": {
+    "key": "polyolefins",
+    "nameFa": "پلی‌اولفین‌ها",
+    "nameEn": "Polyolefins"
+  },
+  "coverage": {
+    "totalValues": 2,
+    "citedValues": 0,
+    "coveragePct": 100.0
+  },
+  "identifiers": {},
+  "propertyGroups": [
+    {
+      "key": "thermal",
+      "nameFa": "خواص حرارتی",
+      "nameEn": "Thermal",
+      "properties": [
+        {
+          "key": "tm",
+          "nameFa": "دمای ذوب",
+          "nameEn": "Melting Temperature",
+          "symbol": "Tm",
+          "dataType": "range",
+          "valueMin": 122,
+          "valueMax": 128,
+          "valueTypical": null,
+          "valueTextFa": null,
+          "valueTextEn": null,
+          "valueEnum": null,
+          "valueBool": null,
+          "qualifier": null,
+          "unit": "°C",
+          "display": "122 - 128 °C",
+          "status": "unsourced",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "key": "physical",
+      "nameFa": "خواص فیزیکی",
+      "nameEn": "Physical",
+      "properties": [
+        {
+          "key": "density",
+          "nameFa": "چگالی",
+          "nameEn": "Density",
+          "symbol": "ρ",
+          "dataType": "range",
+          "valueMin": 0.915,
+          "valueMax": 0.94,
+          "valueTypical": null,
+          "valueTextFa": null,
+          "valueTextEn": null,
+          "valueEnum": null,
+          "valueBool": null,
+          "qualifier": null,
+          "unit": "g/cm³",
+          "display": "0.915 - 0.94 g/cm³",
+          "status": "unsourced",
+          "citations": []
+        }
+      ]
+    }
+  ],
+  "chemicalResistance": [],
+  "marketShare": [],
+  "structure": null,
+  "processingTechniques": [],
+  "gradeClasses": []
+}

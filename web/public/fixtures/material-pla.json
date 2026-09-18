@@ -1,0 +1,33 @@
+{
+  "slug": "pla",
+  "nameFa": "پلی لاکتیک اسید",
+  "nameEn": "Polylactic Acid",
+  "code": null,
+  "status": "published",
+  "overviewFa": null,
+  "overviewEn": null,
+  "discoveryYear": null,
+  "chainType": null,
+  "field": {
+    "key": "thermoplastics",
+    "nameFa": "پلیمرهای مهندسی",
+    "nameEn": "Thermoplastics"
+  },
+  "family": {
+    "key": "polylactides",
+    "nameFa": "پلی‌لاکتیدها",
+    "nameEn": "Polylactides"
+  },
+  "coverage": {
+    "totalValues": 0,
+    "citedValues": 0,
+    "coveragePct": 0.0
+  },
+  "identifiers": {},
+  "propertyGroups": [],
+  "chemicalResistance": [],
+  "marketShare": [],
+  "structure": null,
+  "processingTechniques": [],
+  "gradeClasses": []
+}

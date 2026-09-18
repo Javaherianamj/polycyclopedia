@@ -19,6 +19,13 @@ function baseUrl(): string {
   return import.meta.env.PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 }
 
+/** Whether this build should use static fixture files instead of the live API.
+ * Set `PUBLIC_STATIC_FALLBACK=true` in the environment to enable this — useful
+ * in CI or when the API/database is not reachable. */
+function useFixtures(): boolean {
+  return import.meta.env.PUBLIC_STATIC_FALLBACK === 'true';
+}
+
 function buildQuery(params: Record<string, string | number | undefined>): string {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -26,6 +33,27 @@ function buildQuery(params: Record<string, string | number | undefined>): string
   }
   const qs = search.toString();
   return qs ? `?${qs}` : '';
+}
+
+function readFixture<T>(filename: string): T | null {
+  if (typeof process === 'undefined' || !process.versions?.node) {
+    // Not running in Node.js — fixtures are build-time only.
+    return null;
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require('node:fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const path = require('node:path');
+    // Resolve relative to the working directory (the web/ dir during Astro build)
+    const fixturePath = path.resolve(
+      process.cwd(), 'public', 'fixtures', filename,
+    );
+    const raw = fs.readFileSync(fixturePath, 'utf-8');
+    return JSON.parse(raw) as T;
+  } catch (err) {
+    return null;
+  }
 }
 
 async function request<T>(path: string): Promise<ApiResult<T>> {
@@ -59,6 +87,35 @@ async function request<T>(path: string): Promise<ApiResult<T>> {
   return { ok: true, data };
 }
 
+/**
+ * Helper: try the live API first; fall back to a static fixture when the
+ * API is unreachable and `PUBLIC_STATIC_FALLBACK=true` is set. Used at
+ * build time to generate static pages without a running API.
+ */
+async function requestWithFallback<T>(
+  path: string,
+  fixtureFile: string,
+): Promise<ApiResult<T>> {
+  // When STATIC_FALLBACK is explicitly on, skip the network call entirely.
+  if (useFixtures()) {
+    const data = readFixture<T>(fixtureFile);
+    if (data) return { ok: true, data };
+    return { ok: false, error: { code: 'FIXTURE_MISSING', message: `Fixture not found: ${fixtureFile}` } };
+  }
+
+  // Try the live API first.
+  const result = await request<T>(path);
+  if (result.ok) return result;
+
+  // On network error, fall back to the fixture.
+  if (!result.ok && result.error.code === 'NETWORK_ERROR') {
+    const data = readFixture<T>(fixtureFile);
+    if (data) return { ok: true, data };
+  }
+
+  return result;
+}
+
 // R2/R3: this client is a typed passthrough. No property list, section
 // order, or display formatting is decided here — it all comes from the API.
 
@@ -73,19 +130,31 @@ export function getMaterials(
     limit: params.limit,
     offset: params.offset,
   });
-  return request<MaterialsListResponse>(`/api/materials${query}`);
+  return requestWithFallback<MaterialsListResponse>(
+    `/api/materials${query}`,
+    'materials-list.json',
+  );
 }
 
 export function getMaterial(slug: string): Promise<ApiResult<MaterialDetail>> {
-  return request<MaterialDetail>(`/api/materials/${encodeURIComponent(slug)}`);
+  return requestWithFallback<MaterialDetail>(
+    `/api/materials/${encodeURIComponent(slug)}`,
+    `material-${slug}.json`,
+  );
 }
 
 export function getProperties(): Promise<ApiResult<PropertiesResponse>> {
-  return request<PropertiesResponse>('/api/properties');
+  return requestWithFallback<PropertiesResponse>(
+    '/api/properties',
+    'properties.json',
+  );
 }
 
 export function getCoverage(): Promise<ApiResult<CoverageResponse>> {
-  return request<CoverageResponse>('/api/coverage');
+  return requestWithFallback<CoverageResponse>(
+    '/api/coverage',
+    'coverage.json',
+  );
 }
 
 export function getHealth(): Promise<ApiResult<HealthResponse>> {

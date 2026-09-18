@@ -510,3 +510,70 @@
 **Context**: CONSTRUCTION, release readiness. Agents delegated per the owner's explicit request. Remaining holes are data (10 of 17 materials empty; LDPE/HDPE citation coverage inverted) and deployment, not code.
 
 ---
+## INCEPTION — new unit `hspip-lab` (from-scratch HSPiP 3D solubility tool) — Requirements Analysis
+
+**Timestamp**: 2026-08-19T00:00:00Z
+**User Input**: "using aidlc,i want you to build the hspip from scratch. the curent model is aweful and leave it, add this as singular madule in learining page later. i have hansen data for 1000 solvent! also i belive we have more that 100 polymer data with RED and so on. go and take a look on hspip. build it from scratch and completely working . it must be beter than the original since we need the 3d movement and also units on the 3d fields axixes. like that we have a sphere around the polymer cord, and solvents get grades from 0 to 2 which 0 means they solve it well and 2 means they don't solve the polymer, and based on this they are colored on the 3d field(3 colors for solvent and one for polymer) i must be able to choose the polymer and then add the solvents. don't add the madule yet and run it seperately here for me so we play with it and test it. i gave you a image from it to(but the color shceme is not what i want  and the affinity is from an article (both are). also i wantall of the dots of materials to be a bit transparent so that if they colide, inside of them would be partialy visible. based on published articles and other features of this software sugegst me 10 more ideas to add or expand on this two and lets continue the insepction and ask me quatsion as needed" [two images attached: (1) Figure 7 Hansen solubility sphere of polymer sample A1 from HSPiP — green sphere, blue spheres = solvents inside, red cubes = solvents outside; (2) Table 4 Affinity Evaluation Scores for Polymer Sample A1 with Organic Coatings — solvents with `scores` 0/1/2 and `RED` columns]"
+**AI Response**: "Loaded AI-DLC common rules + welcome message + 3 extension opt-in prompts. Executed Workspace Detection (brownfield, existing AI-DLC project) and inline Reverse Engineering of the CURRENT Hansen tool: `web/src/islands/HansenSpaceIsland.tsx` + `web/src/lib/learn/hansen-space.ts` — a hand-rolled 360x320 SVG orthographic projection (painter's algorithm, no z-buffer) that only draws an Ro sphere for the 12 catalog materials linked to an `hsp_correlation` row, per its R7 'no invented radius' posture. Confirmed the data the owner referenced EXISTS and is complete: `curation/hsp-solvents.csv` = 1180 solvents (all with δD/δP/δH; 1166 with molar volume); `curation/hsp-polymers.csv` = 466 polymers, ALL 466 carrying full δD/δP/δH AND a real Ro (range 1.0–28.3) across 68 handbook families. Confirmed `three@0.185.1` + `@types/three` are already root dependencies (no new dep needed for real WebGL 3D). Identified a scoring-convention CONTRADICTION to resolve: owner says grade 0 = dissolves well, but the shared Table 4 uses 2 = best affinity (DMF score 2/RED 0.30; water score 0/RED 3.03). Entered Requirements Analysis for new standalone unit `hspip-lab`. Created clarifying-questions file and proposed 10 expansion ideas grounded in real HSPiP features + HSP literature. Nothing built yet — awaiting answers at the Step 6 gate."
+**Context**: INCEPTION / Requirements Analysis for new unit `hspip-lab`. Standalone playground first (owner: "run it separately here ... don't add the module yet"), Learn module later. No application code written; awaiting user answers to `aidlc-docs/inception/requirements/hspip-lab-questions.md`.
+
+---
+## Requirements Analysis — answers received, requirements.md generated, approval gate
+
+**Timestamp**: 2026-08-19T00:10:00Z
+**User Input**: "done, answers are there" — Q1:A (0=dissolves…2=does-not), Q2:C (auto-RED + manual override), Q3:A (green/amber/red + violet polymer), Q4:A (custom polymer allowed), Q5:B "but there must be a limit-be realistic" (multi-sphere, capped), Q6:Other "start with 5, water and 4 most reachable solvents, and let user edit it", Q7:A "(if its the same as db)", Q8:Other "1-6 are nice but put them as later stage of plan not from the beginig, 7-10 we discuss later", Q9:A, Q10:A, Q11:A.
+**AI Response**: "Verified Q7's caveat by reading the importers: `hsp-solvents.csv` is the exact source of DB `solvent`, `hsp-polymers.csv` the exact source of DB `hsp_correlation` — CSV == DB data, and gives all 466 polymers vs the 12 the old tool linked. Loaded the two opted-in extension rule files (security-baseline.md, property-based-testing.md). Detected and resolved two answer-interaction contradictions in `hspip-lab-requirements.md` §6: (1) Q2=C (auto-RED coloring engine = idea #1) vs Q8 'defer 1–6' → kept the coloring engine as CORE v1 (Q2 mandates it), applied 'defer' to ideas 2–6; (2) Q5=B multi-sphere vs Q8 deferring idea #9 → v1 displays up to 3 spheres with one active polymer, miscibility analytics deferred. Wrote `inception/requirements/hspip-lab-requirements.md` (intent analysis, FR-1…FR-13 core + FR-L1…FR-L5 later + parked, NFR-1…NFR-7, assumptions, extension compliance). Updated `aidlc-state.md` with the new unit block + confirmed extension config (Security Yes / Resiliency No / PBT Partial). No application code written yet. Presenting the Requirements Analysis completion gate."
+**Context**: INCEPTION / Requirements Analysis for `hspip-lab`. Extension compliance at this stage: Security — no blocking findings (most rules N/A for a static client tool; SECURITY-05/09/10/15 carried to Construction); PBT Partial — no blocking findings (PBT-02/03/07/08/09 carried to Construction). Next proposed stage: Workflow Planning (User Stories offered but proposed SKIP — single persona, clear requirements). Awaiting explicit approval.
+
+---
+## Requirements Analysis — APPROVED; entering Workflow Planning
+
+**Timestamp**: 2026-08-19T00:20:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Requirements approved as written (both contradiction resolutions in §6 accepted). Marked Requirements Analysis APPROVED and User Stories SKIPPED in aidlc-state.md. Proceeding to Workflow Planning for unit `hspip-lab`."
+**Context**: INCEPTION → Workflow Planning. No code yet. Next artifact: `aidlc-docs/inception/plans/hspip-lab-plan.md`.
+
+---
+## Workflow Planning — plan created, approval gate
+
+**Timestamp**: 2026-08-19T00:30:00Z
+**AI Prompt**: "Workflow plan created for `hspip-lab`. Ready to proceed with this plan?"
+**AI Response**: "Wrote `inception/plans/hspip-lab-plan.md`. Confirmed root = legacy 'react-example' app (React 19 + three.js + Vite already installed; NO vitest/fast-check). Decision: build standalone `hspip-lab/` at repo root, isolated from `web/` and legacy `src/`, reusing root three/react/vite (no new RUNTIME dep). EXECUTE: Application Design (min), Functional Design, NFR Requirements (min), NFR Design (min), Code Generation, Build & Test. SKIP: User Stories (done), Units Generation (single unit), Infrastructure Design (local Vite dev server only). Risk Low–Medium; two real technical risks noted (translucent-overlap depth handling; only render added solvents, not all 1180). MVP = Increment A (playable v1); ideas 2–6 = later cycles; 7–10 parked. Flagged the one dev-dependency addition — vitest + fast-check — required by the enabled PBT-Partial extension (PBT-09), to be confirmed at NFR Requirements. Presenting the Workflow Planning gate."
+**Status**: Awaiting approval
+**Context**: Workflow plan created with 6 stages to execute, 3 skipped. Next stage on approval: Application Design (minimal).
+
+---
+## Workflow Planning — APPROVED; entering Application Design (minimal)
+
+**Timestamp**: 2026-08-19T00:35:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Plan approved (PBT dev-dep decision accepted — vitest + fast-check to be added). Marked Workflow Planning complete in aidlc-state.md. Proceeding to Application Design at minimal depth for `hspip-lab`."
+**Context**: INCEPTION → Application Design (minimal). Next artifact: `aidlc-docs/inception/application-design/hspip-lab-design.md`.
+
+---
+## Application Design (minimal) — artifact created, approval gate
+
+**Timestamp**: 2026-08-19T00:45:00Z
+**AI Prompt**: "Application design complete for `hspip-lab`. Approve & continue to Functional Design?"
+**AI Response**: "Wrote consolidated `inception/application-design/hspip-lab-design.md` (minimal depth, per adaptive principle — one doc covering components C1–C18, methods, services/orchestration, dependency graph, testable properties, decisions). Core/shell split: framework-agnostic core/ (hsp-math, grading, seed, validation, types), data/ (build-data, load), scene/ (SceneController, markers = only three.js users), state/ (store = sole orchestrator), under a thin React ui/. No clarifying questions raised — all five design-question categories evaluated, no blocking ambiguity given approved requirements. Transparency approach fixed (opacity + depthWrite:false + back-to-front sort). Marked Application Design complete in aidlc-state.md. Awaiting approval."
+**Status**: Awaiting approval
+**Context**: INCEPTION / Application Design complete. Next stage on approval: Functional Design (CONSTRUCTION, per-unit). Units Generation remains SKIP (offered at gate).
+
+---
+## Application Design — APPROVED; entering Functional Design
+
+**Timestamp**: 2026-08-19T00:50:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Application design approved. Marked complete. Entering CONSTRUCTION → Functional Design for unit `hspip-lab`."
+**Context**: CONSTRUCTION → Functional Design. Next artifact: `aidlc-docs/construction/hspip-lab/functional-design/`.
+
+---
+## Functional Design — artifact created, approval gate
+
+**Timestamp**: 2026-08-19T01:00:00Z
+**AI Prompt**: "Functional design complete for `hspip-lab`. Approve & continue to NFR Requirements?"
+**AI Response**: "Verified `water` key exists (δ 15.5/16.0/42.3) and captured corpus coordinate ranges (incl. a few negative polymer components) to size the scene domain. Wrote consolidated `construction/hspip-lab/functional-design/hspip-lab-functional-design.md`: domain entities; algorithms (Ra 4×δD, RED, redToGrade with TOL=0.10, seed = water+4 nearest, fixed world mapping that structurally eliminates the old 'points move on add' bug); business rules BR-1…BR-12; frontend component contracts (props/state/actions); error handling (fail-safe, WebGL-absent, no stack traces); testable-property list for PBT. Flagged 3 decisions for confirmation (seed timing, active-switch keeps solvents, multi-polymer cap=3). Marked Functional Design complete in aidlc-state.md. Awaiting approval."
+**Status**: Awaiting approval
+**Context**: CONSTRUCTION / Functional Design complete. Next stage on approval: NFR Requirements (minimal).
+
+---

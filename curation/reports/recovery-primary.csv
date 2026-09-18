@@ -1,0 +1,2 @@
+﻿material_slug,property_key,property_name_en,property_name_fa,unit,plausible_min,plausible_max,current_value,grade_class,grade_class_name_fa,grade_class_name_en,value_min,value_max,value_typical,qualifier,source_key,page,table,figure,section,test_method,conditions,note_en,note_fa,confidence,skip,role,import_error
+pmma,monomer_name,,,,,,,,,,,,,,ali2015,1,,,1. Introduction,,,methyl methacrylate monomer,,0.95,,primary,"no existing value to cite, and this tool can't set a new one for a 'text' property from this CSV. Contact the developer."

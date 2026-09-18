@@ -5,7 +5,7 @@
 - **Project Name**: Polypedia
 - **Project Type**: Brownfield
 - **Start Date**: 2026-07-31T19:39:43Z
-- **Current Stage**: CONSTRUCTION — release readiness (2026-08-14). FE-0 … FE-8 all COMPLETE and gate-passed except FE-8 step 2, which is blocked on data. The stack runs end to end locally (Postgres + API + Astro, all suites green). The three owner-reported UI defects (Hansen 3D, search sliders, Learn structure) are FIXED. Remaining work is **data and deployment**, not new units. Nothing has been published (D10)
+- **Current Stage**: CONSTRUCTION — release readiness (2026-08-14). FE-0 … FE-8 all COMPLETE and gate-passed except FE-8 step 2, which is blocked on data. The stack runs end to end locally (Postgres + API + Astro, all suites green). The three owner-reported UI defects (Hansen 3D, search sliders, Learn structure) are FIXED. Remaining work is **data and deployment**, not new units. Nothing has been published (D10). **2026-08-19: new unit `hspip-lab` opened** — a from-scratch, WebGL (three.js) HSPiP-style 3D solubility-sphere tool over the full 466-polymer / 1180-solvent Hansen dataset; standalone playground first, Learn module later. Currently in **Requirements Analysis** (awaiting answers)
 - **Branch**: `feat/polypedia-database`
 
 ## Workspace State
@@ -653,6 +653,22 @@ path landed).
   - `tools/curation/import_values.py`, its test suite (3 files), and `api/src/routes/materials.ts`/`api.test.ts` updated for the new evidence shape and editorial scoping (FR-11)
 - [x] Build and Test — all three suites green: schema (`db/test.sh`, new GRADE CLASS / OBSERVATION-EDITORIAL / VARIANCE CLASS / EVIDENCE POLYMORPHISM / PUBLISH THRESHOLD sections), curation (111 pytest), API (18 vitest via `tsx --test`)
 - [x] Data injection (FR-12) — `tools/curation/scripts/import_pe_cited_data.py`, a one-off script (not the CSV pipeline, which doesn't yet model grade_class/observations) shaping `curation/cited data-by author-p1-PE.md` into the database: **69 property_value rows** (62 editorial, 7 observations linked under 5 pre-existing uncited editorial rows via `editorial_value_id` — LDPE/HDPE density and unit_cell already existed unsourced from the original 2026-07-31 seed, and this import cited them for the first time rather than overwriting them), **14 `grade_class` rows** across ldpe/hdpe/lldpe (film, injection, blow_molding, thermoforming, rotational_molding + gas-phase/solution variants), **9 citations** (Handbook of Industrial Polyethylene and Technology p577; Encyclopedia of Polymer Science and Technology vol2 pp392/397/448/477/518, vol tables 3/9/10/11), all attributed to contributor #1 (the owner) with role `author`. 8 source facts deliberately not imported — logged in `curation/new_properties.md` (missing property_definition: brittleness temp, ESCR, comonomer %, tensile impact, heat resistance temp, specific heat, heat of combustion, temp coefficient of expansion) and one genuine unit mismatch (izod_impact canonical J/m vs source's kJ/m², not force-converted)
+
+### INCEPTION — U-`hspip-lab` (from-scratch HSPiP 3D solubility tool) — 2026-08-19
+
+- [x] Workspace Detection — brownfield, existing AI-DLC project. New standalone unit opened.
+- [x] Reverse Engineering — inline (no new artifacts). Current tool = `web/src/islands/HansenSpaceIsland.tsx` + `web/src/lib/learn/hansen-space.ts`: hand-rolled 360×320 SVG projection, no z-buffer, sphere drawn only for 12 correlation-linked materials. New tool supersedes it with WebGL over all 466 handbook polymers (each has a real Ro).
+- [x] Requirements Analysis — complete (Standard→Comprehensive). `inception/requirements/hspip-lab-questions.md` (11 Qs answered) → `inception/requirements/hspip-lab-requirements.md`. **APPROVED 2026-08-19.**
+- [x] User Stories — SKIPPED (owner approved skip; single persona = owner/researcher, requirements concrete).
+- [x] Workflow Planning — complete. → `inception/plans/hspip-lab-plan.md`. Awaiting approval.
+- [x] Application Design — **COMPLETE (minimal)**: `inception/application-design/hspip-lab-design.md` (C1–C18 across core/data/scene/state/ui; framework-agnostic core/shell split). Awaiting approval.
+- [ ] Units Generation — **SKIP**: single cohesive unit.
+- [x] CONSTRUCTION — Functional Design **COMPLETE**: `construction/hspip-lab/functional-design/hspip-lab-functional-design.md` (entities, algorithms Ra/RED/grade/seed/world-mapping, BR-1…BR-12, frontend contracts, error handling, testable properties). Awaiting approval.
+- [ ] CONSTRUCTION remaining: NFR Requirements **EXECUTE (min)**, NFR Design **EXECUTE (min)**, Infrastructure Design **SKIP**, Code Generation **EXECUTE**, Build & Test **EXECUTE**. MVP = Increment A (playable v1); ideas 2–6 = later cycles; 7–10 parked. One dev-dep to add (vitest + fast-check, PBT-09).
+
+**Extension Configuration (unit `hspip-lab`, confirmed 2026-08-19):** Security = **Yes** (Q9-A; mostly N/A for a static client-side tool — applicable: SECURITY-05/09/10/15; SECURITY-04 when served as a page), Resiliency = **No** (Q10-A), PBT = **Partial** (Q11-A; rules PBT-02/03/07/08/09; framework fast-check + Vitest). No blocking findings at Requirements Analysis.
+
+**Scope decisions (from answers):** 0=dissolves…2=does-not (Q1-A); auto-RED grade + manual override (Q2-C); green/amber/red + violet polymer, translucent (Q3-A); custom polymer allowed (Q4-A); up to 3 polymer spheres, one active (Q5-B, capped); seed = water + 4 nearest solvents (Q6); bundled CSV→JSON = DB-identical data (Q7-A); three.js (Q8). Ideas 2–6 = later planned stages; ideas 7–10 = parked.
 
 ### OPERATIONS
 

@@ -1,0 +1,33 @@
+{
+  "slug": "ps",
+  "nameFa": "پلی‌استایرن",
+  "nameEn": "Polystyrene",
+  "code": null,
+  "status": "published",
+  "overviewFa": null,
+  "overviewEn": null,
+  "discoveryYear": null,
+  "chainType": null,
+  "field": {
+    "key": "thermoplastics",
+    "nameFa": "پلیمرهای مهندسی",
+    "nameEn": "Thermoplastics"
+  },
+  "family": {
+    "key": "styrenics",
+    "nameFa": "استایرنی‌ها",
+    "nameEn": "Styrenics"
+  },
+  "coverage": {
+    "totalValues": 0,
+    "citedValues": 0,
+    "coveragePct": 0.0
+  },
+  "identifiers": {},
+  "propertyGroups": [],
+  "chemicalResistance": [],
+  "marketShare": [],
+  "structure": null,
+  "processingTechniques": [],
+  "gradeClasses": []
+}

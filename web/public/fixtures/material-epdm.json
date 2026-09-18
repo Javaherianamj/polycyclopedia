@@ -1,0 +1,33 @@
+{
+  "slug": "epdm",
+  "nameFa": "لاستیک اتیلن پروپیلن دی‌ان",
+  "nameEn": "Ethylene Propylene Diene Monomer Rubber",
+  "code": null,
+  "status": "published",
+  "overviewFa": null,
+  "overviewEn": null,
+  "discoveryYear": null,
+  "chainType": null,
+  "field": {
+    "key": "thermosets",
+    "nameFa": "گرما سخت‌ها",
+    "nameEn": "Thermosets"
+  },
+  "family": {
+    "key": "synthetic-rubbers",
+    "nameFa": "لاستیک‌های سنتزی",
+    "nameEn": "Synthetic Rubbers"
+  },
+  "coverage": {
+    "totalValues": 0,
+    "citedValues": 0,
+    "coveragePct": 0.0
+  },
+  "identifiers": {},
+  "propertyGroups": [],
+  "chemicalResistance": [],
+  "marketShare": [],
+  "structure": null,
+  "processingTechniques": [],
+  "gradeClasses": []
+}

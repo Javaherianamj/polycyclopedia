@@ -12,12 +12,21 @@
  * comment: "Do not edit them here; edit the FE-0 source and re-copy").
  *
  * R34: two colour systems, never mixed. --ramp-* (glass/rubber/melt/burn)
- * encodes a NUMBER -- temperature/phase -- and appears ONLY in
- * StateSimulator. Everything else here (--ok, --muted, --act) is the status
- * palette, carrying the SAME meanings D36 gave it on the datasheet
+ * encodes a NUMBER; everything else here (--ok, --muted, --act) is the
+ * status palette, carrying the SAME meanings D36 gave it on the datasheet
  * (provenance satisfied / absent / actionable) -- e.g. the "uncited" note
  * uses --muted for exactly the reason R22 established: grey, worded as
  * in-progress, never amber or red.
+ *
+ * REVISED 2026-08-16: this note used to say --ramp-* "appears ONLY in
+ * StateSimulator". It now also colours the Hansen RED bands, and that is
+ * R34 being FOLLOWED rather than bent: RED (= Ra/Ro) is a continuous
+ * number, exactly the kind of quantity the ramp exists to encode, and it is
+ * emphatically not a provenance status. Putting it on --ok/--muted/--act
+ * would have been the actual violation -- it would have made a solvent that
+ * simply does not dissolve this polymer look like a DATA problem, which is
+ * what the status palette means everywhere else on the site. Provenance for
+ * those same dots stays in the status system, on the stroke dash.
  */
 
 :root[data-surface='lab'] {
@@ -793,40 +802,53 @@
   stroke-width: 0.5;
 }
 
-/* RED bands. FILL only -- stroke belongs to provenance below, and these
- * three classes must never touch it. Each band pairs its hue with a
- * different fill DENSITY so the three are still separable without colour
- * vision: solid disc / half-filled / open ring. */
+/* RED bands take BOTH fill and stroke COLOUR; provenance takes the stroke
+ * DASH PATTERN. Those are orthogonal properties, so two facts fit in one
+ * mark with no collision.
+ *
+ * The earlier split (RED = fill, provenance = stroke colour) looked cleaner
+ * but had a hole that only showed up on screen: the `poor` band's whole
+ * point is `fill: none`, so it had no fill left to carry its hue and
+ * inherited the cited-green stroke instead. Every non-solvent rendered as a
+ * GREEN ring -- the one band the reader most needs to spot, drawn in the
+ * colour of its opposite. Hue has to live on the channel that is actually
+ * painted for all three bands, and only the stroke qualifies.
+ *
+ * Colour is still never the sole carrier: fill DENSITY separates the bands
+ * for a red-green dichromat and in greyscale -- solid disc (good),
+ * half-filled (boundary), open ring (poor). */
 .hansen-red-good {
   fill: var(--ok);
   fill-opacity: 0.75;
+  stroke: var(--ok-line, var(--ok));
 }
 
 .hansen-red-boundary {
   fill: var(--ramp-melt);
   fill-opacity: 0.4;
+  stroke: var(--ramp-melt);
 }
 
 .hansen-red-poor {
-  /* An OPEN RING: no fill at all is the shape cue, so "outside the sphere"
-   * reads on a greyscale print or to a red-green dichromat. */
+  /* An OPEN RING in the burn hue: the shape cue survives greyscale, the
+   * colour cue does the work for everyone else. */
   fill: none;
   fill-opacity: 1;
+  stroke: var(--ramp-burn);
 }
 
-/* Provenance, moved from fill to stroke so RED can have the fill. Solid
- * outline = a recorded citation, dashed = not yet cited -- the same
- * cited/uncited distinction .mark-cited carries elsewhere, in the one
- * channel still free once RED took the fill. */
+/* Provenance: the stroke DASH only. These rules deliberately set no stroke
+ * colour -- that belongs to the RED band above, and a colour here would
+ * silently win by source order and reintroduce the green-ring bug. Solid
+ * outline = a recorded citation, dashed = not yet cited, the same
+ * cited/uncited distinction .mark-cited carries elsewhere. */
 .hansen-dot-prov-cited {
-  stroke: var(--ok-line, var(--ok));
   stroke-opacity: 0.95;
   stroke-width: 1.25;
   stroke-dasharray: none;
 }
 
 .hansen-dot-prov-uncited {
-  stroke: var(--muted-2);
   stroke-opacity: 0.95;
   stroke-width: 1.25;
   stroke-dasharray: 2 1.6;

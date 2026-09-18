@@ -1,0 +1,982 @@
+{
+  "data": [
+    {
+      "key": "processing",
+      "nameFa": "فرآیندپذیری",
+      "nameEn": "Processing",
+      "properties": [
+        {
+          "key": "mfi",
+          "nameFa": "شاخص جریان مذاب (MFI)",
+          "nameEn": "Melt Flow Index (MFI)",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "MFI",
+          "dataType": "range",
+          "unit": "g/10min",
+          "allowedUnits": [
+            "g/10min"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "mould_temp",
+          "nameFa": "دمای قالب",
+          "nameEn": "Mould Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "process_temp",
+          "nameFa": "دمای فرآیند",
+          "nameEn": "Processing Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        }
+      ]
+    },
+    {
+      "key": "thermal",
+      "nameFa": "خواص حرارتی",
+      "nameEn": "Thermal",
+      "properties": [
+        {
+          "key": "brittleness_temp",
+          "nameFa": "دمای ترد شدن",
+          "nameEn": "Brittleness Temperature (F50)",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "conductivity",
+          "nameFa": "ضریب هدایت حرارتی",
+          "nameEn": "Thermal Conductivity",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "k",
+          "dataType": "range",
+          "unit": "W/m·K",
+          "allowedUnits": [
+            "W/m·K"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "crystallinity",
+          "nameFa": "درصد بلورینگی",
+          "nameEn": "Crystallinity",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Xc",
+          "dataType": "range",
+          "unit": "%",
+          "allowedUnits": [
+            "%"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "cte",
+          "nameFa": "ضریب انبساط حرارتی (CTE)",
+          "nameEn": "Coefficient of Thermal Expansion",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "α",
+          "dataType": "range",
+          "unit": "µm/°C",
+          "allowedUnits": [
+            "µm/°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "degradation_temp",
+          "nameFa": "دمای تخریب حرارتی",
+          "nameEn": "Thermal Degradation Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Td",
+          "dataType": "range",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "enthalpy_100_cryst",
+          "nameFa": "آنتالپی ذوب ۱۰۰٪ بلوری",
+          "nameEn": "Heat of Fusion at 100% Crystallinity",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "ΔH°f",
+          "dataType": "numeric",
+          "unit": "J/g",
+          "allowedUnits": [
+            "J/g"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "enthalpy_exp",
+          "nameFa": "آنتالپی ذوب تجربی",
+          "nameEn": "Experimental Heat of Fusion",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "ΔHf",
+          "dataType": "range",
+          "unit": "J/g",
+          "allowedUnits": [
+            "J/g"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "hdt",
+          "nameFa": "دمای خمش تحت بار (HDT)",
+          "nameEn": "Heat Deflection Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "HDT",
+          "dataType": "range",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "tg",
+          "nameFa": "دمای انتقال شیشه‌ای",
+          "nameEn": "Glass Transition Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Tg",
+          "dataType": "numeric",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "tm",
+          "nameFa": "دمای ذوب",
+          "nameEn": "Melting Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Tm",
+          "dataType": "range",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "vicat",
+          "nameFa": "دمای نرمی ویکات",
+          "nameEn": "Vicat Softening Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "VST",
+          "dataType": "range",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        }
+      ]
+    },
+    {
+      "key": "mechanical",
+      "nameFa": "خواص مکانیکی",
+      "nameEn": "Mechanical",
+      "properties": [
+        {
+          "key": "elongation_at_break",
+          "nameFa": "ازدیاد طول تا پارگی",
+          "nameEn": "Elongation at Break",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "εb",
+          "dataType": "range",
+          "unit": "%",
+          "allowedUnits": [
+            "%"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "flexural_modulus",
+          "nameFa": "مدول خمشی",
+          "nameEn": "Flexural Modulus",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Ef",
+          "dataType": "range",
+          "unit": "GPa",
+          "allowedUnits": [
+            "GPa"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "hardness_brinell",
+          "nameFa": "سختی برینل",
+          "nameEn": "Brinell Hardness",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "MPa",
+          "allowedUnits": [
+            "MPa"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "hardness_shore_d",
+          "nameFa": "سختی شور D",
+          "nameEn": "Shore D Hardness",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "HD",
+          "dataType": "range",
+          "unit": "Shore D",
+          "allowedUnits": [
+            "Shore D"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "izod_impact",
+          "nameFa": "مقاومت ضربه آیزود",
+          "nameEn": "Izod Impact Strength",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "IS",
+          "dataType": "range",
+          "unit": "J/m",
+          "allowedUnits": [
+            "J/m"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "tensile_strength",
+          "nameFa": "استحکام کششی",
+          "nameEn": "Tensile Strength",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "σt",
+          "dataType": "range",
+          "unit": "MPa",
+          "allowedUnits": [
+            "MPa"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "young_modulus",
+          "nameFa": "مدول یانگ",
+          "nameEn": "Young's Modulus",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "E",
+          "dataType": "range",
+          "unit": "GPa",
+          "allowedUnits": [
+            "GPa"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        }
+      ]
+    },
+    {
+      "key": "physical",
+      "nameFa": "خواص فیزیکی",
+      "nameEn": "Physical",
+      "properties": [
+        {
+          "key": "co2_permeability",
+          "nameFa": "نفوذپذیری دی‌اکسید کربن",
+          "nameEn": "CO2 Permeability",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "CO2TR",
+          "dataType": "range",
+          "unit": "cm³·mm/(m²·day·atm)",
+          "allowedUnits": [
+            "cm³·mm/(m²·day·atm)"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "density",
+          "nameFa": "چگالی",
+          "nameEn": "Density",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "ρ",
+          "dataType": "range",
+          "unit": "g/cm³",
+          "allowedUnits": [
+            "g/cm³"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "oxygen_permeability",
+          "nameFa": "نفوذپذیری اکسیژن",
+          "nameEn": "Oxygen Permeability",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "OTR",
+          "dataType": "range",
+          "unit": "cm³·mm/(m²·day·atm)",
+          "allowedUnits": [
+            "cm³·mm/(m²·day·atm)"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "refractive_index",
+          "nameFa": "ضریب شکست",
+          "nameEn": "Refractive Index",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "n_D",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "water_absorption",
+          "nameFa": "جذب آب",
+          "nameEn": "Water Absorption",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "%",
+          "allowedUnits": [
+            "%"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        }
+      ]
+    },
+    {
+      "key": "electrical",
+      "nameFa": "خواص الکتریکی",
+      "nameEn": "Electrical",
+      "properties": [
+        {
+          "key": "dielectric_constant",
+          "nameFa": "ثابت دی‌الکتریک",
+          "nameEn": "Dielectric Constant",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "εr",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "dielectric_strength",
+          "nameFa": "استحکام دی‌الکتریک",
+          "nameEn": "Dielectric Strength",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "kV/mm",
+          "allowedUnits": [
+            "kV/mm"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "dissipation_factor",
+          "nameFa": "ضریب اتلاف",
+          "nameEn": "Dissipation Factor",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "tan δ",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "volume_resistivity",
+          "nameFa": "مقاومت ویژه حجمی",
+          "nameEn": "Volume Resistivity",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "ρv",
+          "dataType": "range",
+          "unit": "Ω·cm",
+          "allowedUnits": [
+            "Ω·cm"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        }
+      ]
+    },
+    {
+      "key": "academic",
+      "nameFa": "اطلاعات علمی و مولکولی",
+      "nameEn": "Academic",
+      "properties": [
+        {
+          "key": "comonomer_content",
+          "nameFa": "درصد کومونومر",
+          "nameEn": "Comonomer Content",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "wt%",
+          "allowedUnits": [
+            "wt%"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "dp_range",
+          "nameFa": "بازه درجه پلیمریزاسیون",
+          "nameEn": "Degree of Polymerization Range",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "DP",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "entanglement_mw",
+          "nameFa": "وزن مولکولی درهم‌تنیدگی",
+          "nameEn": "Entanglement Molecular Weight",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Me",
+          "dataType": "numeric",
+          "unit": "g/mol",
+          "allowedUnits": [
+            "g/mol"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "escr",
+          "nameFa": "مقاومت به ترک‌خوردگی تنشی محیطی",
+          "nameEn": "Environmental Stress-Crack Resistance (ESCR)",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "h",
+          "allowedUnits": [
+            "h"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "ffv",
+          "nameFa": "کسر حجم آزاد",
+          "nameEn": "Fractional Free Volume",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "FFV",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "flory_huggins_chi",
+          "nameFa": "پارامتر برهم‌کنش فلوری-هاگینز",
+          "nameEn": "Flory-Huggins Interaction Parameter",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "χ",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "hansen_d",
+          "nameFa": "پارامتر هانسن - پراکندگی",
+          "nameEn": "Hansen Parameter - Dispersion",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "δd",
+          "dataType": "range",
+          "unit": "MPa^0.5",
+          "allowedUnits": [
+            "MPa^0.5"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "hansen_h",
+          "nameFa": "پارامتر هانسن - پیوند هیدروژنی",
+          "nameEn": "Hansen Parameter - Hydrogen Bonding",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "δh",
+          "dataType": "range",
+          "unit": "MPa^0.5",
+          "allowedUnits": [
+            "MPa^0.5"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "hansen_p",
+          "nameFa": "پارامتر هانسن - قطبی",
+          "nameEn": "Hansen Parameter - Polar",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "δp",
+          "dataType": "range",
+          "unit": "MPa^0.5",
+          "allowedUnits": [
+            "MPa^0.5"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "heat_of_combustion",
+          "nameFa": "گرمای احتراق",
+          "nameEn": "Heat of Combustion",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "kJ/g",
+          "allowedUnits": [
+            "kJ/g"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "heat_resistance_temp",
+          "nameFa": "دمای مقاومت حرارتی",
+          "nameEn": "Heat Resistance Temperature",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "°C",
+          "allowedUnits": [
+            "°C"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "lamella_thickness",
+          "nameFa": "ضخامت لایه بلوری (لاملا)",
+          "nameEn": "Lamella Thickness",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Lc",
+          "dataType": "range",
+          "unit": "nm",
+          "allowedUnits": [
+            "nm"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "mn",
+          "nameFa": "وزن مولکولی عددی",
+          "nameEn": "Number-Average Molecular Weight",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Mn",
+          "dataType": "range",
+          "unit": "g/mol",
+          "allowedUnits": [
+            "g/mol"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "monomer_molar_mass",
+          "nameFa": "جرم مولی مونومر",
+          "nameEn": "Monomer Molar Mass",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "M0",
+          "dataType": "numeric",
+          "unit": "g/mol",
+          "allowedUnits": [
+            "g/mol"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "mw",
+          "nameFa": "وزن مولکولی وزنی",
+          "nameEn": "Weight-Average Molecular Weight",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Mw",
+          "dataType": "range",
+          "unit": "g/mol",
+          "allowedUnits": [
+            "g/mol"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "notched_impact_area_basis",
+          "nameFa": "مقاومت ضربه شیاردار (بر مبنای سطح مقطع)",
+          "nameEn": "Notched Impact Strength (Area Basis)",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "kJ/m²",
+          "allowedUnits": [
+            "kJ/m²"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "pdi",
+          "nameFa": "شاخص چندپخشی",
+          "nameEn": "Polydispersity Index",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "PDI",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "persistence_length",
+          "nameFa": "طول پایداری زنجیر",
+          "nameEn": "Persistence Length",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "lp",
+          "dataType": "range",
+          "unit": "nm",
+          "allowedUnits": [
+            "nm"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "power_law_index",
+          "nameFa": "شاخص قانون توان",
+          "nameEn": "Power-Law Index",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "n",
+          "dataType": "range",
+          "unit": "dimensionless",
+          "allowedUnits": [
+            "dimensionless"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "radius_of_gyration",
+          "nameFa": "شعاع ژیراسیون",
+          "nameEn": "Radius of Gyration",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "Rg",
+          "dataType": "range",
+          "unit": "nm",
+          "allowedUnits": [
+            "nm"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "solubility_parameter",
+          "nameFa": "پارامتر حلالیت",
+          "nameEn": "Solubility Parameter",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "δ",
+          "dataType": "range",
+          "unit": "MPa^0.5",
+          "allowedUnits": [
+            "MPa^0.5"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "specific_heat_capacity",
+          "nameFa": "گرمای ویژه",
+          "nameEn": "Specific Heat Capacity",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "kJ/(kg·K)",
+          "allowedUnits": [
+            "kJ/(kg·K)"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "spherulite_size",
+          "nameFa": "اندازه اسفرولیت",
+          "nameEn": "Spherulite Size",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "range",
+          "unit": "µm",
+          "allowedUnits": [
+            "µm"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "tensile_impact_strength",
+          "nameFa": "مقاومت ضربه کششی",
+          "nameEn": "Tensile Impact Strength",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": null,
+          "dataType": "numeric",
+          "unit": "kJ/m²",
+          "allowedUnits": [
+            "kJ/m²"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        },
+        {
+          "key": "zero_shear_viscosity",
+          "nameFa": "ویسکوزیته برشی صفر",
+          "nameEn": "Zero-Shear Viscosity",
+          "descriptionFa": null,
+          "descriptionEn": null,
+          "symbol": "η0",
+          "dataType": "range",
+          "unit": "Pa·s",
+          "allowedUnits": [
+            "Pa·s"
+          ],
+          "isSearchable": true,
+          "isComparable": true,
+          "appliesToFields": [],
+          "appliesToFamilies": []
+        }
+      ]
+    }
+  ],
+  "total": 55
+}

@@ -1,0 +1,140 @@
+{
+  "data": [
+    {
+      "slug": "abs",
+      "nameFa": "اکریلونیتریل بوتادین استایرن",
+      "nameEn": "Acrylonitrile Butadiene Styrene",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "epoxy",
+      "nameFa": "رزین اپوکسی",
+      "nameEn": "Epoxy Resin",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "epdm",
+      "nameFa": "لاستیک اتیلن پروپیلن دی‌ان",
+      "nameEn": "Ethylene Propylene Diene Monomer Rubber",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "hdpe",
+      "nameFa": "پلی‌اتیلن با چگالی بالا",
+      "nameEn": "High-Density Polyethylene",
+      "totalValues": 45,
+      "citedValues": 0,
+      "coveragePct": 5.45
+    },
+    {
+      "slug": "lldpe",
+      "nameFa": "پلی‌اتیلن خطی با چگالی پایین",
+      "nameEn": "Linear Low-Density Polyethylene",
+      "totalValues": 2,
+      "citedValues": 0,
+      "coveragePct": 100.0
+    },
+    {
+      "slug": "ldpe",
+      "nameFa": "پلی‌اتیلن با چگالی پایین",
+      "nameEn": "Low-Density Polyethylene",
+      "totalValues": 44,
+      "citedValues": 0,
+      "coveragePct": 7.41
+    },
+    {
+      "slug": "pmma",
+      "nameFa": "پلی متیل متاکریلات",
+      "nameEn": "Poly(methyl methacrylate)",
+      "totalValues": 22,
+      "citedValues": 0,
+      "coveragePct": 100.0
+    },
+    {
+      "slug": "pa6",
+      "nameFa": "پلی‌آمید ۶",
+      "nameEn": "Polyamide 6",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "pa66",
+      "nameFa": "پلی‌آمید ۶٬۶",
+      "nameEn": "Polyamide 6.6",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "pc",
+      "nameFa": "پلی‌کربنات",
+      "nameEn": "Polycarbonate",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "pet",
+      "nameFa": "پلی‌اتیلن ترفتالات",
+      "nameEn": "Polyethylene Terephthalate",
+      "totalValues": 11,
+      "citedValues": 0,
+      "coveragePct": 100.0
+    },
+    {
+      "slug": "pla",
+      "nameFa": "پلی لاکتیک اسید",
+      "nameEn": "Polylactic Acid",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "pom",
+      "nameFa": "پلی‌اکسی متیلن (استال)",
+      "nameEn": "Polyoxymethylene (Acetal)",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "pp",
+      "nameFa": "پلی‌پروپیلن",
+      "nameEn": "Polypropylene",
+      "totalValues": 23,
+      "citedValues": 0,
+      "coveragePct": 100.0
+    },
+    {
+      "slug": "ps",
+      "nameFa": "پلی‌استایرن",
+      "nameEn": "Polystyrene",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "ptfe",
+      "nameFa": "پلی‌تترافلوئورواتیلن",
+      "nameEn": "Polytetrafluoroethylene",
+      "totalValues": 0,
+      "citedValues": 0,
+      "coveragePct": 0.0
+    },
+    {
+      "slug": "pvc",
+      "nameFa": "پلی‌وینیل کلراید",
+      "nameEn": "Polyvinyl Chloride",
+      "totalValues": 15,
+      "citedValues": 0,
+      "coveragePct": 100.0
+    }
+  ]
+}
