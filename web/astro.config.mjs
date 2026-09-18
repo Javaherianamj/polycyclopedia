@@ -5,8 +5,9 @@ import react from '@astrojs/react';
 // Hosting (U11) stays undecided by design; static HTML runs anywhere.
 // Base path for GitHub Pages project-site deployment: the repo name.
 // Override with PUBLIC_BASE_PATH env var when moving to a custom domain.
-// When base is empty (local dev), no prefix is added.
-const base = process.env.PUBLIC_BASE_PATH || '/polycyclopedia';
+// When base is empty (local dev, custom domain), no prefix is added.
+// Set PUBLIC_BASE_PATH for GitHub Pages project-site deployment (e.g. /polycyclopedia).
+const base = process.env.PUBLIC_BASE_PATH || '';
 
 export default defineConfig({
   site: 'https://polycyclopedia.ir',
